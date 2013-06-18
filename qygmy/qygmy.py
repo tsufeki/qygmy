@@ -5,9 +5,9 @@ from PySide.QtGui import *
 from .formatter import Formatter
 from .server import Server
 from .browser import Browser
+from .dialogs import Details
 from .uiutils import RichTextDelegate
 from .ui.main import Ui_main
-from .ui.details import Ui_details
 
 
 class Qygmy(QMainWindow):
@@ -190,19 +190,6 @@ class Qygmy(QMainWindow):
                 if i.column() == 0]
         if len(ind) == 1:
             self.details.show_details(self.p.playlist.songs[ind[0]])
-
-
-class Details(QDialog):
-    def __init__(self, main, formatter):
-        super().__init__(main)
-        self.main = main
-        self.fmt = formatter
-        self.ui = Ui_details()
-        self.ui.setupUi(self)
-
-    def show_details(self, metadata):
-        self.ui.details_label.setText(self.fmt.details(metadata))
-        self.exec_()
 
 
 def main():
