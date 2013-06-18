@@ -41,6 +41,8 @@ class Qygmy(QMainWindow):
 
     def setup_icons(self):
         self.setWindowIcon(QIcon.fromTheme('applications-multimedia'))
+        self.ui.settings_icon = QIcon.fromTheme('configure')
+        self.ui.settings_icon_updating = QIcon.fromTheme('view-refresh')
         for action, icon in (
             ('previous', 'media-skip-backward'),
             ('play', 'media-playback-start'),
@@ -179,9 +181,9 @@ class Qygmy(QMainWindow):
     @Slot(bool)
     def on_updating_db_changed(self, updating):
         if updating:
-            self.ui.action_settings.setIcon(QIcon.fromTheme('view-refresh'))
+            self.ui.action_settings.setIcon(self.ui.settings_icon_updating)
         else:
-            self.ui.action_settings.setIcon(QIcon.fromTheme('configure'))
+            self.ui.action_settings.setIcon(self.ui.settings_icon)
 
     @Slot()
     def on_action_details_triggered(self):

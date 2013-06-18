@@ -39,16 +39,19 @@ class Browser(QMainWindow):
 
         self.p.state.changed.connect(self.on_state_changed)
 
-    def setup_database(self):
-        self.ui.db_delegate = RichTextDelegate()
-        self.ui.database.setModel(self.p.database)
-        self.ui.database.setItemDelegate(self.ui.db_delegate)
+    def setup_list(self, widget, model):
+        d = RichTextDelegate()
+        setattr(self.ui, widget.objectName() + '_delegate', d)
+        widget.setModel(model)
+        widget.setItemDelegate(d)
 
-        h = self.ui.database.header()
+        h = widget.header()
         h.setResizeMode(0, QHeaderView.Stretch)
         for i in range(1,h.count()):
             h.setResizeMode(i, QHeaderView.ResizeToContents)
 
+    def setup_database(self):
+        self.setup_list(self.ui.database, self.p.database)
         self.ui.tabs.setTabIcon(0, QIcon.fromTheme('folder-sound'))
         self.ui.action_db_root.setIcon(QIcon.fromTheme('folder-sound'))
         self.ui.db_root_crumb.setDefaultAction(self.ui.action_db_root)
@@ -58,15 +61,7 @@ class Browser(QMainWindow):
         self.p.database_cwd.changed.connect(self.update_db_crumbs)
 
     def setup_stored_playlists(self):
-        self.ui.pl_delegate = RichTextDelegate()
-        self.ui.playlists.setModel(self.p.stored_playlists)
-        self.ui.playlists.setItemDelegate(self.ui.pl_delegate)
-
-        h = self.ui.playlists.header()
-        h.setResizeMode(0, QHeaderView.Stretch)
-        for i in range(1,h.count()):
-            h.setResizeMode(i, QHeaderView.ResizeToContents)
-
+        self.setup_list(self.ui.playlists, self.p.stored_playlists)
         self.ui.tabs.setTabIcon(1, QIcon.fromTheme('document-multiple'))
         self.ui.action_pl_root.setIcon(QIcon.fromTheme('document-multiple'))
         self.ui.pl_root_crumb.setDefaultAction(self.ui.action_pl_root)
@@ -75,15 +70,7 @@ class Browser(QMainWindow):
         self.p.stored_playlists_cwd.changed.connect(self.update_pl_crumbs)
 
     def setup_search(self):
-        self.ui.se_delegate = RichTextDelegate()
-        self.ui.search_results.setModel(self.p.search_results)
-        self.ui.search_results.setItemDelegate(self.ui.se_delegate)
-
-        h = self.ui.search_results.header()
-        h.setResizeMode(0, QHeaderView.Stretch)
-        for i in range(1,h.count()):
-            h.setResizeMode(i, QHeaderView.ResizeToContents)
-
+        self.setup_list(self.ui.search_results, self.p.search_results)
         self.ui.tabs.setTabIcon(2, QIcon.fromTheme('edit-find'))
         self.ui.action_search.setIcon(QIcon.fromTheme('edit-find'))
         self.ui.search.setDefaultAction(self.ui.action_search)
