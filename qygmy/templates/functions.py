@@ -1,0 +1,91 @@
+
+import re
+
+
+def f_noop(*args): return ''
+
+
+# Conditionals
+
+def f_if(cond, yes, no): return yes if cond else no
+
+def f_if2(*args):
+    for a in args:
+        if a:
+            return a
+    return ''
+
+
+# String operations
+
+def f_lower(text): return text.lower()
+def f_upper(text): return text.upper()
+def f_left(text, num): return text[:int(num)]
+def f_right(text, num): return text[-int(num):]
+def f_num(num, length): return '{{:0{}d}}'.format(int(length)).format(int(num))
+def f_replace(text, search, replace): return text.replace(search, replace)
+def f_in(x, y): return '1' if x in y else ''
+def f_trim(text, chars=None): return text.strip(chars)
+def f_len(text): return str(len(text))
+
+def f_eq(x, y): return '1' if x == y else ''
+def f_ne(x, y): return '1' if x != y else ''
+
+
+# Regular expressions
+
+def f_rsearch(text, pattern):
+    m = re.search(pattern, text)
+    if m is None:
+        return ''
+    if m.lastindex is None:
+        return m.group(0)
+    return m.group(1)
+
+def f_rreplace(text, pattern, replace):
+    return re.sub(pattern, replace, text)
+
+
+# Integer arithmetic
+
+def f_add(*args): return str(sum(int(i) for i in args))
+def f_sub(x, y): return str(int(x) - int(y))
+def f_div(x, y): return str(int(x) // int(y))
+def f_mod(x, y): return str(int(x) % int(y))
+
+def f_mul(*args):
+    r = 1
+    for i in args:
+        r *= int(i)
+    return str(r)
+
+def f_lt(x, y): return '1' if int(x) < int(y) else ''
+def f_lte(x, y): return '1' if int(x) <= int(y) else ''
+def f_gt(x, y): return '1' if int(x) > int(y) else ''
+def f_gte(x, y): return '1' if int(x) >= int(y) else ''
+
+
+# Boolean
+
+def f_or(x, y): return str(x or y)
+def f_and(x, y): return str(x and y)
+def f_not(x): return '' if x else '1'
+
+
+# Context operations
+
+def c_get(ctx, name, default=''):
+    if name in ctx and ctx[name]:
+        return ctx[name]
+    else:
+        return default
+
+def c_set(ctx, name, value):
+    ctx[name] = value
+    return ''
+
+def c_unset(ctx, name):
+    if name in ctx:
+        del ctx[name]
+    return ''
+
