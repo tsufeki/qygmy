@@ -111,7 +111,6 @@ class Browser(QMainWindow):
         self.ui.what.setEnabled(c)
         self.ui.query.setEnabled(c)
 
-    @Slot(str)
     def update_db_crumbs(self, path):
         p = path.split('/')
         if p == ['']:
@@ -131,7 +130,6 @@ class Browser(QMainWindow):
         for i in range(len(p), len(self.ui.db_crumbs)):
             self.ui.db_crumbs[i].hide()
 
-    @Slot(str)
     def update_pl_crumbs(self, name):
         if name == '':
             self.ui.pl_crumb0.hide()

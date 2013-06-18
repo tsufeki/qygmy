@@ -26,7 +26,6 @@ class Qygmy(QMainWindow):
         self.timer.timeout.connect(self.p.update)
         self.timer.start(500)
 
-    @Slot()
     def connect_mpd(self):
         self.p.connect_mpd('localhost', 6600, 'ka'*4)
 
@@ -73,8 +72,9 @@ class Qygmy(QMainWindow):
         vm.addAction(self.ui.wa1)
         vm.addAction(self.ui.wa2)
         self.ui.volume_menu = vm
-        self.ui.playback_toolbar.widgetForAction(self.ui.action_volume).setMenu(vm)
-        self.ui.playback_toolbar.widgetForAction(self.ui.action_volume).setPopupMode(QToolButton.InstantPopup)
+        vb = self.ui.playback_toolbar.widgetForAction(self.ui.action_volume)
+        vb.setMenu(vm)
+        vb.setPopupMode(QToolButton.InstantPopup)
 
     def setup_playlist(self):
         self.ui.delegate = RichTextDelegate()

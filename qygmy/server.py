@@ -128,12 +128,11 @@ def mpd_cmdlist(f):
 
 
 def simple_mpd(name, *args):
-    @Slot()
     @mpd
-    def decor(self):
+    def f(self):
         getattr(self.conn, name)(*args)
-    decor.__name__ = name
-    return decor
+    f.__name__ = name
+    return f
 
 
 def not_callable(*args):
@@ -154,6 +153,7 @@ class Server(QObject):
     def __init__(self, formatter, object_name='player'):
         super().__init__()
         self.setObjectName(object_name)
+        self.conn = None
 
         State.create(self, 'state', 'disconnect', not_callable)
         State.create(self, 'volume', 50, 'setvol')
@@ -165,26 +165,29 @@ class Server(QObject):
         BoolState.create(self, 'single')
         BoolState.create(self, 'consume')
         BoolState.create(self, 'updating_db', False, not_callable)
-        TimeTupleState.create(self, 'times', (0, 1), self.seek)
 
-        self.conn = None
-        self.state.changed2.connect(self.state_change)
+        def seek(self, conn, time):
+            if self.state.value != 'stop':
+                conn.seek(self.current_pos.value, time)
+        TimeTupleState.create(self, 'times', (0, 1), seek)
+
+        self.state.changed2.connect(self._state_change)
 
         self.playlist = SonglistModel(formatter)
         self.current_pos.changed.connect(self.playlist.update_current_pos)
-        self.playlist_version.changed.connect(self.update_playlist)
+        self.playlist_version.changed.connect(self._update_playlist)
 
         PathState.create(self, 'database_cwd', '', not_callable)
         self.database = SonglistModel(formatter)
-        self.database_cwd.changed.connect(self.update_database)
+        self.database_cwd.changed.connect(self._update_database)
 
         State.create(self, 'stored_playlists_cwd', '', not_callable)
         self.stored_playlists = SonglistModel(formatter)
-        self.stored_playlists_cwd.changed.connect(self.update_stored_playlists)
+        self.stored_playlists_cwd.changed.connect(self._update_stored_playlists)
 
         State.create(self, 'search_query', (0, ''), not_callable)
         self.search_results = SonglistModel(formatter)
-        self.search_query.changed.connect(self.update_search)
+        self.search_query.changed.connect(self._update_search)
 
     def connect_mpd(self, host, port, password=None):
         if self.conn is not None:
@@ -195,7 +198,6 @@ class Server(QObject):
             self.conn.password(password)
         self.update()
 
-    @Slot()
     def disconnect_mpd(self):
         if self.conn is not None:
             try:
@@ -205,14 +207,12 @@ class Server(QObject):
                 self.conn = None
         self.update()
 
-    @Slot(str, str)
-    def state_change(self, new_state, old_state):
+    def _state_change(self, new_state, old_state):
         if new_state == 'disconnect' or old_state == 'disconnect':
             self.database_cwd.update(None, force=True)
             self.stored_playlists_cwd.update(None, force=True)
             self.search_query.update(None, force=True)
 
-    @Slot()
     def update(self):
         if self.conn:
             self.conn.command_list_ok_begin()
@@ -234,15 +234,13 @@ class Server(QObject):
         self.consume.update(s.get('consume'))
         self.updating_db.update('updating_db' in s)
 
-    @Slot(int)
-    def update_playlist(self, new_version):
+    def _update_playlist(self, new_version):
         if new_version != -1:
             self.playlist.update_list(mpd_wrapper(self, self.conn.playlistinfo))
         else:
             self.playlist.update_list([])
 
-    @Slot(str)
-    def update_database(self, path):
+    def _update_database(self, path):
         if self.state.value == 'disconnect':
             self.database.update_list([])
         else:
@@ -251,8 +249,7 @@ class Server(QObject):
             ls.sort(key=lambda x: (x.get('file', ''), x.get('directory', '')))
             self.database.update_list(ls)
 
-    @Slot(str)
-    def update_stored_playlists(self, name):
+    def _update_stored_playlists(self, name):
         if self.state.value == 'disconnect':
             self.stored_playlists.update_list([])
         elif name == '':
@@ -264,18 +261,13 @@ class Server(QObject):
             ls.sort(key=lambda x: x.get('file', ''))
             self.stored_playlists.update_list(ls)
 
-    @Slot(tuple)
-    def update_search(self, query):
+    def _update_search(self, query):
         if self.state.value == 'disconnect' or query[1] == '':
             self.search_results.update_list([])
         else:
             ls = mpd_wrapper(self, self.conn.search, [self.search_tags[query[0]], query[1]])
             ls.sort(key=lambda x: x.get('file', ''))
             self.search_results.update_list(ls)
-
-    def seek(self, conn, time):
-        if self.state.value != 'stop':
-            conn.seek(self.current_pos.value, time)
 
     @mpd
     def updatedb(self):
@@ -295,7 +287,7 @@ class Server(QObject):
             self.conn.deleteid(self.playlist.songs[i]['id'])
 
     @mpd_cmdlist
-    def add(self, data_list, play=False):
+    def _add(self, data_list, play=False):
         for d in data_list:
             if 'playlist' in d:
                 self.conn.load(d['playlist'])
@@ -321,13 +313,13 @@ class Server(QObject):
                 self.playlists_add([pos])
 
     def database_add(self, positions, play=False):
-        self.add((self.database.songs[i] for i in sorted(positions)), play)
+        self._add((self.database.songs[i] for i in sorted(positions)), play)
 
     def playlists_add(self, positions, play=False):
-        self.add((self.stored_playlists.songs[i] for i in sorted(positions)), play)
+        self._add((self.stored_playlists.songs[i] for i in sorted(positions)), play)
 
     def search_add(self, positions, play=False):
-        self.add((self.search_results.songs[i] for i in sorted(positions)), play)
+        self._add((self.search_results.songs[i] for i in sorted(positions)), play)
 
     @mpd_cmdlist
     def _playlists_remove(self, positions):
