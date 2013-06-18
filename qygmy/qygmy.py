@@ -5,7 +5,7 @@ from PySide.QtGui import *
 from .formatter import Formatter
 from .server import Server
 from .browser import Browser
-from .dialogs import Details
+from .dialogs import Details, Settings
 from .uiutils import RichTextDelegate
 from .ui.main import Ui_main
 
@@ -20,6 +20,7 @@ class Qygmy(QMainWindow):
         self.p.setParent(self)
         self.browser = Browser(self, self.fmt)
         self.details = Details(self, self.fmt)
+        self.settings = Settings(self)
         self.timer = QTimer(self)
         self.setup_ui()
         self.connect_mpd()
@@ -192,6 +193,10 @@ class Qygmy(QMainWindow):
                 if i.column() == 0]
         if len(ind) == 1:
             self.details.show_details(self.p.playlist.songs[ind[0]])
+
+    @Slot()
+    def on_action_settings_triggered(self):
+        self.settings.exec_()
 
 
 def main():
