@@ -60,6 +60,7 @@ class Qygmy(QMainWindow):
             ('consume', 'edit-delete-shred'),
             ('settings', 'configure'),
             ('updatedb', 'view-refresh'),
+            ('quit', 'application-exit'),
         ):
             getattr(self.ui, 'action_' + action).setIcon(QIcon.fromTheme(icon))
 
@@ -95,7 +96,8 @@ class Qygmy(QMainWindow):
             'add', 'remove', 'clear', None,
             'repeat', 'shuffle', 'single', 'consume', None,
             'save', 'details', None,
-            'updatedb', 'connect', 'disconnect', 'settings',
+            'updatedb', 'connect', 'disconnect', 'settings', None,
+            'quit',
         ):
             if action is None:
                 cm.addSeparator()
@@ -124,6 +126,7 @@ class Qygmy(QMainWindow):
         self.ui.action_updatedb.triggered.connect(self.p.updatedb)
         self.ui.action_connect.triggered.connect(self.connect_mpd)
         self.ui.action_disconnect.triggered.connect(self.p.disconnect_mpd)
+        self.ui.action_quit.triggered.connect(self.close)
 
     def contextMenuEvent(self, e):
         e.accept()
@@ -197,6 +200,22 @@ class Qygmy(QMainWindow):
     @Slot()
     def on_action_settings_triggered(self):
         self.settings.exec_()
+
+    @Slot()
+    def on_action_save_triggered(self):
+        while True:
+            name, ok = QInputDialog.getText(self,
+                    self.tr('Save current playlist'),
+                    self.tr('Playlist name:'))
+            if ok:
+                if not name:
+                    QMessageBox.critical(self, self.tr('Error'),
+                            self.tr('You have to provide a name.'))
+                elif self.p.playlists_save(name) is False:
+                    QMessageBox.critical(self, self.tr('Error'),
+                            self.tr('Playlist with such name already exists.'))
+                else: break
+            else: break
 
 
 def main():

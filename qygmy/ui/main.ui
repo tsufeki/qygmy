@@ -159,6 +159,9 @@
       <attribute name="headerVisible">
        <bool>false</bool>
       </attribute>
+      <attribute name="headerMinimumSectionSize">
+       <number>0</number>
+      </attribute>
       <attribute name="headerStretchLastSection">
        <bool>false</bool>
       </attribute>
@@ -232,6 +235,7 @@
    <addaction name="action_shuffle"/>
    <addaction name="action_single"/>
    <addaction name="action_consume"/>
+   <addaction name="separator"/>
    <addaction name="action_settings"/>
   </widget>
   <action name="action_previous">
@@ -387,6 +391,11 @@
   <action name="action_details">
    <property name="text">
     <string>Song details...</string>
+   </property>
+  </action>
+  <action name="action_quit">
+   <property name="text">
+    <string>Quit</string>
    </property>
   </action>
  </widget>

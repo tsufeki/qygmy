@@ -62,13 +62,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QToolButton" name="close">
-            <property name="autoRaise">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item>
@@ -112,6 +105,9 @@
           <property name="expandsOnDoubleClick">
            <bool>false</bool>
           </property>
+          <attribute name="headerMinimumSectionSize">
+           <number>0</number>
+          </attribute>
           <attribute name="headerStretchLastSection">
            <bool>false</bool>
           </attribute>
@@ -211,6 +207,9 @@
           <property name="expandsOnDoubleClick">
            <bool>false</bool>
           </property>
+          <attribute name="headerMinimumSectionSize">
+           <number>0</number>
+          </attribute>
           <attribute name="headerStretchLastSection">
            <bool>false</bool>
           </attribute>
@@ -331,6 +330,9 @@
           <property name="expandsOnDoubleClick">
            <bool>false</bool>
           </property>
+          <attribute name="headerMinimumSectionSize">
+           <number>0</number>
+          </attribute>
           <attribute name="headerStretchLastSection">
            <bool>false</bool>
           </attribute>

@@ -9,6 +9,7 @@ from .ui.browser import Ui_browser
 class Browser(QMainWindow):
     def __init__(self, main, formatter):
         super().__init__()
+        self.setAttribute(Qt.WA_QuitOnClose, False)
         self.main = main
         self.p = main.p
         self.fmt = formatter
@@ -22,19 +23,20 @@ class Browser(QMainWindow):
         self.setup_database()
         self.setup_stored_playlists()
         self.setup_search()
-        self.ui.action_add.setIcon(QIcon.fromTheme('list-add'))
-        self.ui.action_remove.setIcon(QIcon.fromTheme('list-remove'))
         self.setWindowIcon(QIcon.fromTheme('list-add'))
-        self.ui.action_close.setIcon(QIcon.fromTheme('window-close'))
-        self.ui.close.setDefaultAction(self.ui.action_close)
-        self.ui.tabs.setCornerWidget(self.ui.close)
+        for action, icon in (
+            ('add', 'list-add'),
+            ('remove', 'edit-delete'),
+            ('close', 'window-close'),
+        ):
+            getattr(self.ui, 'action_' + action).setIcon(QIcon.fromTheme(icon))
 
         cm = QMenu(self)
-        cm.addAction(self.ui.action_add)
-        cm.addAction(self.ui.action_addplay)
-        cm.addAction(self.ui.action_remove)
-        cm.addAction(self.ui.action_details)
-        cm.addAction(self.ui.action_close)
+        for action in ('add', 'addplay', 'remove', 'details', None, 'close'):
+            if action is None:
+                cm.addSeparator()
+            else:
+                cm.addAction(getattr(self.ui, 'action_' + action))
         self.ui.context_menu = cm
 
         self.p.state.changed.connect(self.on_state_changed)
@@ -75,8 +77,7 @@ class Browser(QMainWindow):
         self.ui.action_search.setIcon(QIcon.fromTheme('edit-find'))
         self.ui.search.setDefaultAction(self.ui.action_search)
 
-    def contextMenuEvent(self, e):
-        e.accept()
+    def details_available(self):
         if self.ui.tabs.currentIndex() == 0:
             wdgt = self.ui.database
         elif self.ui.tabs.currentIndex() == 1:
@@ -84,7 +85,14 @@ class Browser(QMainWindow):
         else:
             wdgt = self.ui.search_results
         ind = [i.row() for i in wdgt.selectedIndexes() if i.column() == 0]
-        self.ui.action_details.setVisible(len(ind) == 1 and 'file' in wdgt.model().songs[ind[0]])
+        if len(ind) == 1:
+            s = wdgt.model().songs[ind[0]]
+            if 'file' in s:
+                return s
+
+    def contextMenuEvent(self, e):
+        e.accept()
+        self.ui.action_details.setVisible(bool(self.details_available()))
         self.ui.action_remove.setVisible(self.ui.tabs.currentIndex() == 1)
         self.ui.context_menu.popup(e.globalPos())
 
@@ -185,15 +193,7 @@ class Browser(QMainWindow):
 
     @Slot()
     def on_action_details_triggered(self):
-        if self.ui.tabs.currentIndex() == 0:
-            wdgt = self.ui.database
-        elif self.ui.tabs.currentIndex() == 1:
-            wdgt = self.ui.playlists
-        else:
-            wdgt = self.ui.search_results
-        ind = [i.row() for i in wdgt.selectedIndexes() if i.column() == 0]
-        if len(ind) == 1:
-            s = wdgt.model().songs[ind[0]]
-            if 'file' in s:
-                self.main.details.show_details(s)
+        s = self.details_available()
+        if s:
+            self.main.details.show_details(s)
 
