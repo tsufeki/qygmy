@@ -207,14 +207,20 @@ class Qygmy(QMainWindow):
             name, ok = QInputDialog.getText(self,
                     self.tr('Save current playlist'),
                     self.tr('Playlist name:'))
-            if ok:
-                if not name:
-                    QMessageBox.critical(self, self.tr('Error'),
-                            self.tr('You have to provide a name.'))
-                elif self.p.playlists_save(name) is False:
-                    QMessageBox.critical(self, self.tr('Error'),
-                            self.tr('Playlist with such name already exists.'))
-                else: break
+            if not ok:
+                break
+            if not name:
+                QMessageBox.critical(self, self.tr('Error'),
+                        self.tr('You have to provide a name.'))
+            elif self.p.playlists_save(name) is False:
+                ans = QMessageBox.question(self, self.tr('Error'),
+                        self.tr('Playlist with such name already exists. '
+                        'Do you want to replace it?'),
+                        QMessageBox.Yes | QMessageBox.No)
+                if ans != QMessageBox.Yes:
+                    break
+                self.p.playlists_save(name, True)
+                break
             else: break
 
 

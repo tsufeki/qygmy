@@ -2,7 +2,7 @@
 import functools
 
 from PySide.QtCore import *
-from mpd import MPDClient, MPDError
+from mpd import MPDClient, MPDError, CommandError
 
 
 class State(QObject):
@@ -94,6 +94,9 @@ class PathState(State):
     def normalize(self, value):
         v = super().normalize(value)
         return v.strip('/')
+
+
+ERR_EXISTS = '[56@'
 
 
 def mpd_wrapper(server, function, args=(), kwargs={}, ignore_conn=False):
@@ -357,12 +360,16 @@ class Server(QObject):
         self.stored_playlists_cwd.update(self.stored_playlists_cwd.value, force=True)
 
     @mpd_cmd
-    def playlists_save(self, name):
-        pls = self.conn.listplaylists()
-        for p in pls:
-            if name == p.get('playlist'):
+    def playlists_save(self, name, replace=False):
+        try:
+            self.conn.save(name)
+        except CommandError as e:
+            if not e.args[0].startswith(ERR_EXISTS):
+                raise
+            if not replace:
                 return False
-        self.conn.save(name)
+            self.conn.rm(name)
+            self.conn.save(name)
         p = self.stored_playlists_cwd
         if p.value == '' or p.value == name:
             p.update(p.value, force=True)
