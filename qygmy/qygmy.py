@@ -146,6 +146,7 @@ class Qygmy(QMainWindow):
     def update_current_song(self, *_):
         s, c = self.srv.state.value, self.srv.current_song.value
         self.ui.current_song.setText(self.fmt.current_song(s, c))
+        self.ui.current_song.setToolTip(self.fmt.current_song_tooltip(s, c))
         self.setWindowTitle(self.fmt.window_title(s, c))
 
     def update_status(self, *_):

@@ -10,23 +10,11 @@ class Formatter:
     _playlist_icon = QIcon.fromTheme('text-plain')
 
     templates = {
-        'playlist_item': (
+        'window_title': (
+            '[Qygmy]'
+            '$if(%playing%, '
             '$if2(%title%,%filename%)'
-            '$if(%artist%,'
-                '<span style="color: gray">\xa0\xa0/\xa0\xa0</span>%artist%,)'
-            '$if(%album%%comment%,'
-                '<br><span style="color: gray; font-size: small">\xa0\xa0\xa0'
-                '%comment%'
-                '$if($and(%album%,%comment%),\xa0\xa0/\xa0\xa0,)'
-                '%album%</span>,)'
-        ),
-        'current_song': (
-            '<span style="font-size: big; font-weight: bold">'
-                '$if2(%title%,%filename%)</span><br>'
-            '<span style="font-size: small">'
-                '%artist%</span><br>'
-            '<span style="font-size: small">'
-                '%comment%$if($and(%comment%,%album%),\xa0\xa0/\xa0\xa0,)%album%</span>'
+            '$if(%artist%, / %artist%,),)'
         ),
         'progressbar': (
             '$if3('
@@ -37,13 +25,33 @@ class Formatter:
                 '%connected%,Connected,'
                 'Disconnected)'
         ),
-        'window_title': (
-            '[Qygmy]'
-            '$if(%playing%,'
+        'current_song': (
+            '<span style="font-size: big; font-weight: bold">'
+                '$if2(%title%,%filename%)</span><br>'
+            '<span style="font-size: small">'
+                '%artist%</span><br>'
+            '<span style="font-size: small">'
+                '%comment%$if($and(%comment%,%album%),\xa0\xa0/\xa0\xa0,)%album%</span>'
+        ),
+        '_current_song_tooltip': (
+            '$if3(%paused%,[Paused] ,'
+                '%stopped%,[Stopped] ,'
+                '%connected%,[Connected] ,'
+                '%disconnected%,[Disconnected])'
+            '$if2(%file%,%directory%,%playlist%)'
+        ),
+        'playlist_item': (
             '$if2(%title%,%filename%)'
-            '$if(%artist%, / %artist%,),)'
+            '$if(%artist%,'
+                '<span style="color: gray">\xa0\xa0/\xa0\xa0</span>%artist%,)'
+            '$if(%album%%comment%,'
+                '<br><span style="color: gray; font-size: small">\xa0\xa0\xa0'
+                '%comment%'
+                '$if($and(%album%,%comment%),\xa0\xa0/\xa0\xa0,)'
+                '%album%</span>,)'
         ),
         '_playlist_column2': '$time(%length%)',
+        '_playlist_tooltip': '$if2(%file%,%directory%,%playlist%)',
         '_status': (
             '$if(%disconnected%,,'
                 '%totalcount% songs'
@@ -55,7 +63,7 @@ class Formatter:
             ('Albums:', '%albums%'),
             ('Artists:', '%artists%'),
             ('Uptime:', '$time(%uptime%)'),
-            ('Total playtime:', '$time(%db_playtime%)'),
+            ('DB playtime:', '$time(%db_playtime%)'),
             ('This instance:', '$time(%playtime%)'),
         ),
         '_details': (
@@ -143,11 +151,26 @@ class Formatter:
         context['bold'] = '1' if bold else ''
         return self._render(tmpl, context)
 
+    def window_title(self, state, song):
+        context = self._prepare_state(state)
+        context.update(self._prepare_song(song, html=False))
+        return self.render('window_title', context)
+
     def progressbar(self, state, elapsed, total, song):
         context = self._prepare_state(state)
         context.update(self._prepare_times(elapsed, total))
         context.update(self._prepare_song(song, html=False))
         return self.render('progressbar', context)
+
+    def current_song(self, state, song):
+        context = self._prepare_state(state)
+        context.update(self._prepare_song(song))
+        return self.render('current_song', context)
+
+    def current_song_tooltip(self, state, song):
+        context = self._prepare_state(state)
+        context.update(self._prepare_song(song, html=False))
+        return self.render('_current_song_tooltip', context)
 
     def playlist_item(self, song, column, is_current=False):
         if column == 0:
@@ -164,32 +187,22 @@ class Formatter:
                 return self._directory_icon
 
     def playlist_tooltip(self, song, column, is_current=False):
-        return song.get('file')
-
-    def window_title(self, state, song):
-        context = self._prepare_state(state)
-        context.update(self._prepare_song(song, html=False))
-        return self.render('window_title', context)
-
-    def current_song(self, state, song):
-        context = self._prepare_state(state)
-        context.update(self._prepare_song(song))
-        return self.render('current_song', context)
+        return self.render('_playlist_tooltip', self._prepare_song(song, html=False))
 
     def status(self, state, totallength, totalcount):
         context = {'totallength': str(totallength), 'totalcount': str(totalcount)}
         context.update(self._prepare_state(state))
         return self.render('_status', context)
 
+    def info_dialog(self, name, info):
+        if name == 'details':
+            info = self._prepare_song(info, html=False)
+        r = self.render('_' + name, info)
+        return [i for i in r if i[1] != '']
+
     @property
     def playlist_column_count(self):
         return 2
-
-    def info_dialog(self, name, info):
-        if name == 'details':
-            info = self._prepare_song(info)
-        r = self.render('_' + name, info)
-        return [i for i in r if i[1] != '']
 
 
     def _details(self, song):

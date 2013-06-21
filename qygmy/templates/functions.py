@@ -99,6 +99,8 @@ def c_unset(ctx, name):
 # Other
 
 def f_time(seconds):
+    if seconds == '':
+        return ''
     t = int(seconds)
     sign = ''
     if t < 0:
