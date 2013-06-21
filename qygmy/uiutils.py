@@ -48,3 +48,46 @@ class ClickableProgressBar(QProgressBar):
 
     clicked = Signal(int)
 
+
+class SonglistView(QTreeView):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+    def setup(self, model):
+        self.setModel(model)
+        self.delegate = RichTextDelegate()
+        self.setItemDelegate(self.delegate)
+
+        h = self.header()
+        h.setResizeMode(0, QHeaderView.Stretch)
+        for i in range(1,h.count()):
+            h.setResizeMode(i, QHeaderView.ResizeToContents)
+
+        self.doubleClicked.connect(self._double_clicked)
+
+    def selection(self):
+        return sorted(i.row()
+                for i in self.selectedIndexes()
+                if i.column() == 0)
+
+    def _double_clicked(self, index):
+        self.model().double_clicked(index.row())
+
+    def details(self):
+        return self.model().details(self.selection())
+
+    def can_add_to_queue(self):
+        return self.model().can_add_to_queue(self.selection())
+
+    def can_remove(self):
+        return self.model().can_remove(self.selection())
+
+    def can_rename(self):
+        return self.model().can_rename(self.selection())
+
+    def add_selected_to_queue(self, play=False, replace=False):
+        self.model().add_to_queue(self.selection(), play, replace)
+
+    def remove_selected(self):
+        self.model().remove(self.selection())
+

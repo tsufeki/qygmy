@@ -84,7 +84,7 @@
     <item>
      <widget class="QLabel" name="current_song">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -107,7 +107,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QTreeView" name="playlist">
+     <widget class="SonglistView" name="queue">
       <property name="acceptDrops">
        <bool>true</bool>
       </property>
@@ -178,6 +178,9 @@
       <property name="text">
        <string notr="true"/>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
      </widget>
     </item>
    </layout>
@@ -208,7 +211,7 @@
    <addaction name="action_next"/>
    <addaction name="action_volume"/>
   </widget>
-  <widget class="QToolBar" name="playlist_toolbar">
+  <widget class="QToolBar" name="queue_toolbar">
    <property name="sizePolicy">
     <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
      <horstretch>0</horstretch>
@@ -385,7 +388,10 @@
   </action>
   <action name="action_save">
    <property name="text">
-    <string>Save current playlist...</string>
+    <string>Save the current playlist...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the current playlist</string>
    </property>
   </action>
   <action name="action_details">
@@ -398,11 +404,26 @@
     <string>Quit</string>
    </property>
   </action>
+  <action name="action_randomize">
+   <property name="text">
+    <string>Randomize the playlist</string>
+   </property>
+  </action>
+  <action name="action_statistics">
+   <property name="text">
+    <string>MPD statistics...</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
    <class>ClickableProgressBar</class>
    <extends>QProgressBar</extends>
+   <header>..uiutils</header>
+  </customwidget>
+  <customwidget>
+   <class>SonglistView</class>
+   <extends>QTreeView</extends>
    <header>..uiutils</header>
   </customwidget>
  </customwidgets>

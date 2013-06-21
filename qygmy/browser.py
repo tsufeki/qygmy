@@ -2,198 +2,174 @@
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-from .uiutils import RichTextDelegate
 from .ui.browser import Ui_browser
 
 
 class Browser(QMainWindow):
-    def __init__(self, main, formatter):
+    def __init__(self, srv, details):
         super().__init__()
-        self.setAttribute(Qt.WA_QuitOnClose, False)
-        self.main = main
-        self.p = main.p
-        self.fmt = formatter
+        self.srv = srv
+        self.details = details
         self.setup_ui()
-        self.p.database_cwd.update(None, force=True)
-        self.p.stored_playlists_cwd.update(None, force=True)
+        self.setAttribute(Qt.WA_QuitOnClose, False)
+        #self.srv.database.refresh()
+        #self.srv.playlists.refresh()
 
     def setup_ui(self):
         self.ui = Ui_browser()
         self.ui.setupUi(self)
         self.setup_database()
-        self.setup_stored_playlists()
+        self.setup_playlists()
         self.setup_search()
         self.setWindowIcon(QIcon.fromTheme('list-add'))
         for action, icon in (
             ('add', 'list-add'),
             ('remove', 'edit-delete'),
             ('close', 'window-close'),
+            ('dbroot', 'folder-sound'),
+            ('plroot', 'document-multiple'),
+            ('search', 'edit-find'),
         ):
             getattr(self.ui, 'action_' + action).setIcon(QIcon.fromTheme(icon))
 
         cm = QMenu(self)
-        for action in ('add', 'addplay', 'remove', 'details', None, 'close'):
+        for action in ('add', 'addplay', 'replace', 'replaceplay', None,
+                'remove', 'rename', 'details', None, 'close'):
             if action is None:
                 cm.addSeparator()
             else:
                 cm.addAction(getattr(self.ui, 'action_' + action))
         self.ui.context_menu = cm
 
-        self.p.state.changed.connect(self.on_state_changed)
-
-    def setup_list(self, widget, model):
-        d = RichTextDelegate()
-        setattr(self.ui, widget.objectName() + '_delegate', d)
-        widget.setModel(model)
-        widget.setItemDelegate(d)
-
-        h = widget.header()
-        h.setResizeMode(0, QHeaderView.Stretch)
-        for i in range(1,h.count()):
-            h.setResizeMode(i, QHeaderView.ResizeToContents)
+        self.srv.state.changed.connect(self.on_state_changed)
 
     def setup_database(self):
-        self.setup_list(self.ui.database, self.p.database)
+        self.ui.database.setup(self.srv.database)
         self.ui.tabs.setTabIcon(0, QIcon.fromTheme('folder-sound'))
-        self.ui.action_db_root.setIcon(QIcon.fromTheme('folder-sound'))
-        self.ui.db_root_crumb.setDefaultAction(self.ui.action_db_root)
-        self.ui.db_crumbs = []
-        self.db_mapper = QSignalMapper(self)
-        self.db_mapper.mapped.connect(self.on_db_crumb_triggered)
-        self.p.database_cwd.changed.connect(self.update_db_crumbs)
+        self.ui.dbroot.setDefaultAction(self.ui.action_dbroot)
+        self.ui.dblist = []
+        self.database_mapper = QSignalMapper(self)
+        self.database_mapper.mapped.connect(self.on_action_db_triggered)
+        self.srv.database.current.changed.connect(self.update_database)
 
-    def setup_stored_playlists(self):
-        self.setup_list(self.ui.playlists, self.p.stored_playlists)
+    def setup_playlists(self):
+        self.ui.playlists.setup(self.srv.playlists)
         self.ui.tabs.setTabIcon(1, QIcon.fromTheme('document-multiple'))
-        self.ui.action_pl_root.setIcon(QIcon.fromTheme('document-multiple'))
-        self.ui.pl_root_crumb.setDefaultAction(self.ui.action_pl_root)
-        self.ui.pl_crumb0.hide()
-        self.ui.pl_crumb0.setDefaultAction(self.ui.action_pl_crumb0)
-        self.p.stored_playlists_cwd.changed.connect(self.update_pl_crumbs)
+        self.ui.plroot.setDefaultAction(self.ui.action_plroot)
+        self.ui.pl.hide()
+        self.ui.pl.setDefaultAction(self.ui.action_pl)
+        self.srv.playlists.current.changed.connect(self.update_playlists)
 
     def setup_search(self):
-        self.setup_list(self.ui.search_results, self.p.search_results)
+        self.ui.search.setup(self.srv.search)
         self.ui.tabs.setTabIcon(2, QIcon.fromTheme('edit-find'))
-        self.ui.action_search.setIcon(QIcon.fromTheme('edit-find'))
-        self.ui.search.setDefaultAction(self.ui.action_search)
+        self.ui.search_button.setDefaultAction(self.ui.action_search)
 
-    def details_available(self):
-        if self.ui.tabs.currentIndex() == 0:
-            wdgt = self.ui.database
-        elif self.ui.tabs.currentIndex() == 1:
-            wdgt = self.ui.playlists
-        else:
-            wdgt = self.ui.search_results
-        ind = [i.row() for i in wdgt.selectedIndexes() if i.column() == 0]
-        if len(ind) == 1:
-            s = wdgt.model().songs[ind[0]]
-            if 'file' in s:
-                return s
+    @property
+    def current_view(self):
+        return (
+            self.ui.database, self.ui.playlists, self.ui.search,
+        )[self.ui.tabs.currentIndex()]
 
     def contextMenuEvent(self, e):
         e.accept()
-        self.ui.action_details.setVisible(bool(self.details_available()))
-        self.ui.action_remove.setVisible(self.ui.tabs.currentIndex() == 1)
+        self.ui.action_add.setVisible(self.current_view.can_add_to_queue())
+        self.ui.action_remove.setVisible(self.current_view.can_remove())
+        self.ui.action_rename.setVisible(self.current_view.can_rename())
+        self.ui.action_details.setVisible(self.current_view.details() is not None)
         self.ui.context_menu.popup(e.globalPos())
 
     def on_state_changed(self, state):
         c = state != 'disconnect'
-        for act in ('add', 'addplay', 'db_root', 'pl_root', 'search', 'remove',
-                'pl_crumb0'):
+        for act in ('dbroot', 'plroot', 'pl', 'search', 'add', 'addplay',
+                'replace', 'replaceplay', 'remove', 'rename', 'details'):
             getattr(self.ui, 'action_' + act).setEnabled(c)
-        for b in self.ui.db_crumbs:
+        for b in self.ui.dblist:
             b.defaultAction().setEnabled(c)
         self.ui.what.setEnabled(c)
         self.ui.query.setEnabled(c)
 
-    def update_db_crumbs(self, path):
+    def update_database(self, path):
         p = path.split('/')
         if p == ['']:
             p = []
-        for i in range(len(self.ui.db_crumbs), len(p)):
+        for i in range(len(self.ui.dblist), len(p)):
             a = QAction(self)
-            a.triggered.connect(self.db_mapper.map)
-            self.db_mapper.setMapping(a, i)
+            a.triggered.connect(self.database_mapper.map)
+            self.database_mapper.setMapping(a, i)
             b = QToolButton(self)
             b.setDefaultAction(a)
             b.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred))
-            self.ui.db_crumbs_lo.insertWidget(i+1, b)
-            self.ui.db_crumbs.append(b)
+            self.ui.dblayout.insertWidget(i+1, b)
+            self.ui.dblist.append(b)
         for i in range(len(p)):
-            self.ui.db_crumbs[i].defaultAction().setText(p[i])
-            self.ui.db_crumbs[i].show()
-        for i in range(len(p), len(self.ui.db_crumbs)):
-            self.ui.db_crumbs[i].hide()
+            self.ui.dblist[i].defaultAction().setText(p[i])
+            self.ui.dblist[i].show()
+        for i in range(len(p), len(self.ui.dblist)):
+            self.ui.dblist[i].hide()
 
-    def update_pl_crumbs(self, name):
+    def update_playlists(self, name):
         if name == '':
-            self.ui.pl_crumb0.hide()
+            self.ui.pl.hide()
         else:
-            self.ui.pl_crumb0.defaultAction().setText(name)
-            self.ui.pl_crumb0.show()
+            self.ui.pl.defaultAction().setText(name)
+            self.ui.pl.show()
 
     @Slot()
     def on_action_close_triggered(self):
         self.hide()
 
     @Slot()
-    def on_action_db_root_triggered(self):
-        self.p.database_cwd.update('', force=True)
+    def on_action_dbroot_triggered(self):
+        self.srv.database.cd('')
 
-    def on_db_crumb_triggered(self, number):
-        path = '/'.join(self.p.database_cwd.value.split('/')[:number+1])
-        self.p.database_cwd.update(path, force=True)
-
-    @Slot(QModelIndex)
-    def on_database_doubleClicked(self, index):
-        self.p.database_add_or_cd(index.row())
+    def on_action_db_triggered(self, number):
+        path = '/'.join(self.srv.database.current.value.split('/')[:number+1])
+        self.srv.database.cd(path)
 
     @Slot()
-    def on_action_pl_root_triggered(self):
-        self.p.stored_playlists_cwd.update('', force=True)
+    def on_action_plroot_triggered(self):
+        self.srv.playlists.cd('')
 
     @Slot()
-    def on_action_pl_crumb0_triggered(self):
-        self.p.stored_playlists_cwd.update(self.p.stored_playlists_cwd.value, force=True)
-
-    @Slot(QModelIndex)
-    def on_playlists_doubleClicked(self, index):
-        self.p.playlists_add_or_cd(index.row())
+    def on_action_pl_triggered(self):
+        self.srv.playlists.refresh()
 
     @Slot()
     def on_action_search_triggered(self):
-        self.p.search_query.update((self.ui.what.currentIndex(), self.ui.query.text()), force=True)
-
-    @Slot(QModelIndex)
-    def on_search_results_doubleClicked(self, index):
-        self.p.search_add([index.row()])
+        self.srv.search.cd((self.ui.what.currentIndex(), self.ui.query.text()))
 
     @Slot()
-    def on_action_add_triggered(self, play=False):
-        if self.ui.tabs.currentIndex() == 0:
-            ind, fun = self.ui.database.selectedIndexes(), self.p.database_add
-        elif self.ui.tabs.currentIndex() == 1:
-            ind, fun = self.ui.playlists.selectedIndexes(), self.p.playlists_add
-        elif self.ui.tabs.currentIndex() == 2:
-            ind, fun = self.ui.search_results.selectedIndexes(), self.p.search_add
-        positions = [i.row() for i in ind if i.column() == 0]
-        fun(positions, play)
+    def on_action_add_triggered(self, play=False, replace=False):
+        self.current_view.add_selected_to_queue(play, replace)
 
     @Slot()
     def on_action_addplay_triggered(self):
         self.on_action_add_triggered(True)
 
     @Slot()
+    def on_action_replace_triggered(self):
+        self.on_action_add_triggered(False, True)
+
+    @Slot()
+    def on_action_replaceplay_triggered(self):
+        self.on_action_add_triggered(True, True)
+
+    @Slot()
     def on_action_remove_triggered(self):
-        if self.ui.tabs.currentIndex() == 1:
-            self.p.playlists_remove([i.row()
-                for i in self.ui.playlists.selectedIndexes()
-                if i.column() == 0
-            ])
+        self.current_view.remove_selected()
+
+    @Slot()
+    def on_action_rename_triggered(self):
+        s = self.current_view.selection()
+        if len(s) == 1:
+            i = self.current_view.model().index(s[0], 0)
+            self.current_view.setCurrentIndex(i)
+            self.current_view.edit(i)
 
     @Slot()
     def on_action_details_triggered(self):
-        s = self.details_available()
-        if s:
-            self.main.details.show_details(s)
+        d = self.current_view.details()
+        if d is not None:
+            self.details.show_dialog('details', d)
 

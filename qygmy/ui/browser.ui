@@ -24,7 +24,7 @@
     <item>
      <widget class="QTabWidget" name="tabs">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="database_tab">
        <property name="sizePolicy">
@@ -38,9 +38,9 @@
        </attribute>
        <layout class="QVBoxLayout" name="db_v">
         <item>
-         <layout class="QHBoxLayout" name="db_crumbs_lo">
+         <layout class="QHBoxLayout" name="dblayout">
           <item>
-           <widget class="QToolButton" name="db_root_crumb">
+           <widget class="QToolButton" name="dbroot">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -50,7 +50,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="db_crumbs_lb">
+           <widget class="QLabel" name="dblabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -65,7 +65,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QTreeView" name="database">
+         <widget class="SonglistView" name="database">
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
           </property>
@@ -127,9 +127,9 @@
        </attribute>
        <layout class="QVBoxLayout" name="pl_v">
         <item>
-         <layout class="QHBoxLayout" name="pl_crumbs_lo">
+         <layout class="QHBoxLayout" name="pllayout">
           <item>
-           <widget class="QToolButton" name="pl_root_crumb">
+           <widget class="QToolButton" name="plroot">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -142,7 +142,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="pl_crumb0">
+           <widget class="QToolButton" name="pl">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -155,7 +155,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="pl_crumbs_lb">
+           <widget class="QLabel" name="pllabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -170,9 +170,9 @@
          </layout>
         </item>
         <item>
-         <widget class="QTreeView" name="playlists">
+         <widget class="SonglistView" name="playlists">
           <property name="editTriggers">
-           <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+           <set>QAbstractItemView::EditKeyPressed</set>
           </property>
           <property name="alternatingRowColors">
            <bool>true</bool>
@@ -229,7 +229,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="se_v">
         <item>
-         <layout class="QHBoxLayout" name="se_crumbs_lo">
+         <layout class="QHBoxLayout" name="selayout">
           <item>
            <widget class="QComboBox" name="what">
             <property name="toolTip">
@@ -284,7 +284,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="search">
+           <widget class="QToolButton" name="search_button">
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonTextBesideIcon</enum>
             </property>
@@ -293,7 +293,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QTreeView" name="search_results">
+         <widget class="SonglistView" name="search">
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
           </property>
@@ -352,7 +352,7 @@
     <string>Add selected songs to the current playlist</string>
    </property>
   </action>
-  <action name="action_db_root">
+  <action name="action_dbroot">
    <property name="text">
     <string>/</string>
    </property>
@@ -368,7 +368,7 @@
     <string>Close this window</string>
    </property>
   </action>
-  <action name="action_pl_root">
+  <action name="action_plroot">
    <property name="text">
     <string>Playlists</string>
    </property>
@@ -391,13 +391,35 @@
     <string>Add selected and play</string>
    </property>
   </action>
-  <action name="action_pl_crumb0"/>
+  <action name="action_pl"/>
   <action name="action_details">
    <property name="text">
     <string>Song details...</string>
    </property>
   </action>
+  <action name="action_rename">
+   <property name="text">
+    <string>Rename</string>
+   </property>
+  </action>
+  <action name="action_replace">
+   <property name="text">
+    <string>Replace the current playlist</string>
+   </property>
+  </action>
+  <action name="action_replaceplay">
+   <property name="text">
+    <string>Replace and play</string>
+   </property>
+  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SonglistView</class>
+   <extends>QTreeView</extends>
+   <header>..uiutils</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

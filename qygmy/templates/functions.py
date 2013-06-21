@@ -15,6 +15,13 @@ def f_if2(*args):
             return a
     return ''
 
+def f_if3(*args):
+    if len(args) == 0:
+        return ''
+    if len(args) == 1:
+        return args[0]
+    return f_if(args[0], args[1], f_if3(*args[2:]))
+
 
 # String operations
 
@@ -88,4 +95,23 @@ def c_unset(ctx, name):
     if name in ctx:
         del ctx[name]
     return ''
+
+# Other
+
+def f_time(seconds):
+    t = int(seconds)
+    sign = ''
+    if t < 0:
+        sign = '-'
+        t = -t
+    t, s = divmod(t, 60)
+    t, m = divmod(t, 60)
+    d, h = divmod(t, 24)
+
+    if d != 0:
+        return '{}{}d {:02d}:{:02d}:{:02d}'.format(sign, d, h, m, s)
+    elif h != 0:
+        return '{}{}:{:02d}:{:02d}'.format(sign, h, m, s)
+    else:
+        return '{}{:02d}:{:02d}'.format(sign, m, s)
 

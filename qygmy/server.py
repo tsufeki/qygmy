@@ -1,4 +1,5 @@
 
+import re
 import functools
 
 from PySide.QtCore import *
@@ -33,16 +34,18 @@ class State(QObject):
 
     def normalize(self, value):
         if value is None or value == '':
-            return self.default
+            value = self.default
+        if isinstance(value, str):
+            value = value.strip()
         if not isinstance(value, type(self.default)):
-            return type(self.default)(value)
+            value = type(self.default)(value)
         return value
 
     def prepare(self, value):
         return self.normalize(value)
 
     @classmethod
-    def create(cls, parent, name, init, send_callable=None):
+    def create(cls, parent, name, init, send_callable=None, prefix=''):
         if not callable(send_callable):
             method = send_callable
             if method is None:
@@ -56,7 +59,7 @@ class State(QObject):
             def send_callable(self, v):
                 return mpd_wrapper(parent, send_callable, [parent.conn, v])
         s = C()
-        s.setObjectName(name)
+        s.setObjectName(prefix + name)
         s.setParent(parent)
         setattr(parent, name, s)
 
@@ -69,25 +72,21 @@ class BoolState(State):
         return int(self.normalize(value))
 
     @classmethod
-    def create(cls, parent, name, init=False, send_callable=None):
-        super().create(parent, name, init, send_callable)
+    def create(cls, parent, name, init=False, send_callable=None, prefix=''):
+        super().create(parent, name, init, send_callable, prefix)
 
 
 class TimeTupleState(State):
     def normalize(self, value):
-        if isinstance(value, (tuple, list)) and len(value) == 2:
-            v = tuple(0 if i in ('', None) else int(i) for i in value)
-            if v == (0, 0):
-                v = (0, 1)
+        if isinstance(value, (tuple, list)):
+            v = [0 if i in ('', None, -1, '-1') else int(i) for i in value]
+            v = v[:2]
+            v = v + [0]*(2 - len(v))
             return v
         return self.default
 
     def prepare(self, value):
         return int(value)
-
-    @classmethod
-    def create(cls, parent, name, init=(0, 1), send_callable=None):
-        super().create(parent, name, init, send_callable)
 
 
 class PathState(State):
@@ -96,17 +95,14 @@ class PathState(State):
         return v.strip('/')
 
 
-ERR_EXISTS = '[56@'
-
-
-def mpd_wrapper(server, function, args=(), kwargs={}, ignore_conn=False):
+def mpd_wrapper(connection, function, args=(), kwargs={}, ignore_conn=False):
     r = None
-    if ignore_conn or server.state.value != 'disconnect':
+    if ignore_conn or connection.state.value != 'disconnect':
         try:
             r = function(*args, **kwargs)
         except MPDError as e:
-            server._handle_errors(e)
-    server.update()
+            connection.handle_error(e)
+    connection.update_state()
     return r
 
 
@@ -147,7 +143,401 @@ def not_callable(*args):
     raise TypeError("Not Callable")
 
 
-class Server(QObject):
+class Connection:
+
+    ERROR = re.compile(r'^\[([0-9]+)@([0-9]+)\] \{([^}]*)\} (.*)$')
+
+    def parse_exception(self, exc):
+        return self.ERROR.match(exc.args[0]).groups()
+
+    def handle_error(self, exc):
+        import sys
+        print('{}: {}'.format(type(exc).__name__, exc), file=sys.stderr)
+        if isinstance(exc, CommandError):
+            errno, cmdno, cmd, msg = self.parse_exception(exc)
+            msg = msg[0].upper() + msg[1:] + ' ({};{})'.format(errno, cmd)
+            self.main.error(msg)
+        # TODO: critical errors
+
+
+class ProperConnection(Connection):
+    def __init__(self, main):
+        super().__init__(main)
+        self.main = main
+        self.conn = MPDClient()
+        State.create(self, 'state', 'disconnect', not_callable)
+
+    def update_state(self):
+        pass
+
+
+class RelayingConnection(Connection):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+    @property
+    def main(self):
+        return self.parent.main
+
+    @property
+    def conn(self):
+        return self.parent.conn
+
+    @property
+    def state(self):
+        return self.parent.state
+
+    def update_state(self):
+        self.parent.update_state()
+
+
+class Server(ProperConnection, QObject):
+
+    def __init__(self, main):
+        super().__init__(main)
+
+        State.create(self, 'volume', 50, 'setvol')
+        State.create(self, 'current_song', {}, not_callable)
+        BoolState.create(self, 'repeat')
+        BoolState.create(self, 'shuffle', False, 'random')
+        BoolState.create(self, 'single')
+        BoolState.create(self, 'consume')
+        BoolState.create(self, 'updating_db', False, not_callable)
+        TimeTupleState.create(self, 'times', (0, 0), self._seek)
+
+        self.queue = Queue(self)
+        self.database = Database(self)
+        self.playlists = Playlists(self)
+        self.search = Search(self)
+
+    #def print(self):
+    #    for i in ('state', 'volume', 'current_song', 'repeat', 'shuffle', 'single',
+    #            'consume', 'updating_db', 'times'):
+    #        print(i, '=', getattr(self, i).value)
+    #    for i in ('queue', 'database', 'playlists', 'search'):
+    #        print(i + '.current', '=', getattr(self, i).current.value)
+    #        print(i + '.current_pos', '=', getattr(self, i).current_pos.value)
+
+    def _seek(self, conn, time):
+        if self.state.value != 'stop':
+            conn.seek(self.queue.current_pos.value, time)
+
+    def update_state(self):
+        s, c = {'state': 'disconnect'}, {}
+        if self.state.value != 'disconnect':
+            try:
+                self.conn.command_list_ok_begin()
+                self.conn.status()
+                self.conn.currentsong()
+                s, c = self.conn.command_list_end()
+            except MPDError as e:
+                self.handle_error(e)
+
+        self.state.update(s['state'])
+        self.times.update(s.get('time', ':').split(':'))
+        self.volume.update(s.get('volume'))
+        self.repeat.update(s.get('repeat'))
+        self.shuffle.update(s.get('random'))
+        self.current_song.update(c)
+        self.single.update(s.get('single'))
+        self.consume.update(s.get('consume'))
+        self.updating_db.update('updating_db' in s)
+
+        self.queue.current.update(s.get('playlist'))
+        self.queue.current_pos.update(s.get('song'))
+
+    @mpd_cmd_ignore_conn
+    def connect_mpd(self, host, port, password=None):
+        if self.state.value != 'disconnect':
+            self.disconnect_mpd()
+        # TODO: ValueError
+        self.conn.connect(host, int(port))
+        self.state.update('connect')
+        if password is not None:
+            self.conn.password(password)
+
+    @mpd_cmd
+    def disconnect_mpd(self):
+        try:
+            try:
+                self.conn.close()
+            finally:
+                self.conn.disconnect()
+        finally:
+            self.state.update('disconnect')
+
+    play = simple_mpd('play')
+    pause = simple_mpd('pause', 1)
+    stop = simple_mpd('stop')
+    previous = simple_mpd('previous')
+    next = simple_mpd('next')
+    clear = simple_mpd('clear')
+    randomize_queue = simple_mpd('shuffle')
+
+    @mpd_cmd
+    def updatedb(self):
+        if not self.updating_db.value:
+            self.conn.update()
+
+    @mpd_cmd
+    def statistics(self):
+        return self.conn.stats()
+
+
+class SongList(RelayingConnection, QAbstractTableModel):
+
+    def __init__(self, parent, current, state_class=State):
+        super().__init__(parent)
+        self.songs = []
+        prefix = self.__class__.__name__.lower() + '_'
+
+        state_class.create(self, 'current', current, not_callable, prefix)
+        State.create(self, 'current_pos', -1, 'play', prefix)
+        self.current.changed.connect(self._update)
+        self.current_pos.changed2.connect(self._update_current_pos)
+        self.state.changed2.connect(self._reset)
+
+        self.total_length = 0
+
+    def retrieve_from_server(self, newcurrent):
+        return []
+
+    def sort_key(self, item):
+        return (item.get('file', ''), item.get('directory', ''), item.get('playlist', ''))
+
+    def refresh(self):
+        self.current.update(self.current.value, force=True)
+
+    def _reset(self, newstate, oldstate):
+        if newstate == 'disconnect' or oldstate == 'disconnect':
+            self.current.update(None, force=True)
+
+    @mpd_cmd_ignore_conn
+    def _update(self, newcurrent):
+        self.total_length = 0
+        self.beginResetModel()
+        try:
+            if self.state.value != 'disconnect':
+                s = self.retrieve_from_server(newcurrent)
+                s.sort(key=self.sort_key)
+                self.songs = s
+            else:
+                self.songs = []
+        except MPDError:
+            self.songs = []
+            raise
+        finally:
+            self.endResetModel()
+        for s in self.songs:
+            if 'time' in s:
+                self.total_length += int(s['time'])
+
+    def _update_current_pos(self, new, old):
+        for i in (old, new):
+            if 0 <= i < len(self):
+                index1 = self.index(i, 0)
+                index2 = self.index(i, self.columnCount() - 1)
+                self.dataChanged.emit(index1, index2)
+
+    def __len__(self):
+        return len(self.songs)
+
+    def __getitem__(self, index):
+        if type(index) == slice or 0 <= index < len(self):
+            return self.songs[index]
+        return {}
+
+    def details(self, positions):
+        if len(positions) == 1 and 'file' in self[positions[0]]:
+            return self[positions[0]]
+
+    def can_add_to_current(self, positions):
+        return False
+
+    def can_remove(self, positions):
+        return False
+
+    def can_rename(self, positions):
+        return False
+
+    def columnCount(self, parent=None):
+        return self.main.fmt.playlist_column_count
+
+    def rowCount(self, parent=None):
+        return len(self)
+
+    def data(self, index, role=Qt.DisplayRole):
+        r, c = index.row(), index.column()
+        if 0 <= r < len(self):
+            if role == Qt.DisplayRole:
+                return self.main.fmt.playlist_item(
+                        self[r], c, r == self.current_pos.value)
+            elif role == Qt.ToolTipRole:
+                return self.main.fmt.playlist_tooltip(
+                        self[r], c, r == self.current_pos.value)
+            elif role == Qt.DecorationRole:
+                return self.main.fmt.playlist_icon(
+                        self[r], c, r == self.current_pos.value)
+        return None
+
+    def flags(self, index):
+        f = Qt.ItemIsEnabled | Qt.ItemIsSelectable #| Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
+        if index.column() == 0 and self.can_rename([index.row()]):
+            f |= Qt.ItemIsEditable
+        return f
+
+    #def supportedDropActions(self):
+    #    return Qt.MoveAction
+
+
+class RemovableItemsMixin:
+
+    def can_remove(self, positions):
+        return len(positions) > 0
+
+    @mpd_cmdlist
+    def _remove(self, positions):
+        for pos in reversed(sorted(positions)):
+            if self[pos]:
+                self.remove_one(pos)
+
+    def remove(self, positions):
+        if self.can_remove(positions):
+            self._remove(positions)
+            self.refresh()
+
+
+class Queue(RemovableItemsMixin, SongList):
+
+    def __init__(self, parent):
+        super().__init__(parent, -1)
+
+    def sort_key(self, item):
+        return 0 # no sorting
+
+    def retrieve_from_server(self, new_version):
+        return self.conn.playlistinfo()
+
+    @mpd_cmdlist
+    def add(self, song_list, play=False, replace=False):
+        if replace:
+            self.conn.clear()
+        cnt = len(song_list)
+        for s in song_list:
+            if 'playlist' in s:
+                self.conn.load(s['playlist'])
+            elif 'directory' in s:
+                self.conn.add(s['directory'])
+            elif 'file' in s:
+                self.conn.add(s['file'])
+            else:
+                cnt -= 1
+        if play and cnt > 0:
+            self.conn.play(0 if replace else len(self))
+
+    def remove_one(self, pos):
+        self.conn.deleteid(self[pos]['id'])
+
+    @mpd_cmd
+    def save(self, name, replace=False):
+        try:
+            self.conn.save(name)
+        except CommandError as e:
+            if self.parse_exception(e)[0] != '56':
+                raise
+            if not replace:
+                return False
+            self.conn.rm(name)
+            self.conn.save(name)
+        if self.current.value in ('', name):
+            self.refresh()
+        return True
+
+    def double_clicked(self, pos):
+        self.current_pos.send(pos)
+
+
+class BrowserList(SongList):
+
+    def can_add_to_queue(self, positions):
+        return len(positions) > 0
+
+    def add_to_queue(self, positions, play=False, replace=False):
+        if self.can_add_to_queue(positions):
+            self.parent.queue.add([self[i] for i in positions], play, replace)
+
+    def add_or_cd(self, pos):
+        self.add_to_queue([pos])
+
+    def cd(self, newcurrent):
+        self.current.update(newcurrent, force=True)
+
+    def double_clicked(self, pos):
+        self.add_or_cd(pos)
+
+
+class Database(BrowserList):
+
+    def __init__(self, parent):
+        super().__init__(parent, '', PathState)
+
+    def retrieve_from_server(self, new_path):
+        ls = self.conn.lsinfo(new_path)
+        return [e for e in ls if 'file' in e or 'directory' in e]
+
+    def add_or_cd(self, pos):
+        if 'directory' in self[pos]:
+            self.cd(self[pos]['directory'])
+        else:
+            super().add_or_cd(pos)
+
+
+class Playlists(RemovableItemsMixin, BrowserList):
+
+    def __init__(self, parent):
+        super().__init__(parent, '')
+
+    def retrieve_from_server(self, new_name):
+        if new_name == '':
+            return self.conn.listplaylists()
+        else:
+            return self.conn.listplaylistinfo(new_name)
+
+    def can_rename(self, positions):
+        return len(positions) == 1 and 'playlist' in self[positions[0]]
+
+    def add_or_cd(self, pos):
+        if 'playlist' in self[pos]:
+            self.cd(self[pos]['playlist'])
+        else:
+            super().add_or_cd(pos)
+
+    def remove_one(self, pos):
+        if self.current.value == '':
+            self.conn.rm(self[pos]['playlist'])
+        else:
+            self.conn.playlistdelete(self.current.value, pos)
+
+    def data(self, index, role=Qt.DisplayRole):
+        r, c = index.row(), index.column()
+        if role == Qt.EditRole and c == 0:
+            return self[r].get('playlist', None)
+        else:
+            return super().data(index, role)
+
+    @mpd_cmd
+    def setData(self, index, value, role=Qt.EditRole):
+        r, c = index.row(), index.column()
+        if role == Qt.EditRole and c == 0:
+            name, new_name = self[r].get('playlist'), str(value)
+            if name and name != new_name:
+                self.conn.rename(name, new_name)
+                self.refresh()
+        return False
+
+
+class Search(BrowserList):
 
     search_tags = [
         'any',
@@ -158,283 +548,11 @@ class Server(QObject):
         'file',
     ]
 
-    def __init__(self, formatter, object_name='player'):
-        super().__init__()
-        self.setObjectName(object_name)
-        self.conn = None
+    def __init__(self, parent):
+        super().__init__(parent, (0, ''))
 
-        State.create(self, 'state', 'disconnect', not_callable)
-        State.create(self, 'volume', 50, 'setvol')
-        State.create(self, 'current_song', {}, not_callable)
-        State.create(self, 'current_pos', -1, 'play')
-        State.create(self, 'playlist_version', -1, not_callable)
-        BoolState.create(self, 'repeat')
-        BoolState.create(self, 'shuffle', False, 'random')
-        BoolState.create(self, 'single')
-        BoolState.create(self, 'consume')
-        BoolState.create(self, 'updating_db', False, not_callable)
-        TimeTupleState.create(self, 'times', (0, 1), self._seek)
-
-        self.state.changed2.connect(self._state_change)
-
-        self.playlist = SonglistModel(formatter)
-        self.current_pos.changed.connect(self.playlist.update_current_pos)
-        self.playlist_version.changed.connect(self._update_playlist)
-
-        PathState.create(self, 'database_cwd', '', not_callable)
-        self.database = SonglistModel(formatter)
-        self.database_cwd.changed.connect(self._update_database)
-
-        State.create(self, 'stored_playlists_cwd', '', not_callable)
-        self.stored_playlists = SonglistModel(formatter)
-        self.stored_playlists_cwd.changed.connect(self._update_stored_playlists)
-
-        State.create(self, 'search_query', (0, ''), not_callable)
-        self.search_results = SonglistModel(formatter)
-        self.search_query.changed.connect(self._update_search)
-
-    def _seek(self, conn, time):
-        if self.state.value != 'stop':
-            conn.seek(self.current_pos.value, time)
-
-    def _handle_errors(self, exc):
-        import sys
-        print('{}: {}'.format(type(exc).__name__, exc), file=sys.stderr)
-
-    @mpd_cmd_ignore_conn
-    def connect_mpd(self, host, port, password=None):
-        if self.conn is not None:
-            self.disconnect_mpd()
-        self.conn = MPDClient()
-        self.conn.connect(host, int(port))
-        if password is not None:
-            self.conn.password(password)
-
-    @mpd_cmd
-    def disconnect_mpd(self):
-        try:
-            if self.conn is not None:
-                self.conn.close()
-                self.conn.disconnect()
-        finally:
-            self.conn = None
-
-    def _state_change(self, new_state, old_state):
-        if new_state == 'disconnect' or old_state == 'disconnect':
-            self.database_cwd.update(None, force=True)
-            self.stored_playlists_cwd.update(None, force=True)
-            self.search_query.update(None, force=True)
-
-    def update(self):
-        s, c = {'state': 'disconnect'}, {}
-        if self.conn:
-            try:
-                self.conn.command_list_ok_begin()
-                self.conn.status()
-                self.conn.currentsong()
-                s, c = self.conn.command_list_end()
-            except MPDError as e:
-                self._handle_errors(e)
-
-        self.state.update(s['state'])
-        self.times.update(s.get('time', ':').split(':'))
-        self.volume.update(s.get('volume'))
-        self.repeat.update(s.get('repeat'))
-        self.shuffle.update(s.get('random'))
-        self.current_song.update(c)
-        self.current_pos.update(s.get('song'))
-        self.playlist_version.update(s.get('playlist'))
-        self.single.update(s.get('single'))
-        self.consume.update(s.get('consume'))
-        self.updating_db.update('updating_db' in s)
-
-    @mpd_cmd_ignore_conn
-    def _update_playlist(self, new_version):
-        if new_version != -1:
-            self.playlist.update_list(self.conn.playlistinfo())
-        else:
-            self.playlist.update_list([])
-
-    def _sort_list(self, ls):
-        return sorted(ls, key=lambda x: (
-            x.get('file', ''),
-            x.get('directory', ''),
-            x.get('playlist', ''),
-        ))
-
-    @mpd_cmd_ignore_conn
-    def _update_database(self, path):
-        if self.state.value == 'disconnect':
-            ls = []
-        else:
-            ls = self.conn.lsinfo(path)
-            ls = [e for e in ls if 'file' in e or 'directory' in e]
-        ls = self._sort_list(ls)
-        self.database.update_list(ls)
-
-    @mpd_cmd_ignore_conn
-    def _update_stored_playlists(self, name):
-        if self.state.value == 'disconnect':
-            ls = []
-        elif name == '':
-            ls = self.conn.listplaylists()
-        else:
-            ls = self.conn.listplaylistinfo(name)
-        ls = self._sort_list(ls)
-        self.stored_playlists.update_list(ls)
-
-    @mpd_cmd_ignore_conn
-    def _update_search(self, query):
-        if self.state.value == 'disconnect' or query[1] == '':
-            ls = []
-        else:
-            ls = self.conn.search(self.search_tags[query[0]], query[1])
-        ls = self._sort_list(ls)
-        self.search_results.update_list(ls)
-
-    @mpd_cmd
-    def updatedb(self):
-        if not self.updating_db.value:
-            self.conn.update()
-
-    play = simple_mpd('play')
-    pause = simple_mpd('pause', 1)
-    stop = simple_mpd('stop')
-    previous = simple_mpd('previous')
-    next = simple_mpd('next')
-    clear = simple_mpd('clear')
-
-    @mpd_cmdlist
-    def remove(self, positions):
-        for i in positions:
-            self.conn.deleteid(self.playlist.songs[i]['id'])
-
-    @mpd_cmdlist
-    def _add(self, data_list, play=False):
-        for d in data_list:
-            if 'playlist' in d:
-                self.conn.load(d['playlist'])
-            else:
-                self.conn.add(d.get('file', d.get('directory')))
-        if play and len(datalist) > 0:
-            self.conn.play(len(self.playlist))
-
-    def database_add_or_cd(self, pos):
-        if 0 <= pos < len(self.database):
-            data = self.database.songs[pos]
-            if 'directory' in data:
-                self.database_cwd.update(data['directory'])
-            else:
-                self.database_add([pos])
-
-    def playlists_add_or_cd(self, pos):
-        if 0 <= pos < len(self.stored_playlists):
-            data = self.stored_playlists.songs[pos]
-            if 'playlist' in data:
-                self.stored_playlists_cwd.update(data['playlist'])
-            else:
-                self.playlists_add([pos])
-
-    def database_add(self, positions, play=False):
-        self._add((self.database.songs[i] for i in sorted(positions)), play)
-
-    def playlists_add(self, positions, play=False):
-        self._add((self.stored_playlists.songs[i] for i in sorted(positions)), play)
-
-    def search_add(self, positions, play=False):
-        self._add((self.search_results.songs[i] for i in sorted(positions)), play)
-
-    @mpd_cmdlist
-    def _playlists_remove(self, positions):
-        if self.stored_playlists_cwd.value == '':
-            names = [self.stored_playlists.songs[i]['playlist'] for i in positions]
-            for n in names:
-                self.conn.rm(n)
-        else:
-            for i in reversed(sorted(positions)):
-                print('playlistdelete', self.stored_playlists_cwd.value, i)
-                self.conn.playlistdelete(self.stored_playlists_cwd.value, i)
-
-    def playlists_remove(self, positions):
-        self._playlists_remove(positions)
-        self.stored_playlists_cwd.update(self.stored_playlists_cwd.value, force=True)
-
-    @mpd_cmd
-    def playlists_save(self, name, replace=False):
-        try:
-            self.conn.save(name)
-        except CommandError as e:
-            if not e.args[0].startswith(ERR_EXISTS):
-                raise
-            if not replace:
-                return False
-            self.conn.rm(name)
-            self.conn.save(name)
-        p = self.stored_playlists_cwd
-        if p.value == '' or p.value == name:
-            p.update(p.value, force=True)
-        return True
-
-
-class SonglistModel(QAbstractTableModel):
-
-    def __init__(self, formatter):
-        super().__init__()
-        self.songs = []
-        self.current = -1
-        self.fmt = formatter
-
-    def update_list(self, songs):
-        self.beginResetModel()
-        self.songs = songs
-        self.endResetModel()
-
-    @Slot(int)
-    def update_current_pos(self, pos):
-        old = self.current
-        self.current = pos
-        for i in (old, pos):
-            if 0 <= i < len(self):
-                index1 = self.index(i, 0)
-                index2 = self.index(i, self.columnCount() - 1)
-                self.dataChanged.emit(index1, index2)
-
-    def __len__(self):
-        return len(self.songs)
-
-    def __getitem__(self, index):
-        return self.songs[index]
-
-    def columnCount(self, parent=None):
-        return self.fmt.playlist_column_count
-
-    def rowCount(self, parent=None):
-        return len(self)
-
-    def data(self, index, role=Qt.DisplayRole):
-        if 0 <= index.row() < len(self):
-            if role == Qt.DisplayRole:
-                return self.fmt.playlist_entry(
-                        self.songs[index.row()],
-                        index.column(),
-                        index.row() == self.current)
-            elif role == Qt.ToolTipRole:
-                return self.fmt.playlist_tooltip(
-                        self.songs[index.row()],
-                        index.column(),
-                        index.row() == self.current)
-            elif role == Qt.DecorationRole:
-                return self.fmt.playlist_icon(
-                        self.songs[index.row()],
-                        index.column(),
-                        index.row() == self.current)
-            #elif role == Qt.EditRole and index.column() == 0:
-            #    return self.songs[index.row()].get('playlist', None)
-        return None
-
-    def flags(self, index):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable #| Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
-
-    #def supportedDropActions(self):
-    #    return Qt.MoveAction
+    def retrieve_from_server(self, new_query):
+        if new_query[1] == '':
+            return []
+        return self.conn.search(self.search_tags[new_query[0]], new_query[1])
 

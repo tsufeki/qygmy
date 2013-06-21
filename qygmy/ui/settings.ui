@@ -107,6 +107,12 @@
          <number>0</number>
         </property>
         <widget class="QWidget" name="tab1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="title">
           <string>Current song</string>
          </attribute>
@@ -117,6 +123,12 @@
          </layout>
         </widget>
         <widget class="QWidget" name="tab2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="title">
           <string>Playlist item</string>
          </attribute>
@@ -127,6 +139,12 @@
          </layout>
         </widget>
         <widget class="QWidget" name="tab3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="title">
           <string>Progress bar</string>
          </attribute>
@@ -137,6 +155,12 @@
          </layout>
         </widget>
         <widget class="QWidget" name="tab4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="title">
           <string>Window title</string>
          </attribute>

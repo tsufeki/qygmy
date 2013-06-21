@@ -10,171 +10,192 @@ class Formatter:
     _playlist_icon = QIcon.fromTheme('text-plain')
 
     templates = {
-        'playlist_entry': Template('%title%$if(%artist%,  <span style="color: gray">/</span>  %artist%,)'
-            '$if($or(%album%,%comment%),\n<span style="color: gray; font-size: small">'
-            '%comment%$if($and(%album%,%comment%),  /  ,)%album%</span>,)'),
-        'current_song': Template('<span style="font-size: big; font-weight: bold">%title%</span>\n'
-            '<span style="font-size: small">%artist%</span>\n'
-            '<span style="font-size: small">%comment%$if($and(%comment%,%album%),  /  ,)%album%</span>'),
-        'folder_entry': Template('%filename%'),
-        'progressbar': Template('%elapsed%$if(%total%, / %total%,)'),
+        'playlist_item': (
+            '$if2(%title%,%filename%)'
+            '$if(%artist%,'
+                '<span style="color: gray">\xa0\xa0/\xa0\xa0</span>%artist%,)'
+            '$if(%album%%comment%,'
+                '<br><span style="color: gray; font-size: small">\xa0\xa0\xa0'
+                '%comment%'
+                '$if($and(%album%,%comment%),\xa0\xa0/\xa0\xa0,)'
+                '%album%</span>,)'
+        ),
+        'current_song': (
+            '<span style="font-size: big; font-weight: bold">'
+                '$if2(%title%,%filename%)</span><br>'
+            '<span style="font-size: small">'
+                '%artist%</span><br>'
+            '<span style="font-size: small">'
+                '%comment%$if($and(%comment%,%album%),\xa0\xa0/\xa0\xa0,)%album%</span>'
+        ),
+        'progressbar': (
+            '$if3('
+                '%playing%%paused%,'
+                    '$time(%elapsed%)'
+                    '$if($and(%total%,$gt(%total%,0)), / $time(%total%),),'
+                '%stopped%,Stopped,'
+                '%connected%,Connected,'
+                'Disconnected)'
+        ),
+        'window_title': (
+            '[Qygmy]'
+            '$if(%playing%,'
+            '$if2(%title%,%filename%)'
+            '$if(%artist%, / %artist%,),)'
+        ),
+        '_playlist_column2': '$time(%length%)',
+        '_status': (
+            '$if(%disconnected%,,'
+                '%totalcount% songs'
+                '$if($gt(%totallength%,0),'
+                    '\\, $time(%totallength%) total,))'
+        ),
+        '_statistics': (
+            ('Songs:', '%songs%'),
+            ('Albums:', '%albums%'),
+            ('Artists:', '%artists%'),
+            ('Uptime:', '$time(%uptime%)'),
+            ('Total playtime:', '$time(%db_playtime%)'),
+            ('This instance:', '$time(%playtime%)'),
+        ),
+        '_details': (
+            ('Path:', '%file%'),
+            ('Title:', '%title%'),
+            ('Artist:', '%artist%'),
+            ('Album:', '%album%'),
+            ('Date:', '%date%'),
+            ('Track:', '%track%$if(%totaltracks%, / %totaltracks%,)'),
+            ('Disc:', '%disc%$if(%totaldiscs%, / %totaldiscs%,)'),
+            ('Comment:', '%comment%'),
+            ('Length:', '$if(%length%,$time(%length%),)'),
+            ('Last modified:', '%lastmodified%'),
+            ('Composer:', '%composer%'),
+            ('Performer:', '%performer%'),
+        )
     }
 
     def _escape(self, s):
         return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
-    def _time(self, seconds):
-        seconds = int(seconds)
-        s = seconds % 60
-        m = (seconds // 60) % 60
-        h = seconds // 3600
-        time = '{:02d}:{:02d}'.format(m, s)
-        if h == 0:
-            return time
-        return '{}:{}'.format(h, time)
-
-    def _prepare(self, metadata, escape=True):
-        metadata = metadata.copy()
-        metadata.pop('id', None)
-        metadata.pop('pos', None)
-        metadata.pop('last-modified', None)
-        if 'time' in metadata:
-            metadata['length'] = self._time(int(metadata.pop('time')))
+    def _prepare_song(self, song, html=True):
+        song = song.copy()
+        song.pop('id', None)
+        song.pop('pos', None)
         for key in ['file', 'directory', 'playlist']:
-            if key in metadata:
-                fullpath = metadata[key]
-                filename = fullpath.rsplit('/', 1)[-1]
-                if fullpath:
-                    metadata['fullpath'] = fullpath
+            if key in song:
+                filename = song[key].rsplit('/', 1)[-1]
                 if filename:
-                    metadata['filename'] = filename
-        if not metadata.get('title') and metadata.get('filename'):
-            metadata['title'] = filename
-        if 'track' in metadata and '/' in metadata['track']:
-            metadata['track'], metadata['totaltracks'] = metadata['track'].split('/', 1)
-        if 'disc' in metadata and '/' in metadata['disc']:
-            metadata['disc'], metadata['totaldiscs'] = metadata['disc'].split('/', 1)
-        if 'elapsed' in metadata and 'total' in metadata:
-            metadata['left'] = self._time(int(metadata['total']) - int(metadata['elapsed']))
-        if 'elapsed' in metadata:
-            metadata['elapsed'] = self._time(int(metadata['elapsed']))
-        if 'total' in metadata:
-            metadata['total'] = self._time(int(metadata['total']))
-        for k, v in metadata.items():
+                    song['filename'] = filename
+        if 'time' in song:
+            song['length'] = int(song.pop('time'))
+        if 'track' in song and '/' in song['track']:
+            song['track'], song['totaltracks'] = song['track'].split('/', 1)
+        if 'disc' in song and '/' in song['disc']:
+            song['disc'], song['totaldiscs'] = song['disc'].split('/', 1)
+        if 'last-modified' in song:
+            song['lastmodified'] = song.pop('last-modified').replace('T', ' ').replace('Z', '')
+        ret = {}
+        for k, v in song.items():
             if isinstance(v, (list, tuple)):
                 v = ', '.join(v)
-            if escape:
+            else:
+                v = str(v)
+            if html:
                 v = self._escape(v)
-            metadata[k] = v
-        return metadata
+            if v != '':
+                ret[k] = v
+        return ret
 
-    def _render(self, metadata, template, html=True, bold=False):
-        metadata = self._prepare(metadata, html)
-        r = self.templates[template].render(metadata)
-        if html and bold:
-            r = '<span style="font-weight: bold !important">{}</span>'.format(r)
-        if html:
-            r = '<span style="white-space: pre">{}</span>'.format(r)
-        return r
+    def _prepare_state(self, state):
+        return {{
+            'play': 'playing',
+            'pause': 'paused',
+            'stop': 'stopped',
+            'disconnect': 'disconnected',
+            'connect': 'connected',
+        }[state]: '1'}
 
-    def progressbar(self, times):
-        e, t = times
-        text = self._render({'elapsed': e, 'total': t}, 'progressbar', html=False)
-        if e == t == 0:
-            t = 1
-        return text, e, t
+    def _prepare_times(self, elapsed, total):
+        return {
+            'elapsed': str(elapsed),
+            'total': str(total),
+            'left': str(max(total - elapsed, 0)),
+        }
 
-    def progressbar_notplaying(self, state):
-        if state == 'disconnect':
-            return 'Disconnected'
-        return 'Stopped'
+    def _compile(self, template):
+        pref = '$if(%bold%,<span style="font-weight: bold">,)'
+        suff = '$if(%bold%,</span>,)'
+        if isinstance(template, str):
+            return Template(pref + template + suff)
+        return tuple((self._compile(a), self._compile(b)) for a, b in template)
 
-    def playlist_entry(self, metadata, column, is_current=False):
-        if 'directory' in metadata or 'playlist' in metadata:
-            if column == 0:
-                return self._render(metadata, 'folder_entry')
-        else:
-            if column == 0:
-                return self._render(metadata, 'playlist_entry', bold=is_current)
-            elif column == 1:
-                return self._time(int(metadata.get('time', '0')))
+    def _render(self, template, context):
+        if isinstance(template, Template):
+            return template.render(context)
+        return [(self._render(a, context), self._render(b, context)) for a, b in template]
+
+    def render(self, name, context, bold=False):
+        if not hasattr(self, '_tmplcache'):
+            self._tmplcache = {}
+        if name not in self._tmplcache:
+            self._tmplcache[name] = self._compile(self.templates[name])
+        tmpl = self._tmplcache[name]
+        context['bold'] = '1' if bold else ''
+        return self._render(tmpl, context)
+
+    def progressbar(self, state, elapsed, total, song):
+        context = self._prepare_state(state)
+        context.update(self._prepare_times(elapsed, total))
+        context.update(self._prepare_song(song, html=False))
+        return self.render('progressbar', context)
+
+    def playlist_item(self, song, column, is_current=False):
+        if column == 0:
+            return self.render('playlist_item', self._prepare_song(song), bold=is_current)
+        elif column == 1 and 'time' in song:
+            return self.render('_playlist_column2', {'length': song['time']}, bold=is_current)
         return ''
 
-    def playlist_icon(self, data, column, is_current=False):
+    def playlist_icon(self, song, column, is_current=False):
         if column == 0:
-            if 'playlist' in data:
+            if 'playlist' in song:
                 return self._playlist_icon
-            if 'directory' in data:
+            if 'directory' in song:
                 return self._directory_icon
 
     def playlist_tooltip(self, song, column, is_current=False):
         return song.get('file')
 
-    def main_window_title(self, song):
-        return 'Qygmy'
+    def window_title(self, state, song):
+        context = self._prepare_state(state)
+        context.update(self._prepare_song(song, html=False))
+        return self.render('window_title', context)
 
-    def browser_window_title(self, path=''):
-        path = self._escape(path.rsplit('/', 1)[-1])
-        if path:
-            return 'Music database - %s' % path
-        else:
-            return 'Music database'
+    def current_song(self, state, song):
+        context = self._prepare_state(state)
+        context.update(self._prepare_song(song))
+        return self.render('current_song', context)
 
-    def current_song(self, song):
-        return self._render(song, 'current_song')
+    def status(self, state, totallength, totalcount):
+        context = {'totallength': str(totallength), 'totalcount': str(totalcount)}
+        context.update(self._prepare_state(state))
+        return self.render('_status', context)
 
     @property
     def playlist_column_count(self):
         return 2
 
-    def details(self, song):
-        song = song.copy()
-        song.pop('id', None)
-        song.pop('pos', None)
-        s = '<table>'
-        s += '<tr><td colspan=2>{}</td></tr>'.format(song.pop('file', ''))
-        s += '<tr><td colspan=2></td></tr>'
+    def info_dialog(self, name, info):
+        if name == 'details':
+            info = self._prepare_song(info)
+        r = self.render('_' + name, info)
+        return [i for i in r if i[1] != '']
+
+
+    def _details(self, song):
         mblink = lambda typ: lambda x: '<a href="http://musicbrainz.org/{0}/{1}">{1}</a>'.format(typ, x)
-        for key, display, xform in [
-            ('title', 'Title', self._escape),
-            ('artist', 'Artist', self._escape),
-            ('album', 'Album', self._escape),
-            ('date', 'Date', self._escape),
-            ('track', 'Track', self._escape),
-            ('disc', 'Disc', self._escape),
-            ('comment', 'Comment', self._escape),
-            ('time', 'Length', self._time),
-            ('last-modified', 'Last modified', lambda x: x.replace('T', ' ').replace('Z', '')),
-            ('composer', 'Composer', self._escape),
-            ('performer', 'Performer', self._escape),
-            ('musicbrainz_trackid', 'MB track id', mblink('recording')),
-            ('musicbrainz_albumid', 'MB album id', mblink('release')),
-            ('musicbrainz_artistid', 'MB artist id', mblink('artist')),
-            ('musicbrainz_albumartistid', 'MB album artist id', mblink('artist')),
-        ]:
-            v = song.pop(key, '')
-            if v:
-                if isinstance(v, (list, tuple)):
-                    v = ', '.join(v)
-                s += (
-                    '<tr>'
-                        '<td style="'
-                            'padding-top: 5px;'
-                            'white-space: nowrap;'
-                            'font-weight: bold;'
-                        '">{}:</td>'
-                        '<td style="'
-                            'padding-top: 5px;'
-                        '">{}</td>'
-                    '</tr>'
-                ).format(display, xform(v))
-        for key in sorted(song.keys()):
-            s += (
-                '<tr>'
-                    '<td style="padding-top: 5px;">{}:</td>'
-                    '<td style="padding-top: 5px;">{}</td>'
-                '</tr>'
-            ).format(key, song[key])
-        s += '</table>'
-        return s
+        ('musicbrainz_trackid', 'MB track id', mblink('recording')),
+        ('musicbrainz_albumid', 'MB album id', mblink('release')),
+        ('musicbrainz_artistid', 'MB artist id', mblink('artist')),
+        ('musicbrainz_albumartistid', 'MB album artist id', mblink('artist')),
 

@@ -2,20 +2,26 @@
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-from .ui.details import Ui_details
+from .ui.infodialog import Ui_infodialog
 from .ui.settings import Ui_settings
 
 
-class Details(QDialog):
-    def __init__(self, main, formatter):
+class Info(QDialog):
+    def __init__(self, main):
         super().__init__(main)
         self.main = main
-        self.fmt = formatter
-        self.ui = Ui_details()
+        self.ui = Ui_infodialog()
         self.ui.setupUi(self)
 
-    def show_details(self, metadata):
-        self.ui.details_label.setText(self.fmt.details(metadata))
+    def show_dialog(self, name, info):
+        while self.ui.layout.count() > 0:
+            w = self.ui.layout.takeAt(0)
+            w.widget().hide()
+            w.widget().deleteLater()
+        d = self.main.fmt.info_dialog(name, info)
+        for a, b in d:
+            self.ui.layout.addRow(a, QLabel(b))
+        self.adjustSize()
         self.exec_()
 
 

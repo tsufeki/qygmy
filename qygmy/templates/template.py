@@ -78,7 +78,7 @@ class Variable(RegexElement):
         self.name = name.lower()
 
     def render(self, context):
-        return context.get(self.name, '')
+        return str(context.get(self.name, ''))
 
     def __repr__(self):
         return 'Variable({!r})'.format(self.name)
