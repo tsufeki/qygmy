@@ -18,7 +18,7 @@ class Qygmy(QMainWindow):
         self.fmt = Formatter(self.settings.conf)
         self.srv = Server(self)
         self.info = Info(self)
-        self.browser = Browser(self.srv, self.info)
+        self.browser = Browser(self)
         self.timer = QTimer(self)
         self.setup_ui()
         self.connect_mpd()
@@ -38,6 +38,8 @@ class Qygmy(QMainWindow):
         self.setup_icons()
         self.setup_widgets()
         self.setup_context_menu()
+        if 'main_geometry' in self.settings.conf['gui']:
+            self.restoreGeometry(QByteArray.fromBase64(self.settings.conf['gui']['main_geometry']))
         self.setup_signals()
 
     def setup_icons(self):
@@ -161,6 +163,13 @@ class Qygmy(QMainWindow):
         self.ui.action_details.setEnabled(self.ui.queue.details() is not None)
         self.ui.context_menu.popup(e.globalPos())
 
+    def closeEvent(self, e):
+        self.settings.conf['gui']['main_geometry'] = str(self.saveGeometry().toBase64())
+        self.settings.conf['gui']['browser_geometry'] = str(self.browser.saveGeometry().toBase64())
+        self.settings.save()
+        self.browser.close()
+        super().closeEvent(e)
+
     @Slot(str)
     def on_state_changed(self, state):
         c = state != 'disconnect'
@@ -218,10 +227,13 @@ class Qygmy(QMainWindow):
 
 def main():
     import sys
+    import os
     app = QApplication(sys.argv)
     m = Qygmy()
     m.show()
-    sys.exit(app.exec_())
+    # HACK: XXX: TODO: FIXME:
+    os._exit(app.exec_())
+    #sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()

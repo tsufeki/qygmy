@@ -72,6 +72,7 @@ class Settings(QDialog):
                     '%album%</span>,)'
             ),
         },
+        'gui': {},
     }
 
     PATH = os.path.expanduser(os.path.join(os.environ.get('XDG_CONFIG_HOME', '~/.config'), 'qygmy'))
@@ -117,10 +118,12 @@ class Settings(QDialog):
         sb = self.ui.buttonbox.standardButton(button)
         if sb == QDialogButtonBox.Ok:
             self.ui_to_conf()
+            self.save()
         elif sb == QDialogButtonBox.Cancel:
             self.conf_to_ui()
         elif sb == QDialogButtonBox.Apply:
             self.ui_to_conf()
+            self.save()
         elif sb == QDialogButtonBox.RestoreDefaults:
             self.conf_to_ui(self.DEFAULTS)
 
@@ -151,7 +154,7 @@ class Settings(QDialog):
             },
         }
 
-    def ui_to_conf(self, save=True):
+    def ui_to_conf(self):
         d = self.ui_to_dict()
         changed = set()
         for sect in ('connection', 'format'):
@@ -171,13 +174,14 @@ class Settings(QDialog):
             self.main.srv.database.refresh_format()
             self.main.srv.playlists.refresh_format()
             self.main.srv.search.refresh_format()
-        if save:
-            try:
-                os.makedirs(self.PATH, exist_ok=True)
-                with open(os.path.join(self.PATH, self.FILENAME), 'w') as f:
-                    self.conf.write(f)
-            except IOError as e:
-                print(e.__class__.__name__ + ': ' + str(e))
+
+    def save(self):
+        try:
+            os.makedirs(self.PATH, exist_ok=True)
+            with open(os.path.join(self.PATH, self.FILENAME), 'w') as f:
+                self.conf.write(f)
+        except IOError as e:
+            print(e.__class__.__name__ + ': ' + str(e))
 
     def validate_port(self, port):
         pi = None

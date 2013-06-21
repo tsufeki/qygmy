@@ -6,14 +6,12 @@ from .ui.browser import Ui_browser
 
 
 class Browser(QMainWindow):
-    def __init__(self, srv, details):
+    def __init__(self, main):
         super().__init__()
-        self.srv = srv
-        self.details = details
+        self.main = main
+        self.srv = main.srv
         self.setup_ui()
         self.setAttribute(Qt.WA_QuitOnClose, False)
-        #self.srv.database.refresh()
-        #self.srv.playlists.refresh()
 
     def setup_ui(self):
         self.ui = Ui_browser()
@@ -41,6 +39,8 @@ class Browser(QMainWindow):
                 cm.addAction(getattr(self.ui, 'action_' + action))
         self.ui.context_menu = cm
 
+        if 'browser_geometry' in self.main.settings.conf['gui']:
+            self.restoreGeometry(QByteArray.fromBase64(self.main.settings.conf['gui']['browser_geometry']))
         self.srv.state.changed.connect(self.on_state_changed)
 
     def setup_database(self):
@@ -171,5 +171,5 @@ class Browser(QMainWindow):
     def on_action_details_triggered(self):
         d = self.current_view.details()
         if d is not None:
-            self.details.exec_('details', d, 'Details')
+            self.main.info.exec_('details', d, 'Details')
 
