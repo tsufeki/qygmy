@@ -1,9 +1,10 @@
 
 import re
 import functools
+import socket
 
 from PySide.QtCore import *
-from mpd import MPDClient, MPDError, CommandError
+from mpd import MPDClient, MPDError, CommandError, ConnectionError
 
 
 class State(QObject):
@@ -100,7 +101,7 @@ def mpd_wrapper(connection, function, args=(), kwargs={}, ignore_conn=False):
     if ignore_conn or connection.state.value != 'disconnect':
         try:
             r = function(*args, **kwargs)
-        except MPDError as e:
+        except (MPDError, socket.error) as e:
             connection.handle_error(e)
     connection.update_state()
     return r
@@ -148,15 +149,22 @@ class Connection:
     ERROR = re.compile(r'^\[([0-9]+)@([0-9]+)\] \{([^}]*)\} (.*)$')
 
     def parse_exception(self, exc):
-        return self.ERROR.match(exc.args[0]).groups()
+        m = self.ERROR.match(exc.args[0])
+        if m is None:
+            return '', '', '', str(exc)
+        return m.groups()
 
     def handle_error(self, exc):
         import sys
         print('{}: {}'.format(type(exc).__name__, exc), file=sys.stderr)
+        msg = None
         if isinstance(exc, CommandError):
             errno, cmdno, cmd, msg = self.parse_exception(exc)
-            msg = msg[0].upper() + msg[1:] + ' ({};{})'.format(errno, cmd)
-            self.main.error(msg)
+            msg = msg + ' ({};{})'.format(errno, cmd)
+        elif isinstance(exc, (ConnectionError, socket.error)):
+            msg = str(exc)
+        if msg:
+            self.main.error(msg[0].upper() + msg[1:])
         # TODO: critical errors
 
 
@@ -254,7 +262,7 @@ class Server(ProperConnection, QObject):
         # TODO: ValueError
         self.conn.connect(host, int(port))
         self.state.update('connect')
-        if password is not None:
+        if password:
             self.conn.password(password)
 
     @mpd_cmd
@@ -308,6 +316,10 @@ class SongList(RelayingConnection, QAbstractTableModel):
 
     def refresh(self):
         self.current.update(self.current.value, force=True)
+
+    def refresh_format(self):
+        self.beginResetModel()
+        self.endResetModel()
 
     def _reset(self, newstate, oldstate):
         if newstate == 'disconnect' or oldstate == 'disconnect':

@@ -14,11 +14,11 @@ class Qygmy(QMainWindow):
     def __init__(self):
         super().__init__()
         QTextCodec.setCodecForTr(QTextCodec.codecForName('UTF-8'))
-        self.fmt = Formatter()
+        self.settings = Settings(self)
+        self.fmt = Formatter(self.settings.conf)
         self.srv = Server(self)
         self.info = Info(self)
         self.browser = Browser(self.srv, self.info)
-        self.settings = Settings(self)
         self.timer = QTimer(self)
         self.setup_ui()
         self.connect_mpd()
@@ -26,7 +26,10 @@ class Qygmy(QMainWindow):
         self.timer.start(500)
 
     def connect_mpd(self):
-        self.srv.connect_mpd('localhost', 6600, 'ka'*4)
+        self.srv.connect_mpd(
+            self.settings.conf['connection']['host'],
+            int(self.settings.conf['connection']['port']),
+            self.settings.conf['connection']['password'])
 
     def setup_ui(self):
         self.ui = Ui_main()
@@ -186,11 +189,11 @@ class Qygmy(QMainWindow):
     def on_action_details_triggered(self):
         d = self.ui.queue.details()
         if d is not None:
-            self.info.show_dialog('details', d)
+            self.info.exec_('details', d, 'Details')
 
     @Slot()
     def on_action_statistics_triggered(self):
-        self.info.show_dialog('statistics', self.srv.statistics())
+        self.info.exec_('statistics', self.srv.statistics(), 'MPD statistics')
 
     @Slot()
     def on_action_save_triggered(self):

@@ -118,7 +118,13 @@
          </attribute>
          <layout class="QVBoxLayout" name="vf1">
           <item>
-           <widget class="QPlainTextEdit" name="current_song"/>
+           <widget class="QPlainTextEdit" name="current_song">
+            <property name="font">
+             <font>
+              <family>DejaVu Sans Mono</family>
+             </font>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -134,7 +140,13 @@
          </attribute>
          <layout class="QVBoxLayout" name="vf2">
           <item>
-           <widget class="QPlainTextEdit" name="playlist_entry"/>
+           <widget class="QPlainTextEdit" name="playlist_item">
+            <property name="font">
+             <font>
+              <family>DejaVu Sans Mono</family>
+             </font>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -150,7 +162,13 @@
          </attribute>
          <layout class="QVBoxLayout" name="vf3">
           <item>
-           <widget class="QPlainTextEdit" name="progressbar"/>
+           <widget class="QPlainTextEdit" name="progressbar">
+            <property name="font">
+             <font>
+              <family>DejaVu Sans Mono</family>
+             </font>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -166,7 +184,13 @@
          </attribute>
          <layout class="QVBoxLayout" name="vf4">
           <item>
-           <widget class="QPlainTextEdit" name="window_title"/>
+           <widget class="QPlainTextEdit" name="window_title">
+            <property name="font">
+             <font>
+              <family>DejaVu Sans Mono</family>
+             </font>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

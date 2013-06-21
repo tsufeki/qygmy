@@ -171,5 +171,5 @@ class Browser(QMainWindow):
     def on_action_details_triggered(self):
         d = self.current_view.details()
         if d is not None:
-            self.details.show_dialog('details', d)
+            self.details.exec_('details', d, 'Details')
 
