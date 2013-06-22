@@ -8,6 +8,7 @@ class Formatter:
 
     def __init__(self, conf):
         self.conf = conf
+        self._tmplcache = {}
 
     _directory_icon = QIcon.fromTheme('folder')
     _playlist_icon = QIcon.fromTheme('text-plain')
@@ -113,8 +114,6 @@ class Formatter:
         return [(self._render(a, context), self._render(b, context)) for a, b in template]
 
     def render(self, name, context, bold=False):
-        if not hasattr(self, '_tmplcache'):
-            self._tmplcache = {}
         if name not in self._tmplcache:
             if name in self.conf['format']:
                 t = self.conf['format'][name]
@@ -124,6 +123,9 @@ class Formatter:
         tmpl = self._tmplcache[name]
         context['bold'] = '1' if bold else ''
         return self._render(tmpl, context)
+
+    def clear_cache(self):
+        self._tmplcache = {}
 
     def window_title(self, state, song):
         context = self._prepare_state(state)

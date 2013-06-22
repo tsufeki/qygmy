@@ -297,6 +297,7 @@ class SongList(RelayingConnection, QAbstractTableModel):
 
     def __init__(self, parent, current, state_class=State):
         super().__init__(parent)
+        self.setSupportedDragActions(Qt.MoveAction | Qt.CopyAction)
         self.songs = []
         prefix = self.__class__.__name__.lower() + '_'
 
@@ -360,6 +361,9 @@ class SongList(RelayingConnection, QAbstractTableModel):
             return self.songs[index]
         return {}
 
+    def __iter__(self):
+        return iter(self.songs)
+
     def details(self, positions):
         if len(positions) == 1 and 'file' in self[positions[0]]:
             return self[positions[0]]
@@ -391,19 +395,43 @@ class SongList(RelayingConnection, QAbstractTableModel):
             elif role == Qt.DecorationRole:
                 return self.main.fmt.playlist_icon(
                         self[r], c, r == self.current_pos.value)
+            elif role == Qt.UserRole and index.column() == 0:
+                r = index.row()
+                typ = None
+                for t in ('file', 'directory', 'playlist'):
+                    if t in self[r]:
+                        typ = t
+                path = self[r][typ]
+                return (
+                    self.dragdrop_marker +
+                    self.__class__.__name__ + '#' +
+                    str(r) + '#' +
+                    typ + '#' +
+                    path +
+                    self.dragdrop_marker
+                )
         return None
 
     def flags(self, index):
-        f = Qt.ItemIsEnabled | Qt.ItemIsSelectable #| Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
+        f = Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
         if index.column() == 0 and self.can_rename([index.row()]):
             f |= Qt.ItemIsEditable
         return f
 
-    #def supportedDropActions(self):
-    #    return Qt.MoveAction
+    def supportedDropActions(self):
+        return None
+
+    def itemData(self, index):
+        d = super().itemData(index)
+        userrole = self.data(index, Qt.UserRole)
+        if userrole:
+            d[Qt.UserRole] = userrole
+        return d
+
+    dragdrop_marker = '#&#&#&#'
 
 
-class RemovableItemsMixin:
+class WritableMixin:
 
     def can_remove(self, positions):
         return len(positions) > 0
@@ -419,8 +447,46 @@ class RemovableItemsMixin:
             self._remove(positions)
             self.refresh()
 
+    def flags(self, index):
+        return super().flags(index) | Qt.ItemIsDropEnabled
 
-class Queue(RemovableItemsMixin, SongList):
+    def supportedDropActions(self):
+        return Qt.MoveAction | Qt.CopyAction
+
+    def dropMimeData(self, data, action, row, column, parent):
+        print({Qt.MoveAction: 'MoveAction', Qt.CopyAction: 'CopyAction'}[action])
+        if row < 0:
+            row = parent.row()
+        b = data.data(data.formats()[0]).data()
+        m = self.dragdrop_marker.encode('utf-16be')
+        items = b.split(m)[1::2]
+        items = (i.decode('utf-16be').split('#', 3) for i in items)
+        items = sorted(((a, int(b), c, d) for a, b, c, d in items), key=lambda x: (x[0], x[1]))
+        moves = []
+        adds = []
+        for i in items:
+            source, pos, typ, path = i
+            if source != self.__class__.__name__ or action == Qt.CopyAction:
+                adds.append({typ: path})
+            else:
+                moves.append((self[pos]['id'], pos))
+        if row >= 0:
+            self._move(moves, row)
+            self.add(adds, pos=row)
+        else:
+            self.add(adds)
+        self.refresh()
+        return False
+
+    @mpd_cmdlist
+    def _move(self, idposlist, destpos):
+        for i, pos in idposlist:
+            if pos >= destpos:
+                destpos += 1
+            self.move_one(i, destpos)
+
+
+class Queue(WritableMixin, SongList):
 
     def __init__(self, parent):
         super().__init__(parent, -1)
@@ -431,8 +497,11 @@ class Queue(RemovableItemsMixin, SongList):
     def retrieve_from_server(self, new_version):
         return self.conn.playlistinfo()
 
+    def refresh(self):
+        self.refresh_format()
+
     @mpd_cmdlist
-    def add(self, song_list, play=False, replace=False):
+    def add(self, song_list, play=False, replace=False, pos=None):
         if replace:
             self.conn.clear()
         cnt = len(song_list)
@@ -442,7 +511,11 @@ class Queue(RemovableItemsMixin, SongList):
             elif 'directory' in s:
                 self.conn.add(s['directory'])
             elif 'file' in s:
-                self.conn.add(s['file'])
+                if pos is not None:
+                    pos += 1
+                    self.conn.addid(s['file'], pos)
+                else:
+                    self.conn.add(s['file'])
             else:
                 cnt -= 1
         if play and cnt > 0:
@@ -451,20 +524,8 @@ class Queue(RemovableItemsMixin, SongList):
     def remove_one(self, pos):
         self.conn.deleteid(self[pos]['id'])
 
-    @mpd_cmd
-    def save(self, name, replace=False):
-        try:
-            self.conn.save(name)
-        except CommandError as e:
-            if self.parse_exception(e)[0] != '56':
-                raise
-            if not replace:
-                return False
-            self.conn.rm(name)
-            self.conn.save(name)
-        if self.current.value in ('', name):
-            self.refresh()
-        return True
+    def move_one(self, fromid, topos):
+        self.conn.moveid(fromid, topos)
 
     def double_clicked(self, pos):
         self.current_pos.send(pos)
@@ -505,7 +566,7 @@ class Database(BrowserList):
             super().add_or_cd(pos)
 
 
-class Playlists(RemovableItemsMixin, BrowserList):
+class Playlists(WritableMixin, BrowserList):
 
     def __init__(self, parent):
         super().__init__(parent, '')
@@ -515,6 +576,25 @@ class Playlists(RemovableItemsMixin, BrowserList):
             return self.conn.listplaylists()
         else:
             return self.conn.listplaylistinfo(new_name)
+
+    @mpd_cmdlist
+    def add(self, song_list, pos=None):
+        if self.current.value != '':
+            name = self.current.value
+        elif pos is not None:
+            name = self[pos]['playlist']
+        else:
+            playlists = {s['playlist'] for s in self}
+            name = new = self.tr('new_playlist')
+            if name in playlists:
+                for i in range(2, 10000):
+                    name = '{}_{}'.format(new, i)
+                    if name not in playlists:
+                        break
+        for s in song_list:
+            # TODO: directories?
+            if 'file' in s:
+                self.conn.playlistadd(name, s['file'])
 
     def can_rename(self, positions):
         return len(positions) == 1 and 'playlist' in self[positions[0]]
@@ -530,6 +610,25 @@ class Playlists(RemovableItemsMixin, BrowserList):
             self.conn.rm(self[pos]['playlist'])
         else:
             self.conn.playlistdelete(self.current.value, pos)
+
+    def move_one(self, fromid, topos):
+        if self.current.value != '':
+            self.conn.playlistmove(self.current.value, fromid, topos)
+
+    @mpd_cmd
+    def save_current(self, name, replace=False):
+        try:
+            self.conn.save(name)
+        except CommandError as e:
+            if self.parse_exception(e)[0] != '56':
+                raise
+            if not replace:
+                return False
+            self.conn.rm(name)
+            self.conn.save(name)
+        if self.current.value in ('', name):
+            self.refresh()
+        return True
 
     def data(self, index, role=Qt.DisplayRole):
         r, c = index.row(), index.column()

@@ -214,13 +214,13 @@ class Qygmy(QMainWindow):
                 break
             if not name:
                 self.error('You have to provide a name.')
-            elif self.srv.queue.save(name) is False:
+            elif self.srv.playlists.save_current(name) is False:
                 ans = QMessageBox.question(self, self.tr('Error'),
                         self.tr('Playlist with such name already exists. '
-                        'Do you want to replace\u00a0it?'),
+                        'Do you want to replace\xa0it?'),
                         QMessageBox.Yes | QMessageBox.No)
                 if ans == QMessageBox.Yes:
-                    self.srv.queue.save(name, True)
+                    self.srv.playlists.save_current(name, True)
                 break
             else: break
 

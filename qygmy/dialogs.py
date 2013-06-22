@@ -165,6 +165,8 @@ class Settings(QDialog):
         if not {'host', 'port', 'password'}.isdisjoint(changed):
             self.main.srv.disconnect_mpd()
             self.main.connect_mpd()
+        if not {'window_title', 'progressbar', 'current_song', 'playlist_item'}.isdisjoint(changed):
+            self.main.fmt.clear_cache()
         if not {'window_title', 'current_song'}.isdisjoint(changed):
             self.main.update_current_song()
         if 'progressbar' in changed:
