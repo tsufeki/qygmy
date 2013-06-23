@@ -39,8 +39,11 @@ class Browser(QMainWindow):
                 cm.addAction(getattr(self.ui, 'action_' + action))
         self.ui.context_menu = cm
 
-        if 'browser_geometry' in self.main.settings.conf['gui']:
-            self.restoreGeometry(QByteArray.fromBase64(self.main.settings.conf['gui']['browser_geometry']))
+        if 'browser_geometry' in self.main.settings['gui']:
+            self.restoreGeometry(QByteArray.fromBase64(self.main.settings['gui']['browser_geometry']))
+        if ('browser_tab' in self.main.settings['gui'] and
+                0 <= int(self.main.settings['gui']['browser_tab']) < self.ui.tabs.count()):
+            self.ui.tabs.setCurrentIndex(int(self.main.settings['gui']['browser_tab']))
         self.srv.state.changed.connect(self.on_state_changed)
 
     def setup_database(self):
@@ -70,6 +73,11 @@ class Browser(QMainWindow):
         return (
             self.ui.database, self.ui.playlists, self.ui.search,
         )[self.ui.tabs.currentIndex()]
+
+    def closeEvent(self, e):
+        self.main.settings['gui']['browser_geometry'] = str(self.saveGeometry().toBase64())
+        self.main.settings['gui']['browser_tab'] = str(self.ui.tabs.currentIndex())
+        super().closeEvent(e)
 
     def contextMenuEvent(self, e):
         e.accept()

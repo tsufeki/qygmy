@@ -8,6 +8,9 @@ from PySide.QtGui import *
 from .ui.infodialog import Ui_infodialog
 from .ui.settings import Ui_settings
 
+import logging
+logger = logging.getLogger('qygmy')
+
 
 class Info(QDialog):
     def __init__(self, main):
@@ -109,6 +112,12 @@ class Settings(QDialog):
         self.ui.setupUi(self)
         self.conf_to_ui()
 
+    def __getitem__(self, section):
+        return self.conf[section]
+
+    def __contains__(self, section):
+        return section in self.conf
+
     def exec_(self):
         self.conf_to_ui()
         super().exec_()
@@ -162,7 +171,7 @@ class Settings(QDialog):
                 if d[sect][k] != self.conf[sect][k]:
                     changed.add(k)
                     self.conf[sect][k] = d[sect][k]
-        if not {'host', 'port', 'password'}.isdisjoint(changed):
+        if not {'host', 'port', 'password'}.isdisjoint(changed) and self.main.srv.state != 'disconnect':
             self.main.srv.disconnect_mpd()
             self.main.connect_mpd()
         if not {'window_title', 'progressbar', 'current_song', 'playlist_item'}.isdisjoint(changed):
@@ -182,8 +191,8 @@ class Settings(QDialog):
             os.makedirs(self.PATH, exist_ok=True)
             with open(os.path.join(self.PATH, self.FILENAME), 'w') as f:
                 self.conf.write(f)
-        except IOError as e:
-            print(e.__class__.__name__ + ': ' + str(e))
+        except OSError as e:
+            logger.error('{}: {}'.format(e.__class__.__name__, e))
 
     def validate_port(self, port):
         pi = None

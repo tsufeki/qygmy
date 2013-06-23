@@ -1,10 +1,13 @@
 
 import re
 import functools
-import socket
+import pickle
 
+import mpd
 from PySide.QtCore import *
-from mpd import MPDClient, MPDError, CommandError, ConnectionError
+
+import logging
+logger = logging.getLogger('qygmy')
 
 
 class State(QObject):
@@ -101,7 +104,7 @@ def mpd_wrapper(connection, function, args=(), kwargs={}, ignore_conn=False):
     if ignore_conn or connection.state.value != 'disconnect':
         try:
             r = function(*args, **kwargs)
-        except (MPDError, socket.error) as e:
+        except (mpd.MPDError, OSError) as e:
             connection.handle_error(e)
     connection.update_state()
     return r
@@ -126,9 +129,10 @@ def mpd_cmdlist(f):
     def decor(self, *args, **kwargs):
         self.conn.command_list_ok_begin()
         try:
-            return f(self, *args, **kwargs)
+            f(self, *args, **kwargs)
         finally:
-            self.conn.command_list_end()
+            r = self.conn.command_list_end()
+        return r
     return decor
 
 
@@ -155,24 +159,34 @@ class Connection:
         return m.groups()
 
     def handle_error(self, exc):
-        import sys
-        print('{}: {}'.format(type(exc).__name__, exc), file=sys.stderr)
+        if isinstance(exc, (mpd.ConnectionError, mpd.ProtocolError, OSError)):
+            # Critical errors
+            try:
+                self.conn.disconnect()
+            except Exception as e:
+                pass
+            # Needed because it isn't called when socket's close() raises
+            # an exception (python-mpd2 bug).
+            self.conn._reset()
+            self.state.update('disconnect')
+        logger.error('{}: {}'.format(exc.__class__.__name__, exc))
         msg = None
-        if isinstance(exc, CommandError):
+        if isinstance(exc, mpd.CommandError):
             errno, cmdno, cmd, msg = self.parse_exception(exc)
             msg = msg + ' ({};{})'.format(errno, cmd)
-        elif isinstance(exc, (ConnectionError, socket.error)):
+        elif isinstance(exc, OSError) and exc.errno is not None:
+            msg = exc.strerror
+        elif isinstance(exc, (mpd.ConnectionError, OSError)):
             msg = str(exc)
         if msg:
             self.main.error(msg[0].upper() + msg[1:])
-        # TODO: critical errors
 
 
 class ProperConnection(Connection):
     def __init__(self, main):
         super().__init__(main)
         self.main = main
-        self.conn = MPDClient()
+        self.conn = mpd.MPDClient()
         State.create(self, 'state', 'disconnect', not_callable)
 
     def update_state(self):
@@ -239,7 +253,7 @@ class Server(ProperConnection, QObject):
                 self.conn.status()
                 self.conn.currentsong()
                 s, c = self.conn.command_list_end()
-            except MPDError as e:
+            except (mpd.MPDError, OSError) as e:
                 self.handle_error(e)
 
         self.state.update(s['state'])
@@ -299,6 +313,7 @@ class SongList(RelayingConnection, QAbstractTableModel):
         super().__init__(parent)
         self.setSupportedDragActions(Qt.MoveAction | Qt.CopyAction)
         self.songs = []
+        # TODO:
         prefix = self.__class__.__name__.lower() + '_'
 
         state_class.create(self, 'current', current, not_callable, prefix)
@@ -337,7 +352,7 @@ class SongList(RelayingConnection, QAbstractTableModel):
                 self.songs = s
             else:
                 self.songs = []
-        except MPDError:
+        except (MPDError, OSError):
             self.songs = []
             raise
         finally:
@@ -395,21 +410,6 @@ class SongList(RelayingConnection, QAbstractTableModel):
             elif role == Qt.DecorationRole:
                 return self.main.fmt.playlist_icon(
                         self[r], c, r == self.current_pos.value)
-            elif role == Qt.UserRole and index.column() == 0:
-                r = index.row()
-                typ = None
-                for t in ('file', 'directory', 'playlist'):
-                    if t in self[r]:
-                        typ = t
-                path = self[r][typ]
-                return (
-                    self.dragdrop_marker +
-                    self.__class__.__name__ + '#' +
-                    str(r) + '#' +
-                    typ + '#' +
-                    path +
-                    self.dragdrop_marker
-                )
         return None
 
     def flags(self, index):
@@ -421,14 +421,26 @@ class SongList(RelayingConnection, QAbstractTableModel):
     def supportedDropActions(self):
         return None
 
-    def itemData(self, index):
-        d = super().itemData(index)
-        userrole = self.data(index, Qt.UserRole)
-        if userrole:
-            d[Qt.UserRole] = userrole
-        return d
+    MIMETYPE = 'application/x-qygmy-playlistitems'
 
-    dragdrop_marker = '#&#&#&#'
+    def mimeTypes(self):
+        return [self.MIMETYPE]
+
+    def mimeData(self, indexes):
+        data = {'source': self.__class__.__name__, 'items': []}
+        for i in indexes:
+            if i.column() == 0:
+                d = {'pos': i.row()}
+                for k in ('id', 'playlist', 'directory', 'file'):
+                    if k in self[i.row()]:
+                        d[k] = self[i.row()][k]
+                data['items'].append(d)
+        data['items'].sort(key=lambda x: x['pos'])
+        md = QMimeData()
+        if len(data['items']) > 0:
+            # TODO: PickleError
+            md.setData(self.MIMETYPE, pickle.dumps(data))
+        return md
 
 
 class WritableMixin:
@@ -440,7 +452,9 @@ class WritableMixin:
     def _remove(self, positions):
         for pos in reversed(sorted(positions)):
             if self[pos]:
-                self.remove_one(pos)
+                song = self[pos].copy()
+                song['pos'] = pos
+                self.remove_one(song)
 
     def remove(self, positions):
         if self.can_remove(positions):
@@ -454,36 +468,30 @@ class WritableMixin:
         return Qt.MoveAction | Qt.CopyAction
 
     def dropMimeData(self, data, action, row, column, parent):
-        print({Qt.MoveAction: 'MoveAction', Qt.CopyAction: 'CopyAction'}[action])
+        # Ignoring action: move when src list is same as dst list,
+        # copy otherwise.
+        if not data.hasFormat(self.MIMETYPE):
+            return False
         if row < 0:
             row = parent.row()
-        b = data.data(data.formats()[0]).data()
-        m = self.dragdrop_marker.encode('utf-16be')
-        items = b.split(m)[1::2]
-        items = (i.decode('utf-16be').split('#', 3) for i in items)
-        items = sorted(((a, int(b), c, d) for a, b, c, d in items), key=lambda x: (x[0], x[1]))
-        moves = []
-        adds = []
-        for i in items:
-            source, pos, typ, path = i
-            if source != self.__class__.__name__ or action == Qt.CopyAction:
-                adds.append({typ: path})
-            else:
-                moves.append((self[pos]['id'], pos))
-        if row >= 0:
-            self._move(moves, row)
-            self.add(adds, pos=row)
+        if row < 0:
+            row = None
+        d = pickle.loads(data.data(self.MIMETYPE).data())
+        if d['source'] == self.__class__.__name__:
+            if row is None:
+                return False
+            self._move(d['items'], row)
         else:
-            self.add(adds)
+            self.add(d['items'], pos=row)
         self.refresh()
         return False
 
     @mpd_cmdlist
-    def _move(self, idposlist, destpos):
-        for i, pos in idposlist:
-            if pos >= destpos:
-                destpos += 1
-            self.move_one(i, destpos)
+    def _move(self, song_list, pos):
+        for s in song_list:
+            if s['pos'] >= pos:
+                pos += 1
+            self.move_one(s, pos)
 
 
 class Queue(WritableMixin, SongList):
@@ -521,11 +529,11 @@ class Queue(WritableMixin, SongList):
         if play and cnt > 0:
             self.conn.play(0 if replace else len(self))
 
-    def remove_one(self, pos):
-        self.conn.deleteid(self[pos]['id'])
+    def remove_one(self, song):
+        self.conn.deleteid(song['id'])
 
-    def move_one(self, fromid, topos):
-        self.conn.moveid(fromid, topos)
+    def move_one(self, song, pos):
+        self.conn.moveid(song['id'], pos)
 
     def double_clicked(self, pos):
         self.current_pos.send(pos)
@@ -577,8 +585,13 @@ class Playlists(WritableMixin, BrowserList):
         else:
             return self.conn.listplaylistinfo(new_name)
 
+    def sort_key(self, item):
+        # no sorting inside playlist
+        return item['playlist'] if 'playlist' in item else 0
+
     @mpd_cmdlist
     def add(self, song_list, pos=None):
+        # TODO: use 'song' or 'item' consistently
         if self.current.value != '':
             name = self.current.value
         elif pos is not None:
@@ -605,15 +618,15 @@ class Playlists(WritableMixin, BrowserList):
         else:
             super().add_or_cd(pos)
 
-    def remove_one(self, pos):
+    def remove_one(self, song):
         if self.current.value == '':
-            self.conn.rm(self[pos]['playlist'])
+            self.conn.rm(song['playlist'])
         else:
-            self.conn.playlistdelete(self.current.value, pos)
+            self.conn.playlistdelete(self.current.value, song['pos'])
 
-    def move_one(self, fromid, topos):
+    def move_one(self, song, pos):
         if self.current.value != '':
-            self.conn.playlistmove(self.current.value, fromid, topos)
+            self.conn.playlistmove(self.current.value, song['pos'], pos)
 
     @mpd_cmd
     def save_current(self, name, replace=False):

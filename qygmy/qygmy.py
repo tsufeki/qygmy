@@ -15,7 +15,7 @@ class Qygmy(QMainWindow):
         super().__init__()
         QTextCodec.setCodecForTr(QTextCodec.codecForName('UTF-8'))
         self.settings = Settings(self)
-        self.fmt = Formatter(self.settings.conf)
+        self.fmt = Formatter(self.settings)
         self.srv = Server(self)
         self.info = Info(self)
         self.browser = Browser(self)
@@ -27,9 +27,9 @@ class Qygmy(QMainWindow):
 
     def connect_mpd(self):
         self.srv.connect_mpd(
-            self.settings.conf['connection']['host'],
-            int(self.settings.conf['connection']['port']),
-            self.settings.conf['connection']['password'])
+            self.settings['connection']['host'],
+            int(self.settings['connection']['port']),
+            self.settings['connection']['password'])
 
     def setup_ui(self):
         self.ui = Ui_main()
@@ -38,8 +38,8 @@ class Qygmy(QMainWindow):
         self.setup_icons()
         self.setup_widgets()
         self.setup_context_menu()
-        if 'main_geometry' in self.settings.conf['gui']:
-            self.restoreGeometry(QByteArray.fromBase64(self.settings.conf['gui']['main_geometry']))
+        if 'main_geometry' in self.settings['gui']:
+            self.restoreGeometry(QByteArray.fromBase64(self.settings['gui']['main_geometry']))
         self.setup_signals()
 
     def setup_icons(self):
@@ -124,6 +124,7 @@ class Qygmy(QMainWindow):
                 return lambda checked: self.on_bool_triggered(varname, checked)
             act.triggered[bool].connect(Slot(bool)(slot(v)))
         self.ui.action_add.triggered.connect(self.browser.show)
+        self.ui.action_add.triggered.connect(self.browser.activateWindow)
         self.ui.action_remove.triggered.connect(self.ui.queue.remove_selected)
         self.ui.action_clear.triggered.connect(self.srv.clear)
         self.ui.action_randomize.triggered.connect(self.srv.randomize_queue)
@@ -164,10 +165,10 @@ class Qygmy(QMainWindow):
         self.ui.context_menu.popup(e.globalPos())
 
     def closeEvent(self, e):
-        self.settings.conf['gui']['main_geometry'] = str(self.saveGeometry().toBase64())
-        self.settings.conf['gui']['browser_geometry'] = str(self.browser.saveGeometry().toBase64())
-        self.settings.save()
+        self.srv.disconnect_mpd()
+        self.settings['gui']['main_geometry'] = str(self.saveGeometry().toBase64())
         self.browser.close()
+        self.settings.save()
         super().closeEvent(e)
 
     @Slot(str)
@@ -177,7 +178,8 @@ class Qygmy(QMainWindow):
         self.ui.action_disconnect.setVisible(c)
         for action in ('previous', 'play', 'pause', 'stop', 'next', 'volume',
                 'add', 'remove', 'clear', 'repeat', 'shuffle', 'single',
-                'consume', 'updatedb', 'save', 'randomize', 'details'):
+                'consume', 'updatedb', 'save', 'randomize', 'details',
+                'statistics'):
             getattr(self.ui, 'action_' + action).setEnabled(c)
         self.ui.action_play.setVisible(state != 'play')
         self.ui.action_pause.setVisible(state == 'play')

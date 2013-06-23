@@ -6,8 +6,8 @@ from .templates import Template
 
 class Formatter:
 
-    def __init__(self, conf):
-        self.conf = conf
+    def __init__(self, settings):
+        self.settings = settings
         self._tmplcache = {}
 
     _directory_icon = QIcon.fromTheme('folder')
@@ -115,8 +115,8 @@ class Formatter:
 
     def render(self, name, context, bold=False):
         if name not in self._tmplcache:
-            if name in self.conf['format']:
-                t = self.conf['format'][name]
+            if name in self.settings['format']:
+                t = self.settings['format'][name]
             else:
                 t = self.templates[name]
             self._tmplcache[name] = self._compile(t)
@@ -179,12 +179,4 @@ class Formatter:
     @property
     def playlist_column_count(self):
         return 2
-
-
-    def _details(self, song):
-        mblink = lambda typ: lambda x: '<a href="http://musicbrainz.org/{0}/{1}">{1}</a>'.format(typ, x)
-        ('musicbrainz_trackid', 'MB track id', mblink('recording')),
-        ('musicbrainz_albumid', 'MB album id', mblink('release')),
-        ('musicbrainz_artistid', 'MB artist id', mblink('artist')),
-        ('musicbrainz_albumartistid', 'MB album artist id', mblink('artist')),
 
