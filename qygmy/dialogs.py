@@ -67,6 +67,9 @@ class Settings(QDialog):
             ),
         },
         'gui': {},
+        'misc': {
+            'autoscroll': '1',
+        },
     }
 
     PATH = os.path.expanduser(os.path.join(os.environ.get('XDG_CONFIG_HOME', '~/.config'), 'qygmy'))

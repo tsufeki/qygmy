@@ -121,6 +121,7 @@ class Qygmy(QMainWindow):
         self.srv.state.changed.connect(self.update_current_song)
         self.srv.current_song.changed.connect(self.update_progressbar)
         self.srv.current_song.changed.connect(self.update_current_song)
+        self.srv.current_song.changed2.connect(self.scroll_to_current)
         self.srv.queue.current.changed.connect(self.update_status)
         self.srv.volume.changed.connect(self.ui.volume_slider.setValue)
         self.srv.volume.changed.connect(lambda v: self.ui.volume_label.setText(str(v)))
@@ -171,6 +172,17 @@ class Qygmy(QMainWindow):
     def update_status(self, *_):
         self.ui.status.setText(self.fmt.status(self.srv.state.value,
                 self.srv.queue.total_length, len(self.srv.queue)))
+
+    def scroll_to_current(self, new_song, old_song):
+        pnew, pold = new_song.get('file', ''), old_song.get('file', '')
+        pos = int(new_song.get('pos', '-1'))
+        if (pos < 0 or pnew == pold or not pnew or
+                self.srv.state.value != 'play' or
+                self.settings['misc']['autoscroll'] != '1'):
+            return
+        index = self.srv.queue.index(pos, 0)
+        if not self.ui.queue.rect().contains(self.ui.queue.visualRect(index)):
+            self.ui.queue.scrollTo(index, QAbstractItemView.PositionAtCenter)
 
     def contextMenuEvent(self, e):
         e.accept()
