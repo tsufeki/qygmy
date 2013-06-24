@@ -174,7 +174,6 @@ class Qygmy(QMainWindow):
 
     def contextMenuEvent(self, e):
         e.accept()
-        self.ui.remove.setEnabled(self.ui.queue.can_remove())
         self.ui.highprio.setEnabled(self.ui.queue.can_set_priority(1))
         self.ui.normprio.setEnabled(self.ui.queue.can_set_priority(0))
         self.ui.details.setEnabled(self.ui.queue.details() is not None)
@@ -193,12 +192,12 @@ class Qygmy(QMainWindow):
         self.ui.connect.setVisible(not c)
         self.ui.disconnect.setVisible(c)
         for action in ('previous', 'play', 'pause', 'stop', 'next', 'volume',
-                'add', 'remove', 'clear', 'repeat', 'shuffle', 'single',
-                'consume', 'updatedb', 'save', 'randomize', 'details',
-                'statistics'):
+                'add', 'clear', 'repeat', 'shuffle', 'single', 'consume',
+                'updatedb', 'save', 'randomize', 'details', 'statistics'):
             getattr(self.ui, action).setEnabled(c)
         self.ui.play.setVisible(state != 'play')
         self.ui.pause.setVisible(state == 'play')
+        self.on_queue_selection_changed()
 
     @Slot(bool)
     def on_updating_db_changed(self, updating):
@@ -206,6 +205,11 @@ class Qygmy(QMainWindow):
             self.ui.settings.setIcon(self.ui.settings_icon_updating)
         else:
             self.ui.settings.setIcon(self.ui.settings_icon)
+
+    @Slot()
+    def on_queue_selection_changed(self):
+        self.ui.remove.setEnabled(self.srv.state.value != 'disconnect' and
+                self.ui.queue.can_remove())
 
     @Slot()
     def on_details_triggered(self):

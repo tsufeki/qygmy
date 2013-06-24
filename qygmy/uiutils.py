@@ -98,6 +98,9 @@ class ChangeDuringDragTabWidget(QTabWidget):
 
 
 class SonglistView(QTreeView):
+
+    selection_changed = Signal()
+
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -112,6 +115,10 @@ class SonglistView(QTreeView):
             h.setResizeMode(i, QHeaderView.ResizeToContents)
 
         self.doubleClicked.connect(self._double_clicked)
+
+    def selectionChanged(self, selected, deselected):
+        self.selection_changed.emit()
+        super().selectionChanged(selected, deselected)
 
     def selection(self):
         return sorted(i.row()
