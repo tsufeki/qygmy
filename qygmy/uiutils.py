@@ -31,8 +31,7 @@ class RichTextDelegate(QStyledItemDelegate):
         option = QStyleOptionViewItemV4(option);
         self.initStyleOption(option, index);
         doc = self._make_document(option.text);
-        #doc.setTextWidth(option.rect.width());
-        return QSize(min(doc.size().width(), 800), doc.size().height())
+        return QSize(doc.size().width(), doc.size().height())
 
 
 class ClickableProgressBar(QProgressBar):
@@ -47,6 +46,55 @@ class ClickableProgressBar(QProgressBar):
             e.ignore()
 
     clicked = Signal(int)
+
+
+class ChangeDuringDragTabBar(QTabBar):
+    def __init__(self, parent=None, drag_change_interval=1000):
+        super().__init__(parent)
+        self.setAcceptDrops(True)
+        self._dragtimer = QTimer(self)
+        self._dragtimer.setInterval(drag_change_interval)
+        self._dragtimer.setSingleShot(True)
+        self._dragtab = -1
+        self._dragtimer.timeout.connect(self._change_tab)
+
+    def _change_tab(self):
+        if self._dragtab >= 0:
+            self.setCurrentIndex(self._dragtab)
+
+    def dropEvent(self, e):
+        self._dragtimer.stop()
+        self._dragtab = -1
+        super().dropEvent(e)
+
+    def dragLeaveEvent(self, e):
+        self._dragtimer.stop()
+        self._dragtab = -1
+        super().dragLeaveEvent(e)
+
+    def dragEnterEvent(self, e):
+        self._dragtimer.stop()
+        self._dragtab = self.tabAt(e.pos())
+        if self._dragtab >= 0:
+            self._dragtimer.start()
+        e.accept()
+        super().dragEnterEvent(e)
+
+    def dragMoveEvent(self, e):
+        t = self.tabAt(e.pos())
+        if t != self._dragtab:
+            self._dragtimer.stop()
+            self._dragtab = t
+            if t >= 0:
+                self._dragtimer.start()
+        super().dragMoveEvent(e)
+
+
+class ChangeDuringDragTabWidget(QTabWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._tabbar = ChangeDuringDragTabBar(self)
+        self.setTabBar(self._tabbar)
 
 
 class SonglistView(QTreeView):
@@ -85,9 +133,15 @@ class SonglistView(QTreeView):
     def can_rename(self):
         return self.model().can_rename(self.selection())
 
+    def can_set_priority(self, prio):
+        return self.model().can_set_priority(self.selection(), prio)
+
     def add_selected_to_queue(self, play=False, replace=False):
         self.model().add_to_queue(self.selection(), play, replace)
 
     def remove_selected(self):
         self.model().remove(self.selection())
+
+    def set_priority(self, prio):
+        self.model().set_priority(self.selection(), prio)
 

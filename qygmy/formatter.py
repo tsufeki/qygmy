@@ -1,5 +1,5 @@
 
-from PySide.QtGui import QIcon
+from PySide.QtGui import QIcon, QBrush, QColor
 
 from .templates import Template
 
@@ -22,7 +22,10 @@ class Formatter:
             '$if2(%file%,%directory%,%playlist%)'
         ),
         'playlist_column2': '$time(%length%)',
-        'playlist_tooltip': '$if2(%file%,%directory%,%playlist%)',
+        'playlist_tooltip': (
+            '$if($ne(%prio%,0),[High priority] ,)'
+            '$if2(%file%,%directory%,%playlist%)'
+        ),
         'status': (
             '$if(%disconnected%,,'
                 '%totalcount% songs'
@@ -60,6 +63,8 @@ class Formatter:
         song = song.copy()
         song.pop('id', None)
         song.pop('pos', None)
+        if 'prio' not in song:
+            song['prio'] = '0'
         for key in ['file', 'directory', 'playlist']:
             if key in song:
                 filename = song[key].rsplit('/', 1)[-1]
@@ -173,10 +178,11 @@ class Formatter:
     def info_dialog(self, name, info):
         if name == 'details':
             info = self._prepare_song(info, html=False)
+            info.pop('prio', None)
+            # TODO: show 'unknown' keys
         r = self.render(name, info)
         return [i for i in r if i[1] != '']
 
-    @property
-    def playlist_column_count(self):
-        return 2
+    playlist_column_count = 2
+    high_prio_background = QBrush(QColor(255, 255, 0, 127))
 

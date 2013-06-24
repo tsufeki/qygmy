@@ -210,12 +210,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_previous"/>
-   <addaction name="action_play"/>
-   <addaction name="action_pause"/>
-   <addaction name="action_stop"/>
-   <addaction name="action_next"/>
-   <addaction name="action_volume"/>
+   <addaction name="previous"/>
+   <addaction name="play"/>
+   <addaction name="pause"/>
+   <addaction name="stop"/>
+   <addaction name="next"/>
+   <addaction name="volume"/>
   </widget>
   <widget class="QToolBar" name="queue_toolbar">
    <property name="sizePolicy">
@@ -236,26 +236,32 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_add"/>
-   <addaction name="action_remove"/>
-   <addaction name="action_clear"/>
+   <addaction name="add"/>
+   <addaction name="remove"/>
+   <addaction name="clear"/>
    <addaction name="separator"/>
-   <addaction name="action_repeat"/>
-   <addaction name="action_shuffle"/>
-   <addaction name="action_single"/>
-   <addaction name="action_consume"/>
+   <addaction name="repeat"/>
+   <addaction name="shuffle"/>
+   <addaction name="single"/>
+   <addaction name="consume"/>
    <addaction name="separator"/>
-   <addaction name="action_settings"/>
+   <addaction name="settings"/>
   </widget>
-  <action name="action_previous">
+  <action name="previous">
    <property name="text">
     <string>Previous</string>
    </property>
    <property name="toolTip">
     <string>Previous song</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
-  <action name="action_play">
+  <action name="play">
    <property name="checkable">
     <bool>false</bool>
    </property>
@@ -265,37 +271,61 @@
    <property name="text">
     <string>Play</string>
    </property>
+   <property name="shortcut">
+    <string>Space</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
-  <action name="action_stop">
+  <action name="stop">
    <property name="text">
     <string>Stop</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
-  <action name="action_next">
+  <action name="next">
    <property name="text">
     <string>Next</string>
    </property>
    <property name="toolTip">
     <string>Next Song</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
-  <action name="action_add">
+  <action name="add">
    <property name="text">
     <string>Add...</string>
    </property>
    <property name="toolTip">
     <string>Add to playlist...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
   </action>
-  <action name="action_remove">
+  <action name="remove">
    <property name="text">
     <string>Remove</string>
    </property>
    <property name="toolTip">
     <string>Remove selected</string>
    </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
   </action>
-  <action name="action_repeat">
+  <action name="repeat">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -306,7 +336,7 @@
     <string>Repeat</string>
    </property>
   </action>
-  <action name="action_shuffle">
+  <action name="shuffle">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -317,7 +347,7 @@
     <string>Shuffle</string>
    </property>
   </action>
-  <action name="action_settings">
+  <action name="settings">
    <property name="text">
     <string>Settings...</string>
    </property>
@@ -325,12 +355,12 @@
     <string>Settings...</string>
    </property>
   </action>
-  <action name="action_volume">
+  <action name="volume">
    <property name="text">
     <string>Volume</string>
    </property>
   </action>
-  <action name="action_clear">
+  <action name="clear">
    <property name="text">
     <string>Clear</string>
    </property>
@@ -338,7 +368,7 @@
     <string>Clear playlist</string>
    </property>
   </action>
-  <action name="action_disconnect">
+  <action name="disconnect">
    <property name="text">
     <string>Disconnect from MPD</string>
    </property>
@@ -346,17 +376,17 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="action_connect">
+  <action name="connect">
    <property name="text">
     <string>Connect to MPD</string>
    </property>
   </action>
-  <action name="action_updatedb">
+  <action name="updatedb">
    <property name="text">
     <string>Update the database</string>
    </property>
   </action>
-  <action name="action_single">
+  <action name="single">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -370,7 +400,7 @@
     <string>Single</string>
    </property>
   </action>
-  <action name="action_consume">
+  <action name="consume">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -384,15 +414,21 @@
     <string>Consume</string>
    </property>
   </action>
-  <action name="action_pause">
+  <action name="pause">
    <property name="text">
     <string>Pause</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
    <property name="visible">
     <bool>false</bool>
    </property>
   </action>
-  <action name="action_save">
+  <action name="save">
    <property name="text">
     <string>Save the current playlist...</string>
    </property>
@@ -400,36 +436,55 @@
     <string>Save the current playlist</string>
    </property>
   </action>
-  <action name="action_details">
+  <action name="details">
    <property name="text">
     <string>Song details...</string>
    </property>
   </action>
-  <action name="action_quit">
+  <action name="quit">
    <property name="text">
     <string>Quit</string>
    </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
-  <action name="action_randomize">
+  <action name="randomize">
    <property name="text">
     <string>Randomize the playlist</string>
    </property>
   </action>
-  <action name="action_statistics">
+  <action name="statistics">
    <property name="text">
     <string>MPD statistics...</string>
+   </property>
+  </action>
+  <action name="highprio">
+   <property name="text">
+    <string>High priority</string>
+   </property>
+   <property name="toolTip">
+    <string>Set high priority for selected songs</string>
+   </property>
+  </action>
+  <action name="normprio">
+   <property name="text">
+    <string>Normal priority</string>
+   </property>
+   <property name="toolTip">
+    <string>Set normal priority for selected songs</string>
    </property>
   </action>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ClickableProgressBar</class>
-   <extends>QProgressBar</extends>
+   <class>SonglistView</class>
+   <extends>QTreeView</extends>
    <header>..uiutils</header>
   </customwidget>
   <customwidget>
-   <class>SonglistView</class>
-   <extends>QTreeView</extends>
+   <class>ClickableProgressBar</class>
+   <extends>QProgressBar</extends>
    <header>..uiutils</header>
   </customwidget>
  </customwidgets>

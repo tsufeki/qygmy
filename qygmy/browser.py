@@ -24,11 +24,11 @@ class Browser(QMainWindow):
             ('add', 'list-add'),
             ('remove', 'edit-delete'),
             ('close', 'window-close'),
-            ('dbroot', 'folder-sound'),
-            ('plroot', 'document-multiple'),
-            ('search', 'edit-find'),
+            ('action_dbroot', 'folder-sound'),
+            ('action_plroot', 'document-multiple'),
+            ('action_search', 'edit-find'),
         ):
-            getattr(self.ui, 'action_' + action).setIcon(QIcon.fromTheme(icon))
+            getattr(self.ui, action).setIcon(QIcon.fromTheme(icon))
 
         cm = QMenu(self)
         for action in ('add', 'addplay', 'replace', 'replaceplay', None,
@@ -36,7 +36,7 @@ class Browser(QMainWindow):
             if action is None:
                 cm.addSeparator()
             else:
-                cm.addAction(getattr(self.ui, 'action_' + action))
+                cm.addAction(getattr(self.ui, action))
         self.ui.context_menu = cm
 
         if 'browser_geometry' in self.main.settings['gui']:
@@ -81,17 +81,17 @@ class Browser(QMainWindow):
 
     def contextMenuEvent(self, e):
         e.accept()
-        self.ui.action_add.setVisible(self.current_view.can_add_to_queue())
-        self.ui.action_remove.setVisible(self.current_view.can_remove())
-        self.ui.action_rename.setVisible(self.current_view.can_rename())
-        self.ui.action_details.setVisible(self.current_view.details() is not None)
+        self.ui.add.setVisible(self.current_view.can_add_to_queue())
+        self.ui.remove.setVisible(self.current_view.can_remove())
+        self.ui.rename.setVisible(self.current_view.can_rename())
+        self.ui.details.setVisible(self.current_view.details() is not None)
         self.ui.context_menu.popup(e.globalPos())
 
     def on_state_changed(self, state):
         c = state != 'disconnect'
-        for act in ('dbroot', 'plroot', 'pl', 'search', 'add', 'addplay',
-                'replace', 'replaceplay', 'remove', 'rename', 'details'):
-            getattr(self.ui, 'action_' + act).setEnabled(c)
+        for act in ('action_dbroot', 'action_plroot', 'action_pl', 'action_search',
+                'add', 'addplay', 'replace', 'replaceplay', 'remove', 'rename', 'details'):
+            getattr(self.ui, act).setEnabled(c)
         for b in self.ui.dblist:
             b.defaultAction().setEnabled(c)
         self.ui.what.setEnabled(c)
@@ -124,7 +124,7 @@ class Browser(QMainWindow):
             self.ui.pl.show()
 
     @Slot()
-    def on_action_close_triggered(self):
+    def on_close_triggered(self):
         self.hide()
 
     @Slot()
@@ -148,27 +148,27 @@ class Browser(QMainWindow):
         self.srv.search.cd((self.ui.what.currentIndex(), self.ui.query.text()))
 
     @Slot()
-    def on_action_add_triggered(self, play=False, replace=False):
+    def on_add_triggered(self, play=False, replace=False):
         self.current_view.add_selected_to_queue(play, replace)
 
     @Slot()
-    def on_action_addplay_triggered(self):
-        self.on_action_add_triggered(True)
+    def on_addplay_triggered(self):
+        self.on_add_triggered(True)
 
     @Slot()
-    def on_action_replace_triggered(self):
-        self.on_action_add_triggered(False, True)
+    def on_replace_triggered(self):
+        self.on_add_triggered(False, True)
 
     @Slot()
-    def on_action_replaceplay_triggered(self):
-        self.on_action_add_triggered(True, True)
+    def on_replaceplay_triggered(self):
+        self.on_add_triggered(True, True)
 
     @Slot()
-    def on_action_remove_triggered(self):
+    def on_remove_triggered(self):
         self.current_view.remove_selected()
 
     @Slot()
-    def on_action_rename_triggered(self):
+    def on_rename_triggered(self):
         s = self.current_view.selection()
         if len(s) == 1:
             i = self.current_view.model().index(s[0], 0)
@@ -176,7 +176,7 @@ class Browser(QMainWindow):
             self.current_view.edit(i)
 
     @Slot()
-    def on_action_details_triggered(self):
+    def on_details_triggered(self):
         d = self.current_view.details()
         if d is not None:
             self.main.info.exec_('details', d, 'Details')

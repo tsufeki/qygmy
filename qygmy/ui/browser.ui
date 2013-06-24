@@ -22,7 +22,7 @@
    </property>
    <layout class="QVBoxLayout" name="vv">
     <item>
-     <widget class="QTabWidget" name="tabs">
+     <widget class="ChangeDuringDragTabWidget" name="tabs">
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -392,7 +392,7 @@
     </item>
    </layout>
   </widget>
-  <action name="action_add">
+  <action name="add">
    <property name="text">
     <string>Add selected</string>
    </property>
@@ -408,7 +408,7 @@
     <string>Root directory</string>
    </property>
   </action>
-  <action name="action_close">
+  <action name="close">
    <property name="text">
     <string>Close</string>
    </property>
@@ -429,33 +429,36 @@
     <string>Search</string>
    </property>
   </action>
-  <action name="action_remove">
+  <action name="remove">
    <property name="text">
     <string>Remove selected</string>
    </property>
   </action>
-  <action name="action_addplay">
+  <action name="addplay">
    <property name="text">
     <string>Add selected and play</string>
    </property>
   </action>
   <action name="action_pl"/>
-  <action name="action_details">
+  <action name="details">
    <property name="text">
     <string>Song details...</string>
    </property>
   </action>
-  <action name="action_rename">
+  <action name="rename">
    <property name="text">
     <string>Rename</string>
    </property>
+   <property name="shortcut">
+    <string>F2</string>
+   </property>
   </action>
-  <action name="action_replace">
+  <action name="replace">
    <property name="text">
     <string>Replace the current playlist</string>
    </property>
   </action>
-  <action name="action_replaceplay">
+  <action name="replaceplay">
    <property name="text">
     <string>Replace and play</string>
    </property>
@@ -466,6 +469,12 @@
    <class>SonglistView</class>
    <extends>QTreeView</extends>
    <header>..uiutils</header>
+  </customwidget>
+  <customwidget>
+   <class>ChangeDuringDragTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>..uiutils</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
