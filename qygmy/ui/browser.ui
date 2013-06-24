@@ -37,7 +37,7 @@
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Database</string>
+        <string>&amp;Database</string>
        </attribute>
        <layout class="QVBoxLayout" name="db_v">
         <item>
@@ -138,7 +138,7 @@
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Playlists</string>
+        <string>&amp;Playlists</string>
        </attribute>
        <layout class="QVBoxLayout" name="pl_v">
         <item>
@@ -261,7 +261,7 @@
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Search</string>
+        <string>&amp;Search</string>
        </attribute>
        <layout class="QVBoxLayout" name="se_v">
         <item>
@@ -394,10 +394,19 @@
   </widget>
   <action name="add">
    <property name="text">
-    <string>Add selected</string>
+    <string>&amp;Add selected</string>
    </property>
    <property name="toolTip">
     <string>Add selected songs to the current playlist</string>
+   </property>
+   <property name="shortcut">
+    <string>Return</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="dbroot">
@@ -407,13 +416,31 @@
    <property name="toolTip">
     <string>Root directory</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="close">
    <property name="text">
-    <string>Close</string>
+    <string>&amp;Close</string>
    </property>
    <property name="toolTip">
     <string>Close this window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="plroot">
@@ -423,44 +450,99 @@
    <property name="toolTip">
     <string>All playlists</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="search">
    <property name="text">
     <string>Search</string>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="remove">
    <property name="text">
-    <string>Remove selected</string>
+    <string>&amp;Remove selected</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="addplay">
    <property name="text">
-    <string>Add selected and play</string>
+    <string>Add selected and &amp;play</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+Return</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
-  <action name="pl"/>
+  <action name="pl">
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
   <action name="details">
    <property name="text">
-    <string>Song details...</string>
+    <string>Song &amp;details...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="rename">
    <property name="text">
-    <string>Rename</string>
+    <string>Re&amp;name</string>
    </property>
    <property name="shortcut">
     <string>F2</string>
    </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="replace">
    <property name="text">
-    <string>Replace the current playlist</string>
+    <string>R&amp;eplace the current playlist</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="replaceplay">
    <property name="text">
-    <string>Replace and play</string>
+    <string>Rep&amp;lace and play</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

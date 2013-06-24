@@ -89,8 +89,13 @@ class Qygmy(QMainWindow):
         vb.setPopupMode(QToolButton.InstantPopup)
 
     def setup_context_menu(self):
+        pm = QMenu(self.tr('&Playback'), self)
+        for action in ('play', 'pause', 'stop', 'previous', 'next'):
+            pm.addAction(getattr(self.ui, action))
+        self.ui.playback_menu = pm
         cm = QMenu(self)
-        for action in (
+        cm.addMenu(pm)
+        for action in (None,
             'add', 'remove', 'clear', None,
             'repeat', 'shuffle', 'single', 'consume', None,
             'save', 'randomize', 'details', None,
@@ -161,6 +166,7 @@ class Qygmy(QMainWindow):
         self.ui.current_song.setText(self.fmt.current_song(s, c))
         self.ui.current_song.setToolTip(self.fmt.current_song_tooltip(s, c))
         self.setWindowTitle(self.fmt.window_title(s, c))
+        # TODO: scroll to the current song
 
     def update_status(self, *_):
         self.ui.status.setText(self.fmt.status(self.srv.state.value,

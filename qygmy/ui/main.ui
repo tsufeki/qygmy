@@ -252,7 +252,7 @@
   </widget>
   <action name="previous">
    <property name="text">
-    <string>Previous</string>
+    <string>P&amp;revious</string>
    </property>
    <property name="toolTip">
     <string>Previous song</string>
@@ -263,6 +263,9 @@
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
    </property>
+   <property name="autoRepeat">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="play">
    <property name="checkable">
@@ -272,7 +275,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Play</string>
+    <string>&amp;Play</string>
    </property>
    <property name="shortcut">
     <string>Space</string>
@@ -280,10 +283,13 @@
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="stop">
    <property name="text">
-    <string>Stop</string>
+    <string>&amp;Stop</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -291,10 +297,13 @@
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="next">
    <property name="text">
-    <string>Next</string>
+    <string>&amp;Next</string>
    </property>
    <property name="toolTip">
     <string>Next Song</string>
@@ -305,10 +314,13 @@
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
    </property>
+   <property name="autoRepeat">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="add">
    <property name="text">
-    <string>Add...</string>
+    <string>&amp;Add...</string>
    </property>
    <property name="toolTip">
     <string>Add to playlist...</string>
@@ -319,13 +331,19 @@
   </action>
   <action name="remove">
    <property name="text">
-    <string>Remove</string>
+    <string>&amp;Remove</string>
    </property>
    <property name="toolTip">
     <string>Remove selected</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="repeat">
@@ -336,7 +354,10 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Repeat</string>
+    <string>R&amp;epeat</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="shuffle">
@@ -347,33 +368,48 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Shuffle</string>
+    <string>S&amp;huffle</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="settings">
    <property name="text">
-    <string>Settings...</string>
+    <string>Se&amp;ttings...</string>
    </property>
    <property name="toolTip">
     <string>Settings...</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="volume">
    <property name="text">
     <string>Volume</string>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="clear">
    <property name="text">
-    <string>Clear</string>
+    <string>&amp;Clear</string>
    </property>
    <property name="toolTip">
     <string>Clear playlist</string>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="disconnect">
    <property name="text">
-    <string>Disconnect from MPD</string>
+    <string>Disco&amp;nnect from MPD</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
    <property name="visible">
     <bool>false</bool>
@@ -381,12 +417,18 @@
   </action>
   <action name="connect">
    <property name="text">
-    <string>Connect to MPD</string>
+    <string>Co&amp;nnect to MPD</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="updatedb">
    <property name="text">
-    <string>Update the database</string>
+    <string>&amp;Update the database</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="single">
@@ -397,10 +439,13 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Single track mode</string>
+    <string>S&amp;ingle track mode</string>
    </property>
    <property name="iconText">
     <string>Single</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="consume">
@@ -411,15 +456,18 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Remove songs after playback</string>
+    <string>Rem&amp;ove songs after playback</string>
    </property>
    <property name="iconText">
     <string>Consume</string>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="pause">
    <property name="text">
-    <string>Pause</string>
+    <string>&amp;Pause</string>
    </property>
    <property name="shortcut">
     <string>Space</string>
@@ -427,55 +475,100 @@
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
    <property name="visible">
     <bool>false</bool>
    </property>
   </action>
   <action name="save">
    <property name="text">
-    <string>Save the current playlist...</string>
+    <string>&amp;Save the current playlist...</string>
    </property>
    <property name="toolTip">
     <string>Save the current playlist</string>
    </property>
-  </action>
-  <action name="details">
-   <property name="text">
-    <string>Song details...</string>
-   </property>
-  </action>
-  <action name="quit">
-   <property name="text">
-    <string>Quit</string>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
    </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="details">
+   <property name="text">
+    <string>Song &amp;details...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="quit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="randomize">
    <property name="text">
-    <string>Randomize the playlist</string>
+    <string>Randomi&amp;ze the playlist</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="statistics">
    <property name="text">
-    <string>MPD statistics...</string>
+    <string>&amp;MPD statistics...</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
   <action name="highprio">
    <property name="text">
-    <string>High priority</string>
+    <string>Hi&amp;gh priority</string>
    </property>
    <property name="toolTip">
     <string>Set high priority for selected songs</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="normprio">
    <property name="text">
-    <string>Normal priority</string>
+    <string>Norma&amp;l priority</string>
    </property>
    <property name="toolTip">
     <string>Set normal priority for selected songs</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
  </widget>
