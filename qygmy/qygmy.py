@@ -121,13 +121,14 @@ class Qygmy(QMainWindow):
         self.srv.volume.changed.connect(self.ui.volume_slider.setValue)
         self.srv.volume.changed.connect(lambda v: self.ui.volume_label.setText(str(v)))
         self.ui.volume_slider.sliderMoved.connect(self.srv.volume.send)
-        # TODO:
         for v in ('repeat', 'shuffle', 'single', 'consume'):
             act = getattr(self.ui, v)
-            getattr(self.srv, v).changed.connect(act.setChecked)
-            def slot(varname):
-                return lambda checked: self.on_bool_triggered(varname, checked)
-            act.triggered[bool].connect(Slot(bool)(slot(v)))
+            var = getattr(self.srv, v)
+            var.changed.connect(act.setChecked)
+            def slot(checked, act=act, var=var):
+                act.setChecked(var.value)
+                var.send(checked)
+            act.triggered[bool].connect(slot)
         self.ui.add.triggered.connect(self.browser.show)
         self.ui.add.triggered.connect(self.browser.activateWindow)
         self.ui.remove.triggered.connect(self.ui.queue.remove_selected)
@@ -138,6 +139,8 @@ class Qygmy(QMainWindow):
         self.ui.disconnect.triggered.connect(self.srv.disconnect_mpd)
         self.ui.settings.triggered.connect(self.settings.exec_)
         self.ui.quit.triggered.connect(self.close)
+        self.ui.highprio.triggered.connect(lambda: self.ui.queue.set_priority(1))
+        self.ui.normprio.triggered.connect(lambda: self.ui.queue.set_priority(0))
 
     def error(self, message):
         QMessageBox.critical(self, self.tr('Error'), self.tr(message))
@@ -191,19 +194,6 @@ class Qygmy(QMainWindow):
             getattr(self.ui, action).setEnabled(c)
         self.ui.play.setVisible(state != 'play')
         self.ui.pause.setVisible(state == 'play')
-
-    def on_bool_triggered(self, varname, checked):
-        var = getattr(self.srv, varname)
-        getattr(self.ui, varname).setChecked(var.value)
-        var.send(checked)
-
-    @Slot()
-    def on_highprio_triggered(self):
-        self.ui.queue.set_priority(1)
-
-    @Slot()
-    def on_normprio_triggered(self):
-        self.ui.queue.set_priority(0)
 
     @Slot(bool)
     def on_updating_db_changed(self, updating):

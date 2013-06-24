@@ -2,25 +2,26 @@
 import re
 
 
-def f_noop(*args): return ''
+def lazy_noop(*args): return ''
 
 
 # Conditionals
 
-def f_if(cond, yes, no): return yes if cond else no
+def lazy_if(cond, yes, no): return yes() if cond() else no()
 
-def f_if2(*args):
+def lazy_if2(*args):
     for a in args:
-        if a:
-            return a
+        val = a()
+        if val:
+            return val
     return ''
 
-def f_if3(*args):
+def lazy_if3(*args):
     if len(args) == 0:
         return ''
     if len(args) == 1:
-        return args[0]
-    return f_if(args[0], args[1], f_if3(*args[2:]))
+        return args[0]()
+    return lazy_if(args[0], args[1], lambda: lazy_if3(*args[2:]))
 
 
 # String operations
@@ -74,24 +75,24 @@ def f_gte(x, y): return '1' if int(x) >= int(y) else ''
 
 # Boolean
 
-def f_or(x, y): return str(x or y)
-def f_and(x, y): return str(x and y)
+def lazy_or(x, y): return str(x() or y())
+def lazy_and(x, y): return str(x() and y())
 def f_not(x): return '' if x else '1'
 
 
 # Context operations
 
-def c_get(ctx, name, default=''):
+def context_get(ctx, name, default=''):
     if name in ctx and ctx[name]:
         return ctx[name]
     else:
         return default
 
-def c_set(ctx, name, value):
+def context_set(ctx, name, value):
     ctx[name] = value
     return ''
 
-def c_unset(ctx, name):
+def context_unset(ctx, name):
     if name in ctx:
         del ctx[name]
     return ''

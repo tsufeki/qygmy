@@ -12,7 +12,7 @@ class SongList(RelayingConnection, QAbstractTableModel):
     def __init__(self, parent, current, state_class=State):
         super().__init__(parent)
         self.setSupportedDragActions(Qt.MoveAction | Qt.CopyAction)
-        self.songs = []
+        self.items = []
         # TODO:
         prefix = self.__class__.__name__.lower() + '_'
 
@@ -24,7 +24,7 @@ class SongList(RelayingConnection, QAbstractTableModel):
 
         self.total_length = 0
 
-    def retrieve_from_server(self, newcurrent):
+    def retrieve_from_server(self, new_current):
         return []
 
     def sort_key(self, item):
@@ -42,24 +42,24 @@ class SongList(RelayingConnection, QAbstractTableModel):
             self.current.update(None, force=True)
 
     @mpd_cmd_ignore_conn
-    def _update(self, newcurrent):
+    def _update(self, new_current):
         self.total_length = 0
         self.beginResetModel()
         try:
             if self.state.value != 'disconnect':
-                s = self.retrieve_from_server(newcurrent)
+                s = self.retrieve_from_server(new_current)
                 s.sort(key=self.sort_key)
-                self.songs = s
+                self.items = s
             else:
-                self.songs = []
+                self.items = []
         except (mpd.MPDError, OSError):
-            self.songs = []
+            self.items = []
             raise
         finally:
             self.endResetModel()
-        for s in self.songs:
-            if 'time' in s:
-                self.total_length += int(s['time'])
+        for i in self.items:
+            if 'time' in i:
+                self.total_length += int(i['time'])
 
     def _update_current_pos(self, new, old):
         for i in (old, new):
@@ -69,15 +69,15 @@ class SongList(RelayingConnection, QAbstractTableModel):
                 self.dataChanged.emit(index1, index2)
 
     def __len__(self):
-        return len(self.songs)
+        return len(self.items)
 
     def __getitem__(self, index):
         if type(index) == slice or 0 <= index < len(self):
-            return self.songs[index]
+            return self.items[index]
         return {}
 
     def __iter__(self):
-        return iter(self.songs)
+        return iter(self.items)
 
     def details(self, positions):
         if len(positions) == 1 and 'file' in self[positions[0]]:
@@ -135,15 +135,14 @@ class SongList(RelayingConnection, QAbstractTableModel):
         data = {'source': self.__class__.__name__, 'items': []}
         for i in indexes:
             if i.column() == 0:
-                d = {'pos': i.row()}
+                d = {'pos': str(i.row())}
                 for k in ('id', 'playlist', 'directory', 'file'):
                     if k in self[i.row()]:
                         d[k] = self[i.row()][k]
                 data['items'].append(d)
-        data['items'].sort(key=lambda x: x['pos'])
+        data['items'].sort(key=lambda x: int(x['pos']))
         md = QMimeData()
         if len(data['items']) > 0:
-            # TODO: PickleError
             md.setData(self.MIMETYPE, pickle.dumps(data))
         return md
 
@@ -157,9 +156,9 @@ class WritableMixin:
     def _remove(self, positions):
         for pos in reversed(sorted(positions)):
             if self[pos]:
-                song = self[pos].copy()
-                song['pos'] = pos
-                self.remove_one(song)
+                item = self[pos].copy()
+                item['pos'] = str(pos)
+                self.remove_one(item)
 
     def remove(self, positions):
         if self.can_remove(positions):
@@ -192,11 +191,11 @@ class WritableMixin:
         return False
 
     @mpd_cmdlist
-    def _move(self, song_list, pos):
-        for s in song_list:
-            if s['pos'] >= pos:
+    def _move(self, items, pos):
+        for i in items:
+            if int(i['pos']) >= pos:
                 pos += 1
-            self.move_one(s, pos)
+            self.move_one(i, pos)
 
 
 class Queue(WritableMixin, SongList):
@@ -214,31 +213,31 @@ class Queue(WritableMixin, SongList):
         self.refresh_format()
 
     @mpd_cmdlist
-    def add(self, song_list, play=False, replace=False, pos=None):
+    def add(self, items, play=False, replace=False, pos=None):
         if replace:
             self.conn.clear()
-        cnt = len(song_list)
-        for s in song_list:
-            if 'playlist' in s:
-                self.conn.load(s['playlist'])
-            elif 'directory' in s:
-                self.conn.add(s['directory'])
-            elif 'file' in s:
+        cnt = len(items)
+        for i in items:
+            if 'playlist' in i:
+                self.conn.load(i['playlist'])
+            elif 'directory' in i:
+                self.conn.add(i['directory'])
+            elif 'file' in i:
                 if pos is not None:
                     pos += 1
-                    self.conn.addid(s['file'], pos)
+                    self.conn.addid(i['file'], pos)
                 else:
-                    self.conn.add(s['file'])
+                    self.conn.add(i['file'])
             else:
                 cnt -= 1
         if play and cnt > 0:
             self.conn.play(0 if replace else len(self))
 
-    def remove_one(self, song):
-        self.conn.deleteid(song['id'])
+    def remove_one(self, item):
+        self.conn.deleteid(item['id'])
 
-    def move_one(self, song, pos):
-        self.conn.moveid(song['id'], pos)
+    def move_one(self, item, pos):
+        self.conn.moveid(item['id'], pos)
 
     def can_set_priority(self, positions, prio):
         return any((self[i].get('prio', '0') == '0') != (int(prio) == 0) for i in positions)
@@ -263,8 +262,8 @@ class BrowserList(SongList):
     def add_or_cd(self, pos):
         self.add_to_queue([pos])
 
-    def cd(self, newcurrent):
-        self.current.update(newcurrent, force=True)
+    def cd(self, new_current):
+        self.current.update(new_current, force=True)
 
     def double_clicked(self, pos):
         self.add_or_cd(pos)
@@ -302,8 +301,7 @@ class Playlists(WritableMixin, BrowserList):
         return item['playlist'] if 'playlist' in item else 0
 
     @mpd_cmdlist
-    def add(self, song_list, pos=None):
-        # TODO: use 'song' or 'item' consistently
+    def add(self, items, pos=None):
         if self.current.value != '':
             name = self.current.value
         elif pos is not None:
@@ -316,10 +314,10 @@ class Playlists(WritableMixin, BrowserList):
                     name = '{}_{}'.format(new, i)
                     if name not in playlists:
                         break
-        for s in song_list:
+        for i in items:
             # TODO: directories?
-            if 'file' in s:
-                self.conn.playlistadd(name, s['file'])
+            if 'file' in i:
+                self.conn.playlistadd(name, i['file'])
 
     def can_rename(self, positions):
         return len(positions) == 1 and 'playlist' in self[positions[0]]
@@ -330,15 +328,15 @@ class Playlists(WritableMixin, BrowserList):
         else:
             super().add_or_cd(pos)
 
-    def remove_one(self, song):
-        if self.current.value == '':
-            self.conn.rm(song['playlist'])
+    def remove_one(self, item):
+        if 'playlist' in item:
+            self.conn.rm(item['playlist'])
         else:
-            self.conn.playlistdelete(self.current.value, song['pos'])
+            self.conn.playlistdelete(self.current.value, item['pos'])
 
-    def move_one(self, song, pos):
+    def move_one(self, item, pos):
         if self.current.value != '':
-            self.conn.playlistmove(self.current.value, song['pos'], pos)
+            self.conn.playlistmove(self.current.value, item['pos'], pos)
 
     @mpd_cmd
     def save_current(self, name, replace=False):

@@ -141,6 +141,20 @@ class Function(RegexElement):
         super().__init__(src, start, end)
         self.name = name.lower()
         self.args = []
+        f = getattr(functions, 'lazy_' + self.name, None)
+        if f is not None:
+            self.function = f
+            self.call = self.call_lazy
+            return
+        f = getattr(functions, 'f_' + self.name, None)
+        if f is not None:
+            self.function = f
+            self.call = self.call_f
+            return
+        f = getattr(functions, 'context_' + self.name, None)
+        if f is not None:
+            self.function = f
+            self.call = self.call_context
 
     def parse_rest(self):
         while True:
@@ -152,20 +166,24 @@ class Function(RegexElement):
             if type(seq.last) != self.Comma:
                 return
 
-    def evaluate(self, context, *args):
+    def call_lazy(self, context):
+        args = [(lambda a=a: a.render(context)) for a in self.args]
+        return self.function(*args)
+
+    def call_f(self, context):
+        args = [a.render(context) for a in self.args]
+        return self.function(*args)
+
+    def call_context(self, context):
+        args = [a.render(context) for a in self.args]
+        return self.function(context, *args)
+
+    def render(self, context):
         try:
-            f = getattr(functions, 'c_' + self.name, None)
-            if f is not None:
-                return f(context, *args)
-            f = getattr(functions, 'f_' + self.name, None)
-            if f is not None:
-                return f(*args)
+            return self.call(context)
         except Exception as e:
             raise TemplateError(str(e))
         raise TemplateError('no such function: {!r}'.format(self.name))
-
-    def render(self, context):
-        return self.evaluate(context, *[a.render(context) for a in self.args])
 
     def __repr__(self):
         s = 'Function('
