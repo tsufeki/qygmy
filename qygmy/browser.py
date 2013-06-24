@@ -16,19 +16,10 @@ class Browser(QMainWindow):
     def setup_ui(self):
         self.ui = Ui_browser()
         self.ui.setupUi(self)
+        self.setup_icons()
         self.setup_database()
         self.setup_playlists()
         self.setup_search()
-        self.setWindowIcon(QIcon.fromTheme('list-add'))
-        for action, icon in (
-            ('add', 'list-add'),
-            ('remove', 'edit-delete'),
-            ('close', 'window-close'),
-            ('action_dbroot', 'folder-sound'),
-            ('action_plroot', 'document-multiple'),
-            ('action_search', 'edit-find'),
-        ):
-            getattr(self.ui, action).setIcon(QIcon.fromTheme(icon))
 
         cm = QMenu(self)
         for action in ('add', 'addplay', 'replace', 'replaceplay', None,
@@ -46,33 +37,45 @@ class Browser(QMainWindow):
             self.ui.tabs.setCurrentIndex(int(self.main.settings['gui']['browser_tab']))
         self.srv.state.changed.connect(self.on_state_changed)
 
+    def setup_icons(self):
+        self.setWindowIcon(QIcon.fromTheme('list-add'))
+        for action, icon in (
+            ('add', 'list-add'),
+            ('remove', 'edit-delete'),
+            ('close', 'window-close'),
+            ('dbroot', 'folder-sound'),
+            ('plroot', 'document-multiple'),
+            ('search', 'edit-find'),
+        ):
+            getattr(self.ui, action).setIcon(QIcon.fromTheme(icon))
+        for i, icon in enumerate(['folder-sound', 'document-multiple', 'edit-find']):
+            self.ui.tabs.setTabIcon(i, QIcon.fromTheme(icon))
+
     def setup_database(self):
         self.ui.database.setup(self.srv.database)
-        self.ui.tabs.setTabIcon(0, QIcon.fromTheme('folder-sound'))
-        self.ui.dbroot.setDefaultAction(self.ui.action_dbroot)
-        self.ui.dblist = []
+        self.ui.dbroot_button.setDefaultAction(self.ui.dbroot)
+        self.ui.db_list = []
         self.database_mapper = QSignalMapper(self)
-        self.database_mapper.mapped.connect(self.on_action_db_triggered)
+        self.database_mapper.mapped.connect(self.on_db_triggered)
         self.srv.database.current.changed.connect(self.update_database)
 
     def setup_playlists(self):
         self.ui.playlists.setup(self.srv.playlists)
-        self.ui.tabs.setTabIcon(1, QIcon.fromTheme('document-multiple'))
-        self.ui.plroot.setDefaultAction(self.ui.action_plroot)
-        self.ui.pl.hide()
-        self.ui.pl.setDefaultAction(self.ui.action_pl)
+        self.ui.plroot_button.setDefaultAction(self.ui.plroot)
+        self.ui.pl_button.hide()
+        self.ui.pl_button.setDefaultAction(self.ui.pl)
         self.srv.playlists.current.changed.connect(self.update_playlists)
 
     def setup_search(self):
-        self.ui.search.setup(self.srv.search)
-        self.ui.tabs.setTabIcon(2, QIcon.fromTheme('edit-find'))
-        self.ui.search_button.setDefaultAction(self.ui.action_search)
+        self.ui.search_results.setup(self.srv.search)
+        self.ui.search_button.setDefaultAction(self.ui.search)
 
     @property
     def current_view(self):
-        return (
-            self.ui.database, self.ui.playlists, self.ui.search,
-        )[self.ui.tabs.currentIndex()]
+        i = self.ui.tabs.currentIndex()
+        if i == 0: return self.ui.database
+        elif i == 1: return self.ui.playlists
+        elif i == 2: return self.ui.search_results
 
     def closeEvent(self, e):
         self.main.settings['gui']['browser_geometry'] = str(self.saveGeometry().toBase64())
@@ -89,10 +92,10 @@ class Browser(QMainWindow):
 
     def on_state_changed(self, state):
         c = state != 'disconnect'
-        for act in ('action_dbroot', 'action_plroot', 'action_pl', 'action_search',
-                'add', 'addplay', 'replace', 'replaceplay', 'remove', 'rename', 'details'):
+        for act in ('dbroot', 'plroot', 'pl', 'search', 'add', 'addplay',
+                'replace', 'replaceplay', 'remove', 'rename', 'details'):
             getattr(self.ui, act).setEnabled(c)
-        for b in self.ui.dblist:
+        for b in self.ui.db_list:
             b.defaultAction().setEnabled(c)
         self.ui.what.setEnabled(c)
         self.ui.query.setEnabled(c)
@@ -101,50 +104,50 @@ class Browser(QMainWindow):
         p = path.split('/')
         if p == ['']:
             p = []
-        for i in range(len(self.ui.dblist), len(p)):
+        for i in range(len(self.ui.db_list), len(p)):
             a = QAction(self)
             a.triggered.connect(self.database_mapper.map)
             self.database_mapper.setMapping(a, i)
             b = QToolButton(self)
             b.setDefaultAction(a)
             b.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred))
-            self.ui.dblayout.insertWidget(i+1, b)
-            self.ui.dblist.append(b)
+            self.ui.db_layout.insertWidget(i+1, b)
+            self.ui.db_list.append(b)
         for i in range(len(p)):
-            self.ui.dblist[i].defaultAction().setText(p[i])
-            self.ui.dblist[i].show()
-        for i in range(len(p), len(self.ui.dblist)):
-            self.ui.dblist[i].hide()
+            self.ui.db_list[i].defaultAction().setText(p[i])
+            self.ui.db_list[i].show()
+        for i in range(len(p), len(self.ui.db_list)):
+            self.ui.db_list[i].hide()
 
     def update_playlists(self, name):
         if name == '':
-            self.ui.pl.hide()
+            self.ui.pl_button.hide()
         else:
-            self.ui.pl.defaultAction().setText(name)
-            self.ui.pl.show()
+            self.ui.pl_button.defaultAction().setText(name)
+            self.ui.pl_button.show()
 
     @Slot()
     def on_close_triggered(self):
-        self.hide()
+        self.close()
 
     @Slot()
-    def on_action_dbroot_triggered(self):
+    def on_dbroot_triggered(self):
         self.srv.database.cd('')
 
-    def on_action_db_triggered(self, number):
+    def on_db_triggered(self, number):
         path = '/'.join(self.srv.database.current.value.split('/')[:number+1])
         self.srv.database.cd(path)
 
     @Slot()
-    def on_action_plroot_triggered(self):
+    def on_plroot_triggered(self):
         self.srv.playlists.cd('')
 
     @Slot()
-    def on_action_pl_triggered(self):
+    def on_pl_triggered(self):
         self.srv.playlists.refresh()
 
     @Slot()
-    def on_action_search_triggered(self):
+    def on_search_triggered(self):
         self.srv.search.cd((self.ui.what.currentIndex(), self.ui.query.text()))
 
     @Slot()

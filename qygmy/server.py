@@ -25,14 +25,6 @@ class Server(ProperConnection, QObject):
         self.playlists = Playlists(self)
         self.search = Search(self)
 
-    #def print(self):
-    #    for i in ('state', 'volume', 'current_song', 'repeat', 'shuffle', 'single',
-    #            'consume', 'updating_db', 'times'):
-    #        print(i, '=', getattr(self, i).value)
-    #    for i in ('queue', 'database', 'playlists', 'search'):
-    #        print(i + '.current', '=', getattr(self, i).current.value)
-    #        print(i + '.current_pos', '=', getattr(self, i).current_pos.value)
-
     def _seek(self, conn, time):
         if self.state.value != 'stop':
             conn.seek(self.queue.current_pos.value, time)
@@ -65,7 +57,6 @@ class Server(ProperConnection, QObject):
     def connect_mpd(self, host, port, password=None):
         if self.state.value != 'disconnect':
             self.disconnect_mpd()
-        # TODO: ValueError
         self.conn.connect(host, int(port))
         self.state.update('connect')
         if password:

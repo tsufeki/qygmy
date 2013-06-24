@@ -182,7 +182,7 @@ class Function(RegexElement):
         try:
             return self.call(context)
         except Exception as e:
-            raise TemplateError(str(e))
+            raise TemplateError(str(e)) from e
         raise TemplateError('no such function: {!r}'.format(self.name))
 
     def __repr__(self):

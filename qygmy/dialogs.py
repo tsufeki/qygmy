@@ -42,10 +42,10 @@ class Settings(QDialog):
         },
         'format': {
             'window_title': (
-                '[Qygmy]'
-                '$if(%playing%, '
-                '$if2(%title%,%filename%)'
-                '$if(%artist%, / %artist%,),)'
+                'Qygmy'
+                '$if(%playing%, / '
+                '$if(%artist%,%artist% \u2014 ,)'
+                '$if2(%title%,%filename%),)'
             ),
             'progressbar': (
                 '$if3('
@@ -59,20 +59,11 @@ class Settings(QDialog):
             'current_song': (
                 '<span style="font-size: big; font-weight: bold">'
                     '$if2(%title%,%filename%)</span><br>'
-                '<span style="font-size: small">'
-                    '%artist%</span><br>'
-                '<span style="font-size: small">'
-                    '%comment%$if($and(%comment%,%album%),&nbsp;&nbsp;/&nbsp;&nbsp;,)%album%</span>'
+                '%artist%$if(%album%, \u2014 %album%,)'
             ),
             'playlist_item': (
+                '$if(%artist%,%artist% \u2014 ,)'
                 '$if2(%title%,%filename%)'
-                '$if(%artist%,'
-                    '<span style="color: gray">&nbsp;&nbsp;/&nbsp;&nbsp;</span>%artist%,)'
-                '$if(%album%%comment%,'
-                    '<br><span style="color: gray; font-size: small">&nbsp;&nbsp;&nbsp;'
-                    '%comment%'
-                    '$if($and(%album%,%comment%),&nbsp;&nbsp;/&nbsp;&nbsp;,)'
-                    '%album%</span>,)'
             ),
         },
         'gui': {},

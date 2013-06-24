@@ -48,7 +48,7 @@ class State(QObject):
         return self.normalize(value)
 
     @classmethod
-    def create(cls, parent, name, init, send_callable=None, prefix=''):
+    def create(cls, parent, name, init, send_callable=None):
         if not callable(send_callable):
             method = send_callable
             if method is None:
@@ -62,7 +62,7 @@ class State(QObject):
             def send_callable(self, v):
                 return mpd_wrapper(parent, send_callable, [parent.conn, v])
         s = C()
-        s.setObjectName(prefix + name)
+        s.setObjectName(name)
         s.setParent(parent)
         setattr(parent, name, s)
 
@@ -75,8 +75,8 @@ class BoolState(State):
         return int(self.normalize(value))
 
     @classmethod
-    def create(cls, parent, name, init=False, send_callable=None, prefix=''):
-        super().create(parent, name, init, send_callable, prefix)
+    def create(cls, parent, name, init=False, send_callable=None):
+        super().create(parent, name, init, send_callable)
 
 
 class TimeTupleState(State):
@@ -164,21 +164,20 @@ class Connection:
                 self.conn.disconnect()
             except Exception as e:
                 pass
-            # Needed because it isn't called when socket's close() raises
-            # an exception (python-mpd2 bug).
+            # Needed because it isn't called when socket's close()
+            # raises an exception (python-mpd2 bug(?)).
             self.conn._reset()
             self.state.update('disconnect')
         logger.error('{}: {}'.format(exc.__class__.__name__, exc))
         msg = None
         if isinstance(exc, mpd.CommandError):
             errno, cmdno, cmd, msg = self.parse_exception(exc)
-            msg = msg + ' ({};{})'.format(errno, cmd)
         elif isinstance(exc, OSError) and exc.errno is not None:
             msg = exc.strerror
         elif isinstance(exc, (mpd.ConnectionError, OSError)):
             msg = str(exc)
         if msg:
-            self.main.error(msg[0].upper() + msg[1:])
+            self.main.error(msg[0].upper() + msg[1:] + ('.' if msg[-1] != '.' else ''))
 
 
 class ProperConnection(Connection):

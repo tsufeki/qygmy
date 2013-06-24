@@ -56,6 +56,11 @@ class Formatter:
         )
     }
 
+    standard_tags = {'file', 'directory', 'playlist', 'filename', 'title',
+        'artist', 'album', 'date', 'track', 'totaltracks', 'disc', 'totaldiscs',
+        'comment', 'length', 'lastmodified', 'composer', 'performer',
+    }
+
     def _escape(self, s):
         return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
@@ -176,12 +181,15 @@ class Formatter:
         return self.render('status', context)
 
     def info_dialog(self, name, info):
+        unrecognized = []
         if name == 'details':
             info = self._prepare_song(info, html=False)
             info.pop('prio', None)
-            # TODO: show 'unknown' keys
-        r = self.render(name, info)
-        return [i for i in r if i[1] != '']
+            for k, v in info.items():
+                if k not in self.standard_tags and k and v:
+                    unrecognized.append((k + ':', v))
+        r = [i for i in self.render(name, info) if i[1] != '']
+        return r + unrecognized
 
     playlist_column_count = 2
     high_prio_background = QBrush(QColor(255, 255, 0, 127))

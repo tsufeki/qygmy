@@ -13,11 +13,9 @@ class SongList(RelayingConnection, QAbstractTableModel):
         super().__init__(parent)
         self.setSupportedDragActions(Qt.MoveAction | Qt.CopyAction)
         self.items = []
-        # TODO:
-        prefix = self.__class__.__name__.lower() + '_'
 
-        state_class.create(self, 'current', current, not_callable, prefix)
-        State.create(self, 'current_pos', -1, 'play', prefix)
+        state_class.create(self, 'current', current, not_callable)
+        State.create(self, 'current_pos', -1, 'play')
         self.current.changed.connect(self._update)
         self.current_pos.changed2.connect(self._update_current_pos)
         self.state.changed2.connect(self._reset)

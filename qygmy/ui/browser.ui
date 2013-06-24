@@ -41,9 +41,9 @@
        </attribute>
        <layout class="QVBoxLayout" name="db_v">
         <item>
-         <layout class="QHBoxLayout" name="dblayout">
+         <layout class="QHBoxLayout" name="db_layout">
           <item>
-           <widget class="QToolButton" name="dbroot">
+           <widget class="QToolButton" name="dbroot_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -53,7 +53,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="dblabel">
+           <widget class="QLabel" name="db_label">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -142,9 +142,9 @@
        </attribute>
        <layout class="QVBoxLayout" name="pl_v">
         <item>
-         <layout class="QHBoxLayout" name="pllayout">
+         <layout class="QHBoxLayout" name="pl_layout">
           <item>
-           <widget class="QToolButton" name="plroot">
+           <widget class="QToolButton" name="plroot_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -157,7 +157,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="pl">
+           <widget class="QToolButton" name="pl_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -170,7 +170,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="pllabel">
+           <widget class="QLabel" name="pl_label">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -265,7 +265,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="se_v">
         <item>
-         <layout class="QHBoxLayout" name="selayout">
+         <layout class="QHBoxLayout" name="search_layout">
           <item>
            <widget class="QComboBox" name="what">
             <property name="toolTip">
@@ -329,7 +329,7 @@
          </layout>
         </item>
         <item>
-         <widget class="SonglistView" name="search">
+         <widget class="SonglistView" name="search_results">
           <property name="acceptDrops">
            <bool>false</bool>
           </property>
@@ -400,7 +400,7 @@
     <string>Add selected songs to the current playlist</string>
    </property>
   </action>
-  <action name="action_dbroot">
+  <action name="dbroot">
    <property name="text">
     <string>/</string>
    </property>
@@ -416,7 +416,7 @@
     <string>Close this window</string>
    </property>
   </action>
-  <action name="action_plroot">
+  <action name="plroot">
    <property name="text">
     <string>Playlists</string>
    </property>
@@ -424,7 +424,7 @@
     <string>All playlists</string>
    </property>
   </action>
-  <action name="action_search">
+  <action name="search">
    <property name="text">
     <string>Search</string>
    </property>
@@ -439,7 +439,7 @@
     <string>Add selected and play</string>
    </property>
   </action>
-  <action name="action_pl"/>
+  <action name="pl"/>
   <action name="details">
    <property name="text">
     <string>Song details...</string>
@@ -482,7 +482,7 @@
   <connection>
    <sender>query</sender>
    <signal>returnPressed()</signal>
-   <receiver>action_search</receiver>
+   <receiver>search</receiver>
    <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">

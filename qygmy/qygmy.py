@@ -105,7 +105,6 @@ class Qygmy(QMainWindow):
         self.ui.context_menu = cm
 
     def setup_signals(self):
-        # TODO: action_play -> play
         self.ui.play.triggered.connect(self.srv.play)
         self.ui.pause.triggered.connect(self.srv.pause)
         self.ui.stop.triggered.connect(self.srv.stop)
