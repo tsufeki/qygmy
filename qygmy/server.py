@@ -27,7 +27,7 @@ class Server(ProperConnection, QObject):
 
     def _seek(self, conn, time):
         if self.state.value != 'stop':
-            conn.seek(self.queue.current_pos.value, time)
+            conn.seek(self.queue.current_pos, time)
 
     def update_state(self):
         s, c = {'state': 'disconnect'}, {}
@@ -51,7 +51,7 @@ class Server(ProperConnection, QObject):
         self.updating_db.update('updating_db' in s)
 
         self.queue.current.update(s.get('playlist'))
-        self.queue.current_pos.update(s.get('song'))
+        self.queue._current_pos.update(s.get('song'))
 
     @mpd_cmd_ignore_conn
     def connect_mpd(self, host, port, password=None):

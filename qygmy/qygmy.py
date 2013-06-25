@@ -32,16 +32,14 @@ class Qygmy(QMainWindow):
             self.settings['connection']['password'])
 
     def setup_ui(self):
-        # TODO: keyboard shortcuts
         self.ui = Ui_main()
         self.ui.setupUi(self)
         self.ui.current_song.setText(self.fmt.current_song('disconnect', {}))
         self.setup_icons()
         self.setup_widgets()
-        self.setup_context_menu()
+        self.setup_signals()
         if 'main_geometry' in self.settings['gui']:
             self.restoreGeometry(QByteArray.fromBase64(self.settings['gui']['main_geometry']))
-        self.setup_signals()
 
     def setup_icons(self):
         self.setWindowIcon(QIcon.fromTheme('applications-multimedia'))
@@ -73,7 +71,6 @@ class Qygmy(QMainWindow):
         self.ui.playback_toolbar.insertWidget(self.ui.volume, self.ui.progressbar)
         self.ui.queue_toolbar.insertWidget(self.ui.settings, self.ui.status)
         self.ui.queue_toolbar.insertSeparator(self.ui.settings)
-
         self.ui.queue.setup(self.srv.queue)
 
         self.ui.wa1 = QWidgetAction(self)
@@ -83,31 +80,10 @@ class Qygmy(QMainWindow):
         vm = QMenu(self)
         vm.addAction(self.ui.wa1)
         vm.addAction(self.ui.wa2)
-        self.ui.volume_menu = vm
+        self.ui.volume_popup = vm
         vb = self.ui.playback_toolbar.widgetForAction(self.ui.volume)
         vb.setMenu(vm)
         vb.setPopupMode(QToolButton.InstantPopup)
-
-    def setup_context_menu(self):
-        pm = QMenu(self.tr('&Playback'), self)
-        for action in ('play', 'pause', 'stop', 'previous', 'next'):
-            pm.addAction(getattr(self.ui, action))
-        self.ui.playback_menu = pm
-        cm = QMenu(self)
-        cm.addMenu(pm)
-        for action in (None,
-            'add', 'remove', 'clear', None,
-            'repeat', 'shuffle', 'single', 'consume', None,
-            'save', 'randomize', 'details', None,
-            'highprio', 'normprio', None,
-            'statistics', 'updatedb', 'connect', 'disconnect', 'settings', None,
-            'quit',
-        ):
-            if action is None:
-                cm.addSeparator()
-            else:
-                cm.addAction(getattr(self.ui, action))
-        self.ui.context_menu = cm
 
     def setup_signals(self):
         self.ui.play.triggered.connect(self.srv.play)
@@ -126,14 +102,16 @@ class Qygmy(QMainWindow):
         self.srv.volume.changed.connect(self.ui.volume_slider.setValue)
         self.srv.volume.changed.connect(lambda v: self.ui.volume_label.setText(str(v)))
         self.ui.volume_slider.sliderMoved.connect(self.srv.volume.send)
+        self.ui.louder.triggered.connect(lambda v=self.srv.volume: v.send(min(v.value+1, 100)))
+        self.ui.quieter.triggered.connect(lambda v=self.srv.volume: v.send(max(v.value-1, 0)))
         for v in ('repeat', 'shuffle', 'single', 'consume'):
             act = getattr(self.ui, v)
             var = getattr(self.srv, v)
-            var.changed.connect(act.setChecked)
             def slot(checked, act=act, var=var):
                 act.setChecked(var.value)
                 var.send(checked)
             act.triggered[bool].connect(slot)
+            var.changed.connect(act.setChecked)
         self.ui.add.triggered.connect(self.browser.show)
         self.ui.add.triggered.connect(self.browser.activateWindow)
         self.ui.remove.triggered.connect(self.ui.queue.remove_selected)
@@ -167,7 +145,6 @@ class Qygmy(QMainWindow):
         self.ui.current_song.setText(self.fmt.current_song(s, c))
         self.ui.current_song.setToolTip(self.fmt.current_song_tooltip(s, c))
         self.setWindowTitle(self.fmt.window_title(s, c))
-        # TODO: scroll to the current song
 
     def update_status(self, *_):
         self.ui.status.setText(self.fmt.status(self.srv.state.value,
@@ -235,22 +212,24 @@ class Qygmy(QMainWindow):
 
     @Slot()
     def on_save_triggered(self):
+        name = None
         while True:
             name, ok = QInputDialog.getText(self,
                     self.tr('Save current playlist'),
-                    self.tr('Playlist name:'))
+                    self.tr('Playlist name:'),
+                    text=name if name else 'playlist')
             if not ok:
                 break
             if not name:
                 self.error('You have to provide a name.')
-            elif self.srv.playlists.save_current(name) is False:
+            elif self.srv.playlists.save_queue(name) is False:
                 ans = QMessageBox.question(self, self.tr('Error'),
                         self.tr('Playlist with such name already exists. '
                         'Do you want to replace\xa0it?'),
                         QMessageBox.Yes | QMessageBox.No)
                 if ans == QMessageBox.Yes:
-                    self.srv.playlists.save_current(name, True)
-                break
+                    self.srv.playlists.save_queue(name, True)
+                    break
             else: break
 
 
@@ -260,7 +239,7 @@ def main():
     app = QApplication(sys.argv)
     m = Qygmy()
     m.show()
-    # HACK: XXX: TODO: FIXME:
+    # XXX: TODO: FIXME:
     os._exit(app.exec_())
     #sys.exit(app.exec_())
 

@@ -250,6 +250,84 @@
    <addaction name="separator"/>
    <addaction name="settings"/>
   </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>1</width>
+     <height>1</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>1</height>
+    </size>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="context_menu">
+    <property name="separatorsCollapsible">
+     <bool>true</bool>
+    </property>
+    <widget class="QMenu" name="volume_menu">
+     <property name="title">
+      <string>Volume</string>
+     </property>
+     <property name="separatorsCollapsible">
+      <bool>true</bool>
+     </property>
+     <addaction name="louder"/>
+     <addaction name="quieter"/>
+    </widget>
+    <widget class="QMenu" name="playback_menu">
+     <property name="title">
+      <string>Playback</string>
+     </property>
+     <property name="separatorsCollapsible">
+      <bool>true</bool>
+     </property>
+     <addaction name="play"/>
+     <addaction name="pause"/>
+     <addaction name="stop"/>
+     <addaction name="previous"/>
+     <addaction name="next"/>
+    </widget>
+    <addaction name="playback_menu"/>
+    <addaction name="volume_menu"/>
+    <addaction name="separator"/>
+    <addaction name="add"/>
+    <addaction name="remove"/>
+    <addaction name="clear"/>
+    <addaction name="separator"/>
+    <addaction name="repeat"/>
+    <addaction name="shuffle"/>
+    <addaction name="single"/>
+    <addaction name="consume"/>
+    <addaction name="separator"/>
+    <addaction name="highprio"/>
+    <addaction name="normprio"/>
+    <addaction name="separator"/>
+    <addaction name="save"/>
+    <addaction name="randomize"/>
+    <addaction name="details"/>
+    <addaction name="separator"/>
+    <addaction name="statistics"/>
+    <addaction name="updatedb"/>
+    <addaction name="connect"/>
+    <addaction name="disconnect"/>
+    <addaction name="settings"/>
+    <addaction name="separator"/>
+    <addaction name="quit"/>
+   </widget>
+   <addaction name="context_menu"/>
+  </widget>
   <action name="previous">
    <property name="text">
     <string>P&amp;revious</string>
@@ -380,6 +458,12 @@
    </property>
    <property name="toolTip">
     <string>Settings...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
@@ -569,6 +653,28 @@
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="louder">
+   <property name="text">
+    <string>&amp;Louder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="quieter">
+   <property name="text">
+    <string>&amp;Quieter</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
  </widget>

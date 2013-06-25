@@ -9,15 +9,15 @@ from .connection import *
 
 class SongList(RelayingConnection, QAbstractTableModel):
 
+    current_pos = -1
+
     def __init__(self, parent, current, state_class=State):
         super().__init__(parent)
         self.setSupportedDragActions(Qt.MoveAction | Qt.CopyAction)
         self.items = []
 
         state_class.create(self, 'current', current, not_callable)
-        State.create(self, 'current_pos', -1, 'play')
         self.current.changed.connect(self._update)
-        self.current_pos.changed2.connect(self._update_current_pos)
         self.state.changed2.connect(self._reset)
 
         self.total_length = 0
@@ -59,13 +59,6 @@ class SongList(RelayingConnection, QAbstractTableModel):
             if 'time' in i:
                 self.total_length += int(i['time'])
 
-    def _update_current_pos(self, new, old):
-        for i in (old, new):
-            if 0 <= i < len(self):
-                index1 = self.index(i, 0)
-                index2 = self.index(i, self.columnCount() - 1)
-                self.dataChanged.emit(index1, index2)
-
     def __len__(self):
         return len(self.items)
 
@@ -81,7 +74,7 @@ class SongList(RelayingConnection, QAbstractTableModel):
         if len(positions) == 1 and 'file' in self[positions[0]]:
             return self[positions[0]]
 
-    def can_add_to_current(self, positions):
+    def can_add_to_queue(self, positions):
         return False
 
     def can_remove(self, positions):
@@ -92,6 +85,10 @@ class SongList(RelayingConnection, QAbstractTableModel):
 
     def can_set_priority(self, positions, prio):
         return False
+
+    def item_chosen(self, pos):
+        # i.e. double-clicked or Return pressed
+        pass
 
     def columnCount(self, parent=None):
         return self.main.fmt.playlist_column_count
@@ -104,13 +101,13 @@ class SongList(RelayingConnection, QAbstractTableModel):
         if 0 <= r < len(self):
             if role == Qt.DisplayRole:
                 return self.main.fmt.playlist_item(
-                        self[r], c, r == self.current_pos.value)
+                        self[r], c, r == self.current_pos)
             elif role == Qt.ToolTipRole:
                 return self.main.fmt.playlist_tooltip(
-                        self[r], c, r == self.current_pos.value)
+                        self[r], c, r == self.current_pos)
             elif role == Qt.DecorationRole:
                 return self.main.fmt.playlist_icon(
-                        self[r], c, r == self.current_pos.value)
+                        self[r], c, r == self.current_pos)
             elif role == Qt.BackgroundRole and self[r].get('prio', '0') != '0':
                 return self.main.fmt.high_prio_background
         return None
@@ -200,6 +197,19 @@ class Queue(WritableMixin, SongList):
 
     def __init__(self, parent):
         super().__init__(parent, -1)
+        State.create(self, '_current_pos', -1, 'play')
+        self._current_pos.changed2.connect(self._update_current_pos)
+
+    def _update_current_pos(self, new, old):
+        for i in (old, new):
+            if 0 <= i < len(self):
+                index1 = self.index(i, 0)
+                index2 = self.index(i, self.columnCount() - 1)
+                self.dataChanged.emit(index1, index2)
+
+    @property
+    def current_pos(self):
+        return self._current_pos.value
 
     def sort_key(self, item):
         return 0 # no sorting
@@ -244,8 +254,8 @@ class Queue(WritableMixin, SongList):
     def set_priority(self, positions, prio):
         self.conn.prioid(prio, *[self[i]['id'] for i in positions])
 
-    def double_clicked(self, pos):
-        self.current_pos.send(pos)
+    def item_chosen(self, pos):
+        self._current_pos.send(pos)
 
 
 class BrowserList(SongList):
@@ -257,14 +267,11 @@ class BrowserList(SongList):
         if self.can_add_to_queue(positions):
             self.parent.queue.add([self[i] for i in positions], play, replace)
 
-    def add_or_cd(self, pos):
+    def item_chosen(self, pos):
         self.add_to_queue([pos])
 
     def cd(self, new_current):
         self.current.update(new_current, force=True)
-
-    def double_clicked(self, pos):
-        self.add_or_cd(pos)
 
 
 class Database(BrowserList):
@@ -276,11 +283,11 @@ class Database(BrowserList):
         ls = self.conn.lsinfo(new_path)
         return [e for e in ls if 'file' in e or 'directory' in e]
 
-    def add_or_cd(self, pos):
+    def item_chosen(self, pos):
         if 'directory' in self[pos]:
             self.cd(self[pos]['directory'])
         else:
-            super().add_or_cd(pos)
+            super().item_chosen(pos)
 
 
 class Playlists(WritableMixin, BrowserList):
@@ -320,11 +327,11 @@ class Playlists(WritableMixin, BrowserList):
     def can_rename(self, positions):
         return len(positions) == 1 and 'playlist' in self[positions[0]]
 
-    def add_or_cd(self, pos):
+    def item_chosen(self, pos):
         if 'playlist' in self[pos]:
             self.cd(self[pos]['playlist'])
         else:
-            super().add_or_cd(pos)
+            super().item_chosen(pos)
 
     def remove_one(self, item):
         if 'playlist' in item:
@@ -337,7 +344,7 @@ class Playlists(WritableMixin, BrowserList):
             self.conn.playlistmove(self.current.value, item['pos'], pos)
 
     @mpd_cmd
-    def save_current(self, name, replace=False):
+    def save_queue(self, name, replace=False):
         try:
             self.conn.save(name)
         except mpd.CommandError as e:

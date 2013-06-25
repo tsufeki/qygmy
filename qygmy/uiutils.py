@@ -37,7 +37,7 @@ class RichTextDelegate(QStyledItemDelegate):
 class ClickableProgressBar(QProgressBar):
     def mousePressEvent(self, e):
         sz = self.size()
-        if 0 <= e.x() < sz.width() and 0 <= e.y() < sz.height():
+        if e.button() == Qt.LeftButton and 0 <= e.x() < sz.width() and 0 <= e.y() < sz.height():
             e.accept()
             minv, maxv = self.minimum(), self.maximum()
             newvalue = minv + round((e.x() / sz.width()) * (maxv - minv))
@@ -103,11 +103,15 @@ class SonglistView(QTreeView):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self._enter_action = QAction('Add or descend into', self)
+        self._enter_action.setShortcut(QKeySequence(self.tr('Return')))
+        self._enter_action.setShortcutContext(Qt.WidgetWithChildrenShortcut)
+        self.addAction(self._enter_action)
 
     def setup(self, model):
         self.setModel(model)
-        self.delegate = RichTextDelegate()
-        self.setItemDelegate(self.delegate)
+        self._delegate = RichTextDelegate()
+        self.setItemDelegate(self._delegate)
 
         h = self.header()
         h.setResizeMode(0, QHeaderView.Stretch)
@@ -115,6 +119,7 @@ class SonglistView(QTreeView):
             h.setResizeMode(i, QHeaderView.ResizeToContents)
 
         self.doubleClicked.connect(self._double_clicked)
+        self._enter_action.triggered.connect(self._enter_pressed)
 
     def selectionChanged(self, selected, deselected):
         self.selection_changed.emit()
@@ -126,7 +131,21 @@ class SonglistView(QTreeView):
                 if i.column() == 0)
 
     def _double_clicked(self, index):
-        self.model().double_clicked(index.row())
+        self.model().item_chosen(index.row())
+
+    def _enter_pressed(self):
+        if self.state() == self.EditingState:
+            index = self.currentIndex()
+            editor = self.indexWidget(index)
+            if editor:
+                self.commitData(editor)
+                self.closeEditor(editor, QAbstractItemDelegate.NoHint)
+        else:
+            s = self.selection()
+            if len(s) == 1:
+                self.model().item_chosen(s[0])
+            elif len(s) > 0 and self.model().can_add_to_queue(s):
+                self.model().add_to_queue(s)
 
     def details(self):
         return self.model().details(self.selection())
@@ -148,6 +167,13 @@ class SonglistView(QTreeView):
 
     def remove_selected(self):
         self.model().remove(self.selection())
+
+    def rename_selected(self):
+        s = self.selection()
+        if len(s) == 1 and self.can_rename():
+            i = self.model().index(s[0], 0)
+            self.setCurrentIndex(i)
+            self.edit(i)
 
     def set_priority(self, prio):
         self.model().set_priority(self.selection(), prio)

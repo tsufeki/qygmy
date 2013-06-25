@@ -20,22 +20,13 @@ class Browser(QMainWindow):
         self.setup_database()
         self.setup_playlists()
         self.setup_search()
-
-        cm = QMenu(self)
-        for action in ('add', 'addplay', 'replace', 'replaceplay', None,
-                'remove', 'rename', 'details', None, 'close'):
-            if action is None:
-                cm.addSeparator()
-            else:
-                cm.addAction(getattr(self.ui, action))
-        self.ui.context_menu = cm
+        self.srv.state.changed.connect(self.on_state_changed)
 
         if 'browser_geometry' in self.main.settings['gui']:
             self.restoreGeometry(QByteArray.fromBase64(self.main.settings['gui']['browser_geometry']))
         if ('browser_tab' in self.main.settings['gui'] and
                 0 <= int(self.main.settings['gui']['browser_tab']) < self.ui.tabs.count()):
             self.ui.tabs.setCurrentIndex(int(self.main.settings['gui']['browser_tab']))
-        self.srv.state.changed.connect(self.on_state_changed)
 
     def setup_icons(self):
         self.setWindowIcon(QIcon.fromTheme('list-add'))
@@ -172,11 +163,7 @@ class Browser(QMainWindow):
 
     @Slot()
     def on_rename_triggered(self):
-        s = self.current_view.selection()
-        if len(s) == 1:
-            i = self.current_view.model().index(s[0], 0)
-            self.current_view.setCurrentIndex(i)
-            self.current_view.edit(i)
+        self.current_view.rename_selected()
 
     @Slot()
     def on_details_triggered(self):

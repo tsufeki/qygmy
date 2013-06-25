@@ -392,15 +392,51 @@
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>1</width>
+     <height>1</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>1</height>
+    </size>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="context_menu">
+    <property name="separatorsCollapsible">
+     <bool>true</bool>
+    </property>
+    <addaction name="add"/>
+    <addaction name="addplay"/>
+    <addaction name="replace"/>
+    <addaction name="replaceplay"/>
+    <addaction name="separator"/>
+    <addaction name="remove"/>
+    <addaction name="rename"/>
+    <addaction name="details"/>
+    <addaction name="separator"/>
+    <addaction name="close"/>
+   </widget>
+   <addaction name="context_menu"/>
+  </widget>
   <action name="add">
    <property name="text">
     <string>&amp;Add selected</string>
    </property>
    <property name="toolTip">
     <string>Add selected songs to the current playlist</string>
-   </property>
-   <property name="shortcut">
-    <string>Return</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::WindowShortcut</enum>
