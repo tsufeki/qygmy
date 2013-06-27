@@ -284,19 +284,12 @@
     <bool>false</bool>
    </property>
    <widget class="QMenu" name="context_menu">
+    <property name="title">
+     <string/>
+    </property>
     <property name="separatorsCollapsible">
      <bool>true</bool>
     </property>
-    <widget class="QMenu" name="volume_menu">
-     <property name="title">
-      <string>&amp;Volume</string>
-     </property>
-     <property name="separatorsCollapsible">
-      <bool>true</bool>
-     </property>
-     <addaction name="louder"/>
-     <addaction name="quieter"/>
-    </widget>
     <widget class="QMenu" name="playback_menu">
      <property name="title">
       <string>&amp;Playback</string>
@@ -309,6 +302,21 @@
      <addaction name="stop"/>
      <addaction name="previous"/>
      <addaction name="next"/>
+     <addaction name="separator"/>
+     <addaction name="repeat"/>
+     <addaction name="shuffle"/>
+     <addaction name="single"/>
+     <addaction name="consume"/>
+    </widget>
+    <widget class="QMenu" name="volume_menu">
+     <property name="title">
+      <string>&amp;Volume</string>
+     </property>
+     <property name="separatorsCollapsible">
+      <bool>true</bool>
+     </property>
+     <addaction name="louder"/>
+     <addaction name="quieter"/>
     </widget>
     <widget class="QMenu" name="playlist_menu">
      <property name="title">
@@ -325,21 +333,8 @@
      <addaction name="randomize"/>
      <addaction name="reverse"/>
     </widget>
-    <widget class="QMenu" name="pboptions_menu">
-     <property name="title">
-      <string>Playback &amp;options</string>
-     </property>
-     <property name="separatorsCollapsible">
-      <bool>true</bool>
-     </property>
-     <addaction name="repeat"/>
-     <addaction name="shuffle"/>
-     <addaction name="single"/>
-     <addaction name="consume"/>
-    </widget>
     <addaction name="playback_menu"/>
     <addaction name="playlist_menu"/>
-    <addaction name="pboptions_menu"/>
     <addaction name="volume_menu"/>
     <addaction name="separator"/>
     <addaction name="highprio"/>
@@ -462,7 +457,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>&amp;Repeat</string>
+    <string>R&amp;epeat</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
@@ -476,7 +471,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>&amp;Shuffle</string>
+    <string>S&amp;huffle</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>

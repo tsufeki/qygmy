@@ -44,7 +44,7 @@ class Formatter:
             ('This instance:', '$time(%playtime%)'),
         ),
         'details': (
-            ('Path:', '%file%'),
+            ('%file%', None),
             ('Title:', '%title%'),
             ('Artist:', '%artist%'),
             ('Album:', '%album%'),
@@ -118,12 +118,24 @@ class Formatter:
         suff = '$if(%bold%,</span>,)'
         if isinstance(template, str):
             return Template(pref + template + suff)
-        return tuple((self._compile(a), self._compile(b)) for a, b in template)
+        r = []
+        for a, b in template:
+            a = self._compile(a)
+            if b is not None:
+                b = self._compile(b)
+            r.append((a, b))
+        return tuple(r)
 
     def _render(self, template, context):
         if isinstance(template, Template):
             return template.render(context)
-        return [(self._render(a, context), self._render(b, context)) for a, b in template]
+        r = []
+        for a, b in template:
+            a = self._render(a, context)
+            if b is not None:
+                b = self._render(b, context)
+            r.append((a, b))
+        return r
 
     def render(self, name, context, bold=False):
         tmpl = self._tmplcache.get(name)

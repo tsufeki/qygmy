@@ -79,14 +79,10 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
     def _update(self, new_current):
         self.total_length = 0
         self.beginResetModel()
-        try:
-            self.items = []
-            if self.state.value != 'disconnect':
-                self.items = self.ls(new_current)
-                if self.items is None:
-                    self.items = []
-        finally:
-            self.endResetModel()
+        self.items = []
+        if self.state.value != 'disconnect':
+            self.items = self.ls(new_current)
+        self.endResetModel()
         for i in self.items:
             if 'time' in i:
                 self.total_length += int(i['time'])
@@ -146,21 +142,25 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
 
 class WritableMixin(metaclass=ABCMeta):
 
+    @mpd_cmd(fallback=False)
     def add(self, items, pos=None, extra=None):
-        items.sort(key=self.sort_key)
         a = []
-        for i in items:
+        for i in sorted(items, key=self.sort_key):
             if 'file' in i or self.can_add_directly(i, pos):
                 a.append(i)
             elif 'directory' in i:
                 a.extend(self.parent.database.ls(i['directory'], recursive=True))
             elif 'playlist' in i:
                 a.extend(self.parent.playlists.ls(i['playlist']))
-        if len(a) > 0:
-            self._add(a, pos, extra)
-            self.refresh()
-            return True
-        return False
+        if len(a) == 0:
+            return False
+        if pos is not None:
+            a = reversed(a)
+        with self.mpd_cmdlist:
+            for i in a:
+                self.add_one(i, pos, extra)
+        self.refresh()
+        return True
 
     @abstractmethod
     def can_add_directly(self, item, pos):
@@ -170,16 +170,10 @@ class WritableMixin(metaclass=ABCMeta):
     def add_one(self, item, pos, extra):
         pass
 
-    @mpd_cmdlist
-    def _add(self, items, pos, extra):
-        if pos is not None:
-            items = reversed(items)
-        for i in items:
-            self.add_one(i, pos, extra)
-
     def can_remove(self, positions):
         return len(positions) > 0
 
+    @mpd_cmd
     def remove(self, positions):
         if self.can_remove(positions):
             items = []
@@ -187,41 +181,38 @@ class WritableMixin(metaclass=ABCMeta):
                 i = self[pos].copy()
                 i['pos'] = str(pos)
                 items.append(i)
-            self._remove(items)
+            with self.mpd_cmdlist:
+                for i in reversed(sorted(items, key=lambda x: int(x['pos']))):
+                    self.remove_one(i)
             self.refresh()
 
     @abstractmethod
     def remove_one(self, item):
         pass
 
-    @mpd_cmdlist
-    def _remove(self, items):
-        for i in reversed(sorted(items, key=lambda x: int(x['pos']))):
-            self.remove_one(i)
-
+    @mpd_cmd
     def move(self, items, pos):
-        if len(items) > 0:
-            self._move(items, pos)
-            self.refresh()
+        if len(items) == 0:
+            return
+        items.sort(key=lambda x: int(x['pos']))
+        a = [i for i in items if int(i['pos']) <= pos]
+        b = (i for i in items if int(i['pos']) > pos)
+        apos = pos
+        bpos = pos + (0 if len(a) == 0 else 1)
+        with self.mpd_cmdlist:
+            for i in reversed(a):
+                if apos != i['pos']:
+                    self.move_one(i, apos)
+                apos -= 1
+            for i in b:
+                if bpos != i['pos']:
+                    self.move_one(i, bpos)
+                bpos += 1
+        self.refresh()
 
     @abstractmethod
     def move_one(self, item, pos):
         pass
-
-    @mpd_cmdlist
-    def _move(self, items, pos):
-        a = sorted((i for i in items if int(i['pos']) <= pos), key=lambda x: -int(x['pos']))
-        apos = pos
-        for i in a:
-            if apos != i['pos']:
-                self.move_one(i, apos)
-            apos -= 1
-        b = sorted((i for i in items if int(i['pos']) > pos), key=lambda x: int(x['pos']))
-        bpos = pos + (0 if len(a) == 0 else 1)
-        for i in b:
-            if bpos != i['pos']:
-                self.move_one(i, bpos)
-            bpos += 1
 
     def dropMimeData(self, data, action, row, column, parent):
         # Ignoring the action argument: move when src list is same as dst list,
@@ -239,7 +230,6 @@ class WritableMixin(metaclass=ABCMeta):
             self.move(d['items'], row)
         else:
             self.add(d['items'], row)
-        self.refresh()
         return False
 
     def flags(self, index):
@@ -261,12 +251,14 @@ class Queue(WritableMixin, SongList):
         return self._current_pos.value
 
     def refresh(self):
+        self.update_state()
         self.refresh_format()
 
-    @mpd_cmd
+    @mpd_cmd(fallback=[])
     def ls(self, _=None):
         return self.conn.playlistinfo()
 
+    @mpd_cmd(fallback=False)
     def add(self, items, pos=None, play=False, replace=False):
         if replace:
             self.conn.clear()
@@ -305,11 +297,12 @@ class Queue(WritableMixin, SongList):
         if self.can_set_priority(positions, prio):
             self.conn.prioid(prio, *[self[i]['id'] for i in positions])
 
-    @mpd_cmdlist
+    @mpd_cmd
     def reverse(self):
-        n = len(self)
-        for i in range(n//2 + 1):
-            self.conn.swap(i, n-i-1)
+        with mpd_cmdlist:
+            n = len(self)
+            for i in range(n//2 + 1):
+                self.conn.swap(i, n-i-1)
 
     def item_chosen(self, pos):
         self._current_pos.send(pos)
@@ -349,7 +342,7 @@ class Database(BrowserList):
         else:
             super().item_chosen(pos)
 
-    @mpd_cmd
+    @mpd_cmd(fallback=[])
     def ls(self, path, recursive=False):
         l = self.conn.lsinfo(path)
         r = []
@@ -366,7 +359,7 @@ class Playlists(WritableMixin, BrowserList):
     def __init__(self, parent):
         super().__init__(parent, '')
 
-    @mpd_cmd
+    @mpd_cmd(fallback=[])
     def ls(self, name):
         if name != '':
             return self.conn.listplaylistinfo(name)
@@ -446,7 +439,7 @@ class Playlists(WritableMixin, BrowserList):
         else:
             return super().data(index, role)
 
-    @mpd_cmd
+    @mpd_cmd(fallback=False)
     def setData(self, index, value, role=Qt.EditRole):
         r, c = index.row(), index.column()
         if role == Qt.EditRole and c == 0:
@@ -471,7 +464,7 @@ class Search(BrowserList):
     def __init__(self, parent):
         super().__init__(parent, (0, ''))
 
-    @mpd_cmd
+    @mpd_cmd(fallback=[])
     def ls(self, query):
         if query[1] == '':
             return []

@@ -63,6 +63,7 @@ class Qygmy(QMainWindow):
             ('consume', 'edit-delete-shred'),
             ('highprio', 'flag-red'),
             ('save', 'document-save'),
+            ('details', 'dialog-information'),
             ('settings', 'configure'),
             ('updatedb', 'view-refresh'),
             ('about', 'applications-multimedia'),
@@ -195,7 +196,7 @@ class Qygmy(QMainWindow):
                 'add', 'clear', 'repeat', 'shuffle', 'single', 'consume',
                 'updatedb', 'save', 'randomize', 'details', 'statistics',
                 'louder', 'quieter', 'reverse',
-                'playback_menu', 'volume_menu', 'playlist_menu', 'pboptions_menu'):
+                'playback_menu', 'volume_menu', 'playlist_menu'):
             getattr(self.ui, e).setEnabled(c)
         self.on_queue_selection_changed()
 

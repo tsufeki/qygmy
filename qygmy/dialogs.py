@@ -18,6 +18,7 @@ class Info(QDialog):
         self.main = main
         self.ui = Ui_infodialog()
         self.ui.setupUi(self)
+        self.ui.icon_label.setPixmap(QIcon.fromTheme('dialog-information').pixmap(64, 64))
 
     def exec_(self, name, info, title):
         self.setWindowTitle(title)
@@ -27,7 +28,10 @@ class Info(QDialog):
             w.widget().deleteLater()
         d = self.main.fmt.info_dialog(name, info)
         for a, b in d:
-            self.ui.layout.addRow(a, QLabel(b))
+            if b is None:
+                self.ui.layout.addRow(QLabel(a))
+            else:
+                self.ui.layout.addRow(a, QLabel(b))
         self.adjustSize()
         super().exec_()
 

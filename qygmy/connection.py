@@ -13,7 +13,7 @@ class State(QObject):
 
     default = None
     changed = None
-    send_callable = None
+    changed2 = None
 
     def __init__(self):
         super().__init__()
@@ -31,9 +31,8 @@ class State(QObject):
             self.changed.emit(self._value)
             self.changed2.emit(self._value, old_value)
 
-    def send(self, new_value):
-        new_value = self.prepare(new_value)
-        self.send_callable(new_value)
+    def send(self, value):
+        pass
 
     def normalize(self, value):
         if value is None or value == '':
@@ -48,20 +47,17 @@ class State(QObject):
         return self.normalize(value)
 
     @classmethod
-    def create(cls, parent, name, init, send_callable=None):
-        if not callable(send_callable):
-            method = send_callable
-            if method is None:
-                method = name
-            send_callable = lambda c, v: getattr(c, method)(v)
-        class C(cls):
+    def create(cls, parent, name, init, send_cmd=None):
+        if not callable(send_cmd):
+            send_cmd = lambda v, s=send_cmd or name: getattr(parent.conn, s)(v)
+        class CompleteState(cls):
             default = init
             changed = Signal(type(init))
             changed2 = Signal(type(init), type(init))
-            send = Slot(type(init))(cls.send)
-            def send_callable(self, v):
-                return mpd_wrapper(parent, send_callable, [parent.conn, v])
-        s = C()
+            def send(self, value):
+                value = self.prepare(value)
+                mpd_cmd(lambda p, v: send_cmd(v))(parent, value)
+        s = CompleteState()
         s.setObjectName(name)
         s.setParent(parent)
         setattr(parent, name, s)
@@ -75,8 +71,8 @@ class BoolState(State):
         return int(self.normalize(value))
 
     @classmethod
-    def create(cls, parent, name, init=False, send_callable=None):
-        super().create(parent, name, init, send_callable)
+    def create(cls, parent, name, init=False, send_cmd=None):
+        super().create(parent, name, init, send_cmd)
 
 
 class TimeTupleState(State):
@@ -98,53 +94,39 @@ class PathState(State):
         return v.strip('/')
 
 
-def mpd_wrapper(connection, function, args=(), kwargs={}, ignore_conn=False):
-    r = None
-    if ignore_conn or connection.state.value != 'disconnect':
-        try:
-            r = function(*args, **kwargs)
-        except (mpd.MPDError, OSError) as e:
-            connection.handle_error(e)
-    connection.update_state()
-    return r
-
-
-def mpd_cmd(f):
-    @functools.wraps(f)
-    def decor(self, *args, **kwargs):
-        return mpd_wrapper(self, f, (self,) + args, kwargs)
-    return decor
-
-def mpd_cmd_ignore_conn(f):
-    @functools.wraps(f)
-    def decor(self, *args, **kwargs):
-        return mpd_wrapper(self, f, (self,) + args, kwargs, True)
-    return decor
-
-
-def mpd_cmdlist(f):
-    @mpd_cmd
-    @functools.wraps(f)
-    def decor(self, *args, **kwargs):
-        self.conn.command_list_ok_begin()
-        try:
-            r = f(self, *args, **kwargs)
-        finally:
-            self.conn.command_list_end()
-        return r
-    return decor
+def mpd_cmd(method=None, ignore_conn=False, fallback=None):
+    if method is None:
+        def decorator(method):
+            return mpd_cmd(method, ignore_conn, fallback)
+        return decorator
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        ret = fallback
+        if self.state.value != 'disconnect' or ignore_conn:
+            try:
+                ret = method(self, *args, **kwargs)
+            except (mpd.MPDError, OSError) as e:
+                self.handle_error(e)
+        self.update_state()
+        return ret
+    return wrapper
 
 
 def simple_mpd(name, *args):
-    @mpd_cmd
-    def f(self):
-        return getattr(self.conn, name)(*args)
-    f.__name__ = name
-    return f
+    return mpd_cmd(lambda self: getattr(self.conn, name)(*args))
 
 
 def not_callable(*args):
-    raise TypeError("Not Callable")
+    raise TypeError("Not callable")
+
+
+class MPDCommandList:
+    def __init__(self, conn):
+        self.conn = conn
+    def __enter__(self):
+        self.conn.command_list_ok_begin()
+    def __exit__(self, *exc):
+        self.conn.command_list_end()
 
 
 class Connection:
@@ -185,6 +167,7 @@ class ProperConnection(Connection):
         super().__init__(main)
         self.main = main
         self.conn = mpd.MPDClient()
+        self.mpd_cmdlist = MPDCommandList(self.conn)
         State.create(self, 'state', 'disconnect', not_callable)
 
     def update_state(self):
@@ -203,6 +186,10 @@ class RelayingConnection(Connection):
     @property
     def conn(self):
         return self.parent.conn
+
+    @property
+    def mpd_cmdlist(self):
+        return self.parent.mpd_cmdlist
 
     @property
     def state(self):
