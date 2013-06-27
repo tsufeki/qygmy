@@ -128,9 +128,9 @@ def mpd_cmdlist(f):
     def decor(self, *args, **kwargs):
         self.conn.command_list_ok_begin()
         try:
-            f(self, *args, **kwargs)
+            r = f(self, *args, **kwargs)
         finally:
-            r = self.conn.command_list_end()
+            self.conn.command_list_end()
         return r
     return decor
 
@@ -138,7 +138,7 @@ def mpd_cmdlist(f):
 def simple_mpd(name, *args):
     @mpd_cmd
     def f(self):
-        getattr(self.conn, name)(*args)
+        return getattr(self.conn, name)(*args)
     f.__name__ = name
     return f
 

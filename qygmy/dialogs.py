@@ -66,10 +66,11 @@ class Settings(QDialog):
                 '$if2(%title%,%filename%)'
             ),
         },
-        'gui': {},
-        'misc': {
+        'gui': {
             'autoscroll': '1',
+            'interval': '500',
         },
+        'guistate': {},
     }
 
     PATH = os.path.expanduser(os.path.join(os.environ.get('XDG_CONFIG_HOME', '~/.config'), 'qygmy'))
@@ -83,8 +84,7 @@ class Settings(QDialog):
         self.conf.read_dict(self.DEFAULTS, '<defaults>')
         self.conf.read_dict(self.environ_conf(), '<MPD_HOST>')
         self.conf.read(os.path.join(self.PATH, self.FILENAME), 'utf-8')
-        self.conf['connection']['host'] = self.conf['connection']['host'].strip()
-        self.conf['connection']['port'] = self.validate_port(self.conf['connection']['port'].strip())
+        self.validate(self)
         self.setup_ui()
 
     def environ_conf(self):
@@ -122,18 +122,20 @@ class Settings(QDialog):
         if sb == QDialogButtonBox.Ok:
             self.ui_to_conf()
             self.save()
+            self.conf_to_ui()
         elif sb == QDialogButtonBox.Cancel:
             self.conf_to_ui()
         elif sb == QDialogButtonBox.Apply:
             self.ui_to_conf()
             self.save()
+            self.conf_to_ui()
         elif sb == QDialogButtonBox.RestoreDefaults:
             self.conf_to_ui(self.DEFAULTS)
 
     def conf_to_ui(self, conf=None):
         if conf is None:
             conf = self.conf
-        c, f = conf['connection'], conf['format']
+        c, f, g = conf['connection'], conf['format'], conf['gui']
         self.ui.host.setText(c['host'])
         self.ui.port.setText(c['port'])
         self.ui.password.setText(c['password'])
@@ -141,12 +143,14 @@ class Settings(QDialog):
         self.ui.progressbar.setPlainText(f['progressbar'])
         self.ui.current_song.setPlainText(f['current_song'])
         self.ui.playlist_item.setPlainText(f['playlist_item'])
+        self.ui.autoscroll.setChecked(g['autoscroll'] == '1')
+        self.ui.interval.setValue(int(g['interval']))
 
     def ui_to_dict(self):
         return {
             'connection': {
-                'host': self.ui.host.text().strip(),
-                'port': self.validate_port(self.ui.port.text().strip()),
+                'host': self.ui.host.text(),
+                'port': self.ui.port.text(),
                 'password': self.ui.password.text(),
             },
             'format': {
@@ -155,12 +159,17 @@ class Settings(QDialog):
                 'current_song': self.ui.current_song.toPlainText(),
                 'playlist_item': self.ui.playlist_item.toPlainText(),
             },
+            'gui': {
+                'autoscroll': '1' if self.ui.autoscroll.isChecked() else '0',
+                'interval': str(self.ui.interval.value()),
+            },
         }
 
     def ui_to_conf(self):
         d = self.ui_to_dict()
+        self.validate(d)
         changed = set()
-        for sect in ('connection', 'format'):
+        for sect in ('connection', 'format', 'gui'):
             for k in d[sect]:
                 if d[sect][k] != self.conf[sect][k]:
                     changed.add(k)
@@ -179,22 +188,34 @@ class Settings(QDialog):
             self.main.srv.database.refresh_format()
             self.main.srv.playlists.refresh_format()
             self.main.srv.search.refresh_format()
+        if 'interval' in changed:
+            self.main.timer.stop()
+            self.main.timer.start(int(self.conf['gui']['interval']))
 
     def save(self):
         try:
             os.makedirs(self.PATH, exist_ok=True)
-            with open(os.path.join(self.PATH, self.FILENAME), 'w') as f:
+            with open(os.path.join(self.PATH, self.FILENAME), 'w', encoding='utf-8') as f:
                 self.conf.write(f)
         except OSError as e:
             logger.error('{}: {}'.format(e.__class__.__name__, e))
 
-    def validate_port(self, port):
-        pi = None
+    @classmethod
+    def validate_int(cls, string, imin, imax, default):
+        string = string.strip()
         try:
-            pi = int(port)
+            i = int(string)
+            if imin <= i < imax:
+                return string
         except ValueError:
             pass
-        if pi is not None and pi in range(1, 2**16):
-            return port
-        return self.DEFAULTS['connection']['port']
+        return default
+
+    @classmethod
+    def validate(cls, dct):
+        c, g = dct['connection'], dct['gui']
+        c['host'] = c['host'].strip()
+        c['port'] = cls.validate_int(c['port'], 1, 2**16, cls.DEFAULTS['connection']['port'])
+        g['autoscroll'] = '1' if g['autoscroll'] == '1' else '0'
+        g['interval'] = cls.validate_int(g['interval'], 100, 3600000, cls.DEFAULTS['gui']['interval'])
 

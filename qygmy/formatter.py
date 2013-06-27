@@ -12,6 +12,9 @@ class Formatter:
 
     _directory_icon = QIcon.fromTheme('folder')
     _playlist_icon = QIcon.fromTheme('text-plain')
+    _high_prio_background = QBrush(QColor(255, 255, 0, 127))
+
+    playlist_column_count = 2
 
     templates = {
         'current_song_tooltip': (
@@ -108,7 +111,6 @@ class Formatter:
         return {
             'elapsed': str(elapsed),
             'total': str(total),
-            'left': str(max(total - elapsed, 0)),
         }
 
     def _compile(self, template):
@@ -124,18 +126,18 @@ class Formatter:
         return [(self._render(a, context), self._render(b, context)) for a, b in template]
 
     def render(self, name, context, bold=False):
-        if name not in self._tmplcache:
+        tmpl = self._tmplcache.get(name)
+        if tmpl is None:
             if name in self.settings['format']:
                 t = self.settings['format'][name]
             else:
                 t = self.templates[name]
-            self._tmplcache[name] = self._compile(t)
-        tmpl = self._tmplcache[name]
+            tmpl = self._tmplcache[name] = self._compile(t)
         context['bold'] = '1' if bold else ''
         return self._render(tmpl, context)
 
     def clear_cache(self):
-        self._tmplcache = {}
+        self._tmplcache.clear()
 
     def window_title(self, state, song):
         context = self._prepare_state(state)
@@ -158,22 +160,26 @@ class Formatter:
         context.update(self._prepare_song(song, html=False))
         return self.render('current_song_tooltip', context)
 
-    def playlist_item(self, song, column, is_current=False):
+    def playlist_item(self, song, column, is_current):
         if column == 0:
             return self.render('playlist_item', self._prepare_song(song), bold=is_current)
         elif column == 1 and 'time' in song:
             return self.render('playlist_column2', {'length': song['time']}, bold=is_current)
         return ''
 
-    def playlist_icon(self, song, column, is_current=False):
+    def playlist_icon(self, song, column, is_current):
         if column == 0:
             if 'playlist' in song:
                 return self._playlist_icon
             if 'directory' in song:
                 return self._directory_icon
 
-    def playlist_tooltip(self, song, column, is_current=False):
+    def playlist_tooltip(self, song, column, is_current):
         return self.render('playlist_tooltip', self._prepare_song(song, html=False))
+
+    def playlist_background(self, song, column, is_current):
+        if song.get('prio', '0') != '0':
+            return self._high_prio_background
 
     def status(self, state, totallength, totalcount):
         context = {'totallength': str(totallength), 'totalcount': str(totalcount)}
@@ -190,7 +196,4 @@ class Formatter:
                     unrecognized.append((k + ':', v))
         r = [i for i in self.render(name, info) if i[1] != '']
         return r + unrecognized
-
-    playlist_column_count = 2
-    high_prio_background = QBrush(QColor(255, 255, 0, 127))
 

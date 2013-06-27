@@ -1,5 +1,6 @@
 
 import pickle
+from abc import ABCMeta, abstractmethod
 
 import mpd
 from PySide.QtCore import *
@@ -7,7 +8,11 @@ from PySide.QtCore import *
 from .connection import *
 
 
-class SongList(RelayingConnection, QAbstractTableModel):
+class QABCMeta(ABCMeta, QAbstractTableModel.__class__):
+    pass
+
+
+class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
 
     current_pos = -1
 
@@ -22,43 +27,6 @@ class SongList(RelayingConnection, QAbstractTableModel):
 
         self.total_length = 0
 
-    def retrieve_from_server(self, new_current):
-        return []
-
-    def sort_key(self, item):
-        return (item.get('file', ''), item.get('directory', ''), item.get('playlist', ''))
-
-    def refresh(self):
-        self.current.update(self.current.value, force=True)
-
-    def refresh_format(self):
-        self.beginResetModel()
-        self.endResetModel()
-
-    def _reset(self, newstate, oldstate):
-        if newstate == 'disconnect' or oldstate == 'disconnect':
-            self.current.update(None, force=True)
-
-    @mpd_cmd_ignore_conn
-    def _update(self, new_current):
-        self.total_length = 0
-        self.beginResetModel()
-        try:
-            if self.state.value != 'disconnect':
-                s = self.retrieve_from_server(new_current)
-                s.sort(key=self.sort_key)
-                self.items = s
-            else:
-                self.items = []
-        except (mpd.MPDError, OSError):
-            self.items = []
-            raise
-        finally:
-            self.endResetModel()
-        for i in self.items:
-            if 'time' in i:
-                self.total_length += int(i['time'])
-
     def __len__(self):
         return len(self.items)
 
@@ -70,9 +38,20 @@ class SongList(RelayingConnection, QAbstractTableModel):
     def __iter__(self):
         return iter(self.items)
 
+    def refresh(self):
+        self.current.update(self.current.value, force=True)
+
+    def refresh_format(self):
+        self.beginResetModel()
+        self.endResetModel()
+
     def details(self, positions):
         if len(positions) == 1 and 'file' in self[positions[0]]:
             return self[positions[0]]
+
+    @abstractmethod
+    def ls(self, identifier):
+        return []
 
     def can_add_to_queue(self, positions):
         return False
@@ -86,9 +65,32 @@ class SongList(RelayingConnection, QAbstractTableModel):
     def can_set_priority(self, positions, prio):
         return False
 
+    @abstractmethod
     def item_chosen(self, pos):
-        # i.e. double-clicked or Return pressed
+        """i.e. double-clicked or Return pressed."""
         pass
+
+    def sort_key(self, item):
+        return (item.get('file', ''), item.get('directory', ''), item.get('playlist', ''))
+
+    def _reset(self, newstate, oldstate):
+        if newstate == 'disconnect' or oldstate == 'disconnect':
+            self.current.update(None, force=True)
+
+    def _update(self, new_current):
+        self.total_length = 0
+        self.beginResetModel()
+        try:
+            self.items = []
+            if self.state.value != 'disconnect':
+                self.items = self.ls(new_current)
+                if self.items is None:
+                    self.items = []
+        finally:
+            self.endResetModel()
+        for i in self.items:
+            if 'time' in i:
+                self.total_length += int(i['time'])
 
     def columnCount(self, parent=None):
         return self.main.fmt.playlist_column_count
@@ -108,8 +110,9 @@ class SongList(RelayingConnection, QAbstractTableModel):
             elif role == Qt.DecorationRole:
                 return self.main.fmt.playlist_icon(
                         self[r], c, r == self.current_pos)
-            elif role == Qt.BackgroundRole and self[r].get('prio', '0') != '0':
-                return self.main.fmt.high_prio_background
+            elif role == Qt.BackgroundRole:
+                return self.main.fmt.playlist_background(
+                        self[r], c, r == self.current_pos)
         return None
 
     def flags(self, index):
@@ -117,14 +120,6 @@ class SongList(RelayingConnection, QAbstractTableModel):
         if index.column() == 0 and self.can_rename([index.row()]):
             f |= Qt.ItemIsEditable
         return f
-
-    def supportedDropActions(self):
-        return None
-
-    MIMETYPE = 'application/x-qygmy-playlistitems'
-
-    def mimeTypes(self):
-        return [self.MIMETYPE]
 
     def mimeData(self, indexes):
         data = {'source': self.__class__.__name__, 'items': []}
@@ -141,33 +136,96 @@ class SongList(RelayingConnection, QAbstractTableModel):
             md.setData(self.MIMETYPE, pickle.dumps(data))
         return md
 
+    def mimeTypes(self):
+        return [self.MIMETYPE]
 
-class WritableMixin:
+    def supportedDropActions(self):
+        return None
+
+    MIMETYPE = 'application/x-qygmy-playlistitems'
+
+
+class WritableMixin(metaclass=ABCMeta):
+
+    def add(self, items, pos=None, extra=None):
+        items.sort(key=self.sort_key)
+        a = []
+        for i in items:
+            if 'file' in i or self.can_add_directly(i, pos):
+                a.append(i)
+            elif 'directory' in i:
+                a.extend(self.parent.database.ls(i['directory'], recursive=True))
+            elif 'playlist' in i:
+                a.extend(self.parent.playlists.ls(i['playlist']))
+        if len(a) > 0:
+            self._add(a, pos, extra)
+            self.refresh()
+            return True
+        return False
+
+    @abstractmethod
+    def can_add_directly(self, item, pos):
+        return True
+
+    @abstractmethod
+    def add_one(self, item, pos, extra):
+        pass
+
+    @mpd_cmdlist
+    def _add(self, items, pos, extra):
+        if pos is not None:
+            items = reversed(items)
+        for i in items:
+            self.add_one(i, pos, extra)
 
     def can_remove(self, positions):
         return len(positions) > 0
 
-    @mpd_cmdlist
-    def _remove(self, positions):
-        for pos in reversed(sorted(positions)):
-            if self[pos]:
-                item = self[pos].copy()
-                item['pos'] = str(pos)
-                self.remove_one(item)
-
     def remove(self, positions):
         if self.can_remove(positions):
-            self._remove(positions)
+            items = []
+            for pos in positions:
+                i = self[pos].copy()
+                i['pos'] = str(pos)
+                items.append(i)
+            self._remove(items)
             self.refresh()
 
-    def flags(self, index):
-        return super().flags(index) | Qt.ItemIsDropEnabled
+    @abstractmethod
+    def remove_one(self, item):
+        pass
 
-    def supportedDropActions(self):
-        return Qt.MoveAction | Qt.CopyAction
+    @mpd_cmdlist
+    def _remove(self, items):
+        for i in reversed(sorted(items)):
+            self.remove_one(i)
+
+    def move(self, items, pos):
+        if len(items) > 0:
+            self._move(items, pos)
+            self.refresh()
+
+    @abstractmethod
+    def move_one(self, item, pos):
+        pass
+
+    @mpd_cmdlist
+    def _move(self, items, pos):
+        a = sorted((i for i in items if int(i['pos']) <= pos), key=lambda x: -int(x['pos']))
+        apos = pos
+        for i in a:
+            if apos != i['pos']:
+                self.move_one(i, apos)
+            apos -= 1
+        b = sorted((i for i in items if int(i['pos']) > pos), key=lambda x: int(x['pos']))
+        bpos = pos + (0 if len(a) == 0 else 1)
+        for i in b:
+            if bpos != i['pos']:
+                self.move_one(i, bpos)
+            bpos += 1
 
     def dropMimeData(self, data, action, row, column, parent):
-        # Ignoring action: move when src list is same as dst list,
+        # Ignoring the action argument: move when src list is same as dst list,
         # copy otherwise.
         if not data.hasFormat(self.MIMETYPE):
             return False
@@ -179,18 +237,17 @@ class WritableMixin:
         if d['source'] == self.__class__.__name__:
             if row is None:
                 return False
-            self._move(d['items'], row)
+            self.move(d['items'], row)
         else:
-            self.add(d['items'], pos=row)
+            self.add(d['items'], row)
         self.refresh()
         return False
 
-    @mpd_cmdlist
-    def _move(self, items, pos):
-        for i in items:
-            if int(i['pos']) >= pos:
-                pos += 1
-            self.move_one(i, pos)
+    def flags(self, index):
+        return super().flags(index) | Qt.ItemIsDropEnabled
+
+    def supportedDropActions(self):
+        return Qt.MoveAction | Qt.CopyAction
 
 
 class Queue(WritableMixin, SongList):
@@ -200,46 +257,40 @@ class Queue(WritableMixin, SongList):
         State.create(self, '_current_pos', -1, 'play')
         self._current_pos.changed2.connect(self._update_current_pos)
 
-    def _update_current_pos(self, new, old):
-        for i in (old, new):
-            if 0 <= i < len(self):
-                index1 = self.index(i, 0)
-                index2 = self.index(i, self.columnCount() - 1)
-                self.dataChanged.emit(index1, index2)
-
     @property
     def current_pos(self):
         return self._current_pos.value
 
-    def sort_key(self, item):
-        return 0 # no sorting
-
-    def retrieve_from_server(self, new_version):
-        return self.conn.playlistinfo()
-
     def refresh(self):
         self.refresh_format()
 
-    @mpd_cmdlist
-    def add(self, items, play=False, replace=False, pos=None):
+    @mpd_cmd
+    def ls(self, _=None):
+        return self.conn.playlistinfo()
+
+    def add(self, items, pos=None, play=False, replace=False):
         if replace:
             self.conn.clear()
-        cnt = len(items)
-        for i in items:
-            if 'playlist' in i:
-                self.conn.load(i['playlist'])
-            elif 'directory' in i:
-                self.conn.add(i['directory'])
-            elif 'file' in i:
-                if pos is not None:
-                    pos += 1
-                    self.conn.addid(i['file'], pos)
-                else:
-                    self.conn.add(i['file'])
+        r = super().add(items, pos)
+        if play and r:
+            if replace:
+                playpos = 0
             else:
-                cnt -= 1
-        if play and cnt > 0:
-            self.conn.play(0 if replace else len(self))
+                playpos = len(self) - 1 if pos is None else pos
+            self.conn.play(playpos)
+        return r
+
+    def can_add_directly(self, item, pos):
+        return 'file' in item or ('playlist' in item and pos is None)
+
+    def add_one(self, item, pos, _):
+        if 'playlist' in item and pos is None:
+            self.conn.load(item['playlist'])
+        elif 'file' in item:
+            if pos is None:
+                self.conn.add(item['file'])
+            else:
+                self.conn.addid(item['file'], pos)
 
     def remove_one(self, item):
         self.conn.deleteid(item['id'])
@@ -252,10 +303,18 @@ class Queue(WritableMixin, SongList):
 
     @mpd_cmd
     def set_priority(self, positions, prio):
-        self.conn.prioid(prio, *[self[i]['id'] for i in positions])
+        if self.can_set_priority(positions, prio):
+            self.conn.prioid(prio, *[self[i]['id'] for i in positions])
 
     def item_chosen(self, pos):
         self._current_pos.send(pos)
+
+    def _update_current_pos(self, new, old):
+        for i in {old, new}:
+            if 0 <= i < len(self):
+                index1 = self.index(i, 0)
+                index2 = self.index(i, self.columnCount() - 1)
+                self.dataChanged.emit(index1, index2)
 
 
 class BrowserList(SongList):
@@ -265,7 +324,7 @@ class BrowserList(SongList):
 
     def add_to_queue(self, positions, play=False, replace=False):
         if self.can_add_to_queue(positions):
-            self.parent.queue.add([self[i] for i in positions], play, replace)
+            self.parent.queue.add([self[i] for i in positions], play=play, replace=replace)
 
     def item_chosen(self, pos):
         self.add_to_queue([pos])
@@ -279,15 +338,22 @@ class Database(BrowserList):
     def __init__(self, parent):
         super().__init__(parent, '', PathState)
 
-    def retrieve_from_server(self, new_path):
-        ls = self.conn.lsinfo(new_path)
-        return [e for e in ls if 'file' in e or 'directory' in e]
-
     def item_chosen(self, pos):
         if 'directory' in self[pos]:
             self.cd(self[pos]['directory'])
         else:
             super().item_chosen(pos)
+
+    @mpd_cmd
+    def ls(self, path, recursive=False):
+        l = self.conn.lsinfo(path)
+        r = []
+        for e in sorted(l, key=self.sort_key):
+            if 'file' in e or (not recursive and 'directory' in e):
+                r.append(e)
+            elif 'directory' in e:
+                r.extend(self.ls(e['directory'], recursive=True))
+        return r
 
 
 class Playlists(WritableMixin, BrowserList):
@@ -295,22 +361,20 @@ class Playlists(WritableMixin, BrowserList):
     def __init__(self, parent):
         super().__init__(parent, '')
 
-    def retrieve_from_server(self, new_name):
-        if new_name == '':
-            return self.conn.listplaylists()
-        else:
-            return self.conn.listplaylistinfo(new_name)
+    @mpd_cmd
+    def ls(self, name):
+        if name != '':
+            return self.conn.listplaylistinfo(name)
+        return sorted(self.conn.listplaylists(), key=self.sort_key)
 
-    def sort_key(self, item):
-        # no sorting inside playlist
-        return item['playlist'] if 'playlist' in item else 0
-
-    @mpd_cmdlist
     def add(self, items, pos=None):
+        extra = {}
+        extra['last'] = len(self)
         if self.current.value != '':
-            name = self.current.value
+            extra['name'] = self.current.value
         elif pos is not None:
-            name = self[pos]['playlist']
+            extra['name'] = self[pos]['playlist']
+            pos = None
         else:
             playlists = {s['playlist'] for s in self}
             name = new = self.tr('new_playlist')
@@ -319,10 +383,22 @@ class Playlists(WritableMixin, BrowserList):
                     name = '{}_{}'.format(new, i)
                     if name not in playlists:
                         break
-        for i in items:
-            # TODO: directories?
-            if 'file' in i:
-                self.conn.playlistadd(name, i['file'])
+            extra['name'] = name
+        return super().add(items, pos, extra=extra)
+
+    def can_add_directly(self, item, pos):
+        return 'file' in item
+
+    def add_one(self, item, pos, extra):
+        if 'file' not in item:
+            return
+        name = extra['name']
+        if pos is not None:
+            self.conn.playlistadd(name, item['file'])
+            self.conn.playlistmove(name, extra['last'], pos)
+            extra['last'] += 1
+        else:
+            self.conn.playlistadd(name, item['file'])
 
     def can_rename(self, positions):
         return len(positions) == 1 and 'playlist' in self[positions[0]]
@@ -390,8 +466,10 @@ class Search(BrowserList):
     def __init__(self, parent):
         super().__init__(parent, (0, ''))
 
-    def retrieve_from_server(self, new_query):
-        if new_query[1] == '':
+    @mpd_cmd
+    def ls(self, query):
+        if query[1] == '':
             return []
-        return self.conn.search(self.search_tags[new_query[0]], new_query[1])
+        return sorted(self.conn.search(self.search_tags[query[0]], query[1]),
+                key=self.sort_key)
 

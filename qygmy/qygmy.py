@@ -21,9 +21,7 @@ class Qygmy(QMainWindow):
         self.browser = Browser(self)
         self.timer = QTimer(self)
         self.setup_ui()
-        self.connect_mpd()
-        self.timer.timeout.connect(self.srv.update_state)
-        self.timer.start(500)
+        self.timer.start(int(self.settings['gui']['interval']))
 
     def connect_mpd(self):
         self.srv.connect_mpd(
@@ -38,8 +36,11 @@ class Qygmy(QMainWindow):
         self.setup_icons()
         self.setup_widgets()
         self.setup_signals()
-        if 'main_geometry' in self.settings['gui']:
-            self.restoreGeometry(QByteArray.fromBase64(self.settings['gui']['main_geometry']))
+        try:
+            if 'main_geometry' in self.settings['guistate']:
+                self.restoreGeometry(QByteArray.fromBase64(self.settings['guistate']['main_geometry']))
+        except:
+            pass
 
     def setup_icons(self):
         self.setWindowIcon(QIcon.fromTheme('applications-multimedia'))
@@ -86,6 +87,7 @@ class Qygmy(QMainWindow):
         vb.setPopupMode(QToolButton.InstantPopup)
 
     def setup_signals(self):
+        self.timer.timeout.connect(self.srv.update_state)
         self.ui.play.triggered.connect(self.srv.play)
         self.ui.pause.triggered.connect(self.srv.pause)
         self.ui.stop.triggered.connect(self.srv.stop)
@@ -155,7 +157,7 @@ class Qygmy(QMainWindow):
         pos = int(new_song.get('pos', '-1'))
         if (pos < 0 or pnew == pold or not pnew or
                 self.srv.state.value != 'play' or
-                self.settings['misc']['autoscroll'] != '1'):
+                self.settings['gui']['autoscroll'] != '1'):
             return
         index = self.srv.queue.index(pos, 0)
         if not self.ui.queue.rect().contains(self.ui.queue.visualRect(index)):
@@ -170,7 +172,7 @@ class Qygmy(QMainWindow):
 
     def closeEvent(self, e):
         self.srv.disconnect_mpd()
-        self.settings['gui']['main_geometry'] = str(self.saveGeometry().toBase64())
+        self.settings['guistate']['main_geometry'] = str(self.saveGeometry().toBase64())
         self.browser.close()
         self.settings.save()
         super().closeEvent(e)
@@ -239,6 +241,7 @@ def main():
     app = QApplication(sys.argv)
     m = Qygmy()
     m.show()
+    m.connect_mpd()
     # XXX: TODO: FIXME:
     os._exit(app.exec_())
     #sys.exit(app.exec_())

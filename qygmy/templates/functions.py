@@ -2,14 +2,12 @@
 import re
 
 
-def lazy_noop(*args): return ''
-
-
 # Conditionals
 
 def lazy_if(cond, yes, no): return yes() if cond() else no()
 
 def lazy_if2(*args):
+    """Return first non-empty argument."""
     for a in args:
         val = a()
         if val:
@@ -17,6 +15,11 @@ def lazy_if2(*args):
     return ''
 
 def lazy_if3(*args):
+    """Shorthand for a chain of `if`s.
+
+    `$if3(c_0, v_0, c_1, v_1, c_2, v_2, ...)` - return first `v_i` for which
+    `c_i` is not empty.
+    """
     if len(args) == 0:
         return ''
     if len(args) == 1:
@@ -30,7 +33,7 @@ def f_lower(text): return text.lower()
 def f_upper(text): return text.upper()
 def f_left(text, num): return text[:int(num)]
 def f_right(text, num): return text[-int(num):]
-def f_num(num, length): return '{{:0{}d}}'.format(int(length)).format(int(num))
+def f_num(num, length): return '{{:0{:d}d}}'.format(int(length)).format(int(num))
 def f_replace(text, search, replace): return text.replace(search, replace)
 def f_in(x, y): return '1' if x in y else ''
 def f_trim(text, chars=None): return text.strip(chars)
@@ -67,6 +70,9 @@ def f_mul(*args):
         r *= int(i)
     return str(r)
 
+def f_max(*args): return str(max(int(i) for i in args))
+def f_min(*args): return str(min(int(i) for i in args))
+
 def f_lt(x, y): return '1' if int(x) < int(y) else ''
 def f_lte(x, y): return '1' if int(x) <= int(y) else ''
 def f_gt(x, y): return '1' if int(x) > int(y) else ''
@@ -97,7 +103,10 @@ def context_unset(ctx, name):
         del ctx[name]
     return ''
 
+
 # Other
+
+def lazy_noop(*args): return ''
 
 def f_time(seconds):
     if seconds == '':

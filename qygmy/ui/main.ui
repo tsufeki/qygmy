@@ -251,6 +251,14 @@
    <addaction name="settings"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>500</width>
+     <height>1</height>
+    </rect>
+   </property>
    <property name="sizePolicy">
     <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
      <horstretch>0</horstretch>
@@ -273,12 +281,15 @@
     <bool>false</bool>
    </property>
    <widget class="QMenu" name="context_menu">
+    <property name="title">
+     <string/>
+    </property>
     <property name="separatorsCollapsible">
      <bool>true</bool>
     </property>
     <widget class="QMenu" name="volume_menu">
      <property name="title">
-      <string>Volume</string>
+      <string>&amp;Volume</string>
      </property>
      <property name="separatorsCollapsible">
       <bool>true</bool>
@@ -288,7 +299,7 @@
     </widget>
     <widget class="QMenu" name="playback_menu">
      <property name="title">
-      <string>Playback</string>
+      <string>&amp;Playback</string>
      </property>
      <property name="separatorsCollapsible">
       <bool>true</bool>
@@ -437,6 +448,9 @@
    <property name="autoRepeat">
     <bool>false</bool>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="shuffle">
    <property name="checkable">
@@ -449,6 +463,9 @@
     <string>S&amp;huffle</string>
    </property>
    <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
     <bool>false</bool>
    </property>
   </action>
@@ -531,6 +548,9 @@
    <property name="autoRepeat">
     <bool>false</bool>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="consume">
    <property name="checkable">
@@ -546,6 +566,9 @@
     <string>Consume</string>
    </property>
    <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="iconVisibleInMenu">
     <bool>false</bool>
    </property>
   </action>
@@ -650,6 +673,12 @@
    </property>
    <property name="toolTip">
     <string>Set normal priority for selected songs</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+J</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>

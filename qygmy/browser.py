@@ -22,11 +22,14 @@ class Browser(QMainWindow):
         self.setup_search()
         self.srv.state.changed.connect(self.on_state_changed)
 
-        if 'browser_geometry' in self.main.settings['gui']:
-            self.restoreGeometry(QByteArray.fromBase64(self.main.settings['gui']['browser_geometry']))
-        if ('browser_tab' in self.main.settings['gui'] and
-                0 <= int(self.main.settings['gui']['browser_tab']) < self.ui.tabs.count()):
-            self.ui.tabs.setCurrentIndex(int(self.main.settings['gui']['browser_tab']))
+        try:
+            if 'browser_geometry' in self.main.settings['guistate']:
+                self.restoreGeometry(QByteArray.fromBase64(self.main.settings['guistate']['browser_geometry']))
+            if ('browser_tab' in self.main.settings['guistate'] and
+                    0 <= int(self.main.settings['guistate']['browser_tab']) < self.ui.tabs.count()):
+                self.ui.tabs.setCurrentIndex(int(self.main.settings['guistate']['browser_tab']))
+        except:
+            pass
 
     def setup_icons(self):
         self.setWindowIcon(QIcon.fromTheme('list-add'))
@@ -69,8 +72,8 @@ class Browser(QMainWindow):
         elif i == 2: return self.ui.search_results
 
     def closeEvent(self, e):
-        self.main.settings['gui']['browser_geometry'] = str(self.saveGeometry().toBase64())
-        self.main.settings['gui']['browser_tab'] = str(self.ui.tabs.currentIndex())
+        self.main.settings['guistate']['browser_geometry'] = str(self.saveGeometry().toBase64())
+        self.main.settings['guistate']['browser_tab'] = str(self.ui.tabs.currentIndex())
         super().closeEvent(e)
 
     def contextMenuEvent(self, e):
