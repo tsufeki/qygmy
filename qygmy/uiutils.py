@@ -178,3 +178,51 @@ class SonglistView(QTreeView):
     def set_priority(self, prio):
         self.model().set_priority(self.selection(), prio)
 
+class PathBar(QWidget):
+
+    clicked = Signal(str)
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.path = []
+        self._mapper = QSignalMapper(self)
+        self._mapper.mapped.connect(self._clicked)
+        self._label = QLabel(self)
+        self._label.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred))
+        self._layout = QHBoxLayout(self)
+        self._layout.addWidget(self._label)
+        self._layout.setContentsMargins(0, 4, 0, 0)
+        self.buttons = []
+        self.actions = []
+        self.set_path('')
+
+    def _make_button(self):
+        number = len(self.buttons)
+        a = QAction(self)
+        a.triggered.connect(self._mapper.map)
+        self._mapper.setMapping(a, number)
+        b = QToolButton(self)
+        b.setDefaultAction(a)
+        b.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred))
+        self._layout.insertWidget(number, b)
+        self.actions.append(a)
+        self.buttons.append(b)
+
+    def set_root_icon(self, theme_name):
+        self.actions[0].setIcon(QIcon.fromTheme(theme_name))
+
+    def _clicked(self, number):
+        self.clicked.emit('/'.join(self.path[:number]))
+
+    def set_path(self, path):
+        self.path = path.strip('/').split('/')
+        if self.path == ['']:
+            self.path = []
+        for i in range(len(self.buttons), len(self.path) + 1):
+            self._make_button()
+        for i in range(1, len(self.path) + 1):
+            self.actions[i].setText(self.path[i-1])
+            self.buttons[i].show()
+        for i in range(len(self.path) + 1, len(self.buttons)):
+            self.buttons[i].hide()
+

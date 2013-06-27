@@ -21,6 +21,9 @@
     </sizepolicy>
    </property>
    <layout class="QVBoxLayout" name="vv">
+    <property name="margin">
+     <number>2</number>
+    </property>
     <item>
      <widget class="ChangeDuringDragTabWidget" name="tabs">
       <property name="currentIndex">
@@ -40,32 +43,18 @@
         <string>&amp;Database</string>
        </attribute>
        <layout class="QVBoxLayout" name="db_v">
+        <property name="margin">
+         <number>0</number>
+        </property>
         <item>
-         <layout class="QHBoxLayout" name="db_layout">
-          <item>
-           <widget class="QToolButton" name="dbroot_button">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="db_label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="PathBar" name="dbpath" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="SonglistView" name="database">
@@ -141,48 +130,18 @@
         <string>&amp;Playlists</string>
        </attribute>
        <layout class="QVBoxLayout" name="pl_v">
+        <property name="margin">
+         <number>0</number>
+        </property>
         <item>
-         <layout class="QHBoxLayout" name="pl_layout">
-          <item>
-           <widget class="QToolButton" name="plroot_button">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="pl_button">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="pl_label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="PathBar" name="plpath" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="SonglistView" name="playlists">
@@ -264,8 +223,23 @@
         <string>&amp;Search</string>
        </attribute>
        <layout class="QVBoxLayout" name="se_v">
+        <property name="margin">
+         <number>0</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="search_layout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
            <widget class="QComboBox" name="what">
             <property name="toolTip">
@@ -456,23 +430,6 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="dbroot">
-   <property name="text">
-    <string>/</string>
-   </property>
-   <property name="toolTip">
-    <string>Root directory</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+R</string>
-   </property>
-   <property name="shortcutContext">
-    <enum>Qt::WindowShortcut</enum>
-   </property>
-   <property name="autoRepeat">
-    <bool>false</bool>
-   </property>
-  </action>
   <action name="close">
    <property name="text">
     <string>&amp;Close</string>
@@ -485,23 +442,6 @@
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
-   </property>
-   <property name="autoRepeat">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="plroot">
-   <property name="text">
-    <string>Playlists</string>
-   </property>
-   <property name="toolTip">
-    <string>All playlists</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+R</string>
-   </property>
-   <property name="shortcutContext">
-    <enum>Qt::WindowShortcut</enum>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
@@ -539,11 +479,6 @@
    <property name="shortcutContext">
     <enum>Qt::WindowShortcut</enum>
    </property>
-   <property name="autoRepeat">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="pl">
    <property name="autoRepeat">
     <bool>false</bool>
    </property>
@@ -602,6 +537,12 @@
   <customwidget>
    <class>ChangeDuringDragTabWidget</class>
    <extends>QTabWidget</extends>
+   <header>..uiutils</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PathBar</class>
+   <extends>QWidget</extends>
    <header>..uiutils</header>
    <container>1</container>
   </customwidget>
