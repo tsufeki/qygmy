@@ -77,6 +77,7 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
             self.current.update(None, force=True)
 
     def _update(self, new_current):
+        self.main.busy()
         self.total_length = 0
         self.beginResetModel()
         self.items = []
@@ -86,6 +87,7 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
         for i in self.items:
             if 'time' in i:
                 self.total_length += int(i['time'])
+        self.main.not_busy()
 
     def columnCount(self, parent=None):
         return self.main.fmt.playlist_column_count
@@ -117,7 +119,7 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
         return f
 
     def mimeData(self, indexes):
-        data = {'source': self.__class__.__name__, 'items': []}
+        data = {'source': id(self), 'items': []}
         for i in indexes:
             if i.column() == 0:
                 d = {'pos': str(i.row())}
@@ -224,7 +226,7 @@ class WritableMixin(metaclass=ABCMeta):
         if row < 0:
             row = None
         d = pickle.loads(data.data(self.MIMETYPE).data())
-        if d['source'] == self.__class__.__name__:
+        if d['source'] == id(self):
             if row is None:
                 return False
             self.move(d['items'], row)
@@ -380,7 +382,7 @@ class Playlists(WritableMixin, BrowserList):
             pos = None
         else:
             playlists = {s['playlist'] for s in self}
-            name = new = self.tr('new_playlist')
+            name = new = self.tr('New playlist')
             if name in playlists:
                 for i in range(2, 10000):
                     name = '{}_{}'.format(new, i)

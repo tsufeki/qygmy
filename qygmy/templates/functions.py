@@ -108,7 +108,7 @@ def context_unset(ctx, name):
 
 def lazy_noop(*args): return ''
 
-def f_time(seconds):
+def context_time(ctx, seconds):
     if seconds == '':
         return ''
     t = int(seconds)
@@ -121,9 +121,9 @@ def f_time(seconds):
     d, h = divmod(t, 24)
 
     if d != 0:
-        return '{}{}d {:02d}:{:02d}:{:02d}'.format(sign, d, h, m, s)
+        return ctx['__timefmt__'][0].format(sign, d, h, m, s)
     elif h != 0:
-        return '{}{}:{:02d}:{:02d}'.format(sign, h, m, s)
+        return ctx['__timefmt__'][1].format(sign, h, m, s)
     else:
-        return '{}{:02d}:{:02d}'.format(sign, m, s)
+        return ctx['__timefmt__'][2].format(sign, m, s)
 

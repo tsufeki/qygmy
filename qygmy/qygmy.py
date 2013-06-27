@@ -24,16 +24,18 @@ class Qygmy(QMainWindow):
         self.setup_ui()
         self.timer.start(int(self.settings['gui']['interval']))
 
-        t = QTimer(self)
-        t.setSingleShot(True)
-        t.timeout.connect(self.really_scroll)
-        self.first_scroll_timer = t
-
     def connect_mpd(self):
         self.srv.connect_mpd(
             self.settings['connection']['host'],
             int(self.settings['connection']['port']),
             self.settings['connection']['password'])
+
+    def create_eventloop_timer(self, slot):
+        t = QTimer(self)
+        t.setInterval(0)
+        t.setSingleShot(True)
+        t.timeout.connect(slot)
+        return t
 
     def setup_ui(self):
         self.ui = Ui_main()
@@ -41,7 +43,13 @@ class Qygmy(QMainWindow):
         self.ui.current_song.setText(self.fmt.current_song('disconnect', {}))
         self.setup_icons()
         self.setup_widgets()
+
+        self.busy_stack = 0
+        self.busy_stack_real = 0
+        self.notbusy_timer = self.create_eventloop_timer(self.not_busy2)
+        self.scroll_timer = self.create_eventloop_timer(self.scroll_to_current2)
         self.setup_signals()
+
         try:
             if 'main_geometry' in self.settings['guistate']:
                 self.restoreGeometry(QByteArray.fromBase64(self.settings['guistate']['main_geometry']))
@@ -169,20 +177,14 @@ class Qygmy(QMainWindow):
         pnew, pold = new_song.get('file', ''), old_song.get('file', '')
         pos = int(new_song.get('pos', '-1'))
         if (pos < 0 or pnew == pold or not pnew or
-                self.srv.state.value != 'play' or
+                self.srv.state.value not in ('play', 'pause') or
                 self.settings['gui']['autoscroll'] != '1'):
             return
-        if hasattr(self, 'first_scroll_timer'):
-            self.first_scroll_pos = pos
-            self.first_scroll_timer.start()
-        else:
-            self.really_scroll(pos)
+        self.scroll_pos = pos
+        self.scroll_timer.start()
 
-    def really_scroll(self, pos=None):
-        if pos is None:
-            pos = self.first_scroll_pos
-            del self.first_scroll_timer
-            del self.first_scroll_pos
+    def scroll_to_current2(self):
+        pos = self.scroll_pos
         index = self.srv.queue.index(pos, 0)
         if not self.ui.queue.rect().contains(self.ui.queue.visualRect(index)):
             self.ui.queue.scrollTo(index, QAbstractItemView.PositionAtCenter)
@@ -278,11 +280,30 @@ class Qygmy(QMainWindow):
                 link='http://github.com/tsufeki/qygmy',
         ))
 
+    def busy(self):
+        self.busy_stack_real += 1
+        self.busy_stack += 1
+        QApplication.setOverrideCursor(Qt.BusyCursor)
+
+    def not_busy(self):
+        self.busy_stack -= 1
+        self.notbusy_timer.start()
+
+    def not_busy2(self):
+        while self.busy_stack_real > self.busy_stack:
+            self.busy_stack_real -= 1
+            QApplication.restoreOverrideCursor()
+
 
 def main():
     import sys
     import os
+
+    translator = QTranslator()
+    translator.load('i18n/qygmy_pl')
+
     app = QApplication(sys.argv)
+    app.installTranslator(translator)
     m = Qygmy()
     m.show()
     m.connect_mpd()

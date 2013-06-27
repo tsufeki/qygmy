@@ -38,58 +38,60 @@ class Info(QDialog):
 
 class Settings(QDialog):
 
-    DEFAULTS = {
-        'connection': {
-            'host': 'localhost',
-            'port': '6600',
-            'password': '',
-        },
-        'format': {
-            'window_title': (
-                'Qygmy'
-                '$if(%playing%, / '
-                '$if(%artist%,%artist% \u2014 ,)'
-                '$if2(%title%,%filename%),)'
-            ),
-            'progressbar': (
-                '$if3('
-                    '%playing%%paused%,'
-                        '$time(%elapsed%)'
-                        '$if($and(%total%,$gt(%total%,0)), / $time(%total%),),'
-                    '%stopped%,Stopped,'
-                    '%connected%,Connected,'
-                    'Disconnected)'
-            ),
-            'current_song': (
-                '<span style="font-size: big; font-weight: bold">'
-                    '$if2(%title%,%filename%)</span><br>'
-                '%artist%$if(%album%, \u2014 %album%,)'
-            ),
-            'playlist_item': (
-                '$if(%artist%,%artist% \u2014 ,)'
-                '$if2(%title%,%filename%)'
-            ),
-        },
-        'gui': {
-            'autoscroll': '1',
-            'interval': '500',
-        },
-        'guistate': {},
-    }
-
     PATH = os.path.expanduser(os.path.join(os.environ.get('XDG_CONFIG_HOME', '~/.config'), 'qygmy'))
     FILENAME = 'qygmy.conf'
 
     def __init__(self, main):
         super().__init__(main)
         self.main = main
+        self.retranslate()
 
         self.conf = configparser.ConfigParser(interpolation=None)
-        self.conf.read_dict(self.DEFAULTS, '<defaults>')
+        self.conf.read_dict(self.defaults, '<defaults>')
         self.conf.read_dict(self.environ_conf(), '<MPD_HOST>')
         self.conf.read(os.path.join(self.PATH, self.FILENAME), 'utf-8')
         self.validate(self)
         self.setup_ui()
+
+    def retranslate(self):
+        self.defaults = {
+            'connection': {
+                'host': 'localhost',
+                'port': '6600',
+                'password': '',
+            },
+            'format': {
+                'window_title': self.tr(
+                    'Qygmy'
+                    '$if(%playing%, / '
+                    '$if(%artist%,%artist% \u2014 ,)'
+                    '$if2(%title%,%filename%),)'
+                ),
+                'progressbar': self.tr(
+                    '$if3('
+                        '%playing%%paused%,'
+                            '$time(%elapsed%)'
+                            '$if($and(%total%,$gt(%total%,0)), / $time(%total%),),'
+                        '%stopped%,Stopped,'
+                        '%connected%,Connected,'
+                        'Disconnected)'
+                ),
+                'current_song': self.tr(
+                    '<span style="font-size: big; font-weight: bold">'
+                        '$if2(%title%,%filename%)</span><br>'
+                    '%artist%$if(%album%, \u2014 %album%,)'
+                ),
+                'playlist_item': self.tr(
+                    '$if(%artist%,%artist% \u2014 ,)'
+                    '$if2(%title%,%filename%)'
+                ),
+            },
+            'gui': {
+                'autoscroll': '1',
+                'interval': '500',
+            },
+            'guistate': {},
+        }
 
     def environ_conf(self):
         if 'MPD_HOST' in os.environ:
@@ -108,6 +110,8 @@ class Settings(QDialog):
     def setup_ui(self):
         self.ui = Ui_settings()
         self.ui.setupUi(self)
+        self.ui.help_lb.setText(self.ui.help_lb.text().format(
+            templateslink='https://github.com/tsufeki/qygmy/wiki/Templates'))
         self.conf_to_ui()
 
     def __getitem__(self, section):
@@ -134,7 +138,7 @@ class Settings(QDialog):
             self.save()
             self.conf_to_ui()
         elif sb == QDialogButtonBox.RestoreDefaults:
-            self.conf_to_ui(self.DEFAULTS)
+            self.conf_to_ui(self.defaults)
 
     def conf_to_ui(self, conf=None):
         if conf is None:
@@ -215,11 +219,10 @@ class Settings(QDialog):
             pass
         return default
 
-    @classmethod
-    def validate(cls, dct):
+    def validate(self, dct):
         c, g = dct['connection'], dct['gui']
         c['host'] = c['host'].strip()
-        c['port'] = cls.validate_int(c['port'], 1, 2**16, cls.DEFAULTS['connection']['port'])
+        c['port'] = self.validate_int(c['port'], 1, 2**16, self.defaults['connection']['port'])
         g['autoscroll'] = '1' if g['autoscroll'] == '1' else '0'
-        g['interval'] = cls.validate_int(g['interval'], 100, 3600000, cls.DEFAULTS['gui']['interval'])
+        g['interval'] = self.validate_int(g['interval'], 100, 3600000, self.defaults['gui']['interval'])
 

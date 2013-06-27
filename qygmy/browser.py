@@ -115,5 +115,5 @@ class Browser(QMainWindow):
     def on_details_triggered(self):
         d = self.current_view.details()
         if d is not None:
-            self.main.info.exec_('details', d, 'Details')
+            self.main.info.exec_('details', d, self.tr('Details'))
 

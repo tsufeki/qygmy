@@ -1,14 +1,17 @@
 
-from PySide.QtGui import QIcon, QBrush, QColor
+from PySide.QtCore import QObject
+from PySide.QtGui import QApplication, QIcon, QBrush, QColor
 
 from .templates import Template
 
 
-class Formatter:
+class Formatter(QObject):
 
     def __init__(self, settings):
+        super().__init__()
         self.settings = settings
         self._tmplcache = {}
+        self.retranslate()
 
     _directory_icon = QIcon.fromTheme('folder')
     _playlist_icon = QIcon.fromTheme('text-plain')
@@ -16,48 +19,49 @@ class Formatter:
 
     playlist_column_count = 2
 
-    templates = {
-        'current_song_tooltip': (
-            '$if3(%paused%,[Paused] ,'
-                '%stopped%,[Stopped] ,'
-                '%connected%,[Connected] ,'
-                '%disconnected%,[Disconnected])'
-            '$if2(%file%,%directory%,%playlist%)'
-        ),
-        'playlist_column2': '$time(%length%)',
-        'playlist_tooltip': (
-            '$if($ne(%prio%,0),[High priority] ,)'
-            '$if2(%file%,%directory%,%playlist%)'
-        ),
-        'status': (
-            '$if(%disconnected%,,'
-                '%totalcount% songs'
-                '$if($gt(%totallength%,0),'
-                    '\\, $time(%totallength%) total,))'
-        ),
-        'statistics': (
-            ('Songs:', '%songs%'),
-            ('Albums:', '%albums%'),
-            ('Artists:', '%artists%'),
-            ('Uptime:', '$time(%uptime%)'),
-            ('DB playtime:', '$time(%db_playtime%)'),
-            ('This instance:', '$time(%playtime%)'),
-        ),
-        'details': (
-            ('%file%', None),
-            ('Title:', '%title%'),
-            ('Artist:', '%artist%'),
-            ('Album:', '%album%'),
-            ('Date:', '%date%'),
-            ('Track:', '%track%$if(%totaltracks%, / %totaltracks%,)'),
-            ('Disc:', '%disc%$if(%totaldiscs%, / %totaldiscs%,)'),
-            ('Comment:', '%comment%'),
-            ('Length:', '$if(%length%,$time(%length%),)'),
-            ('Last modified:', '%lastmodified%'),
-            ('Composer:', '%composer%'),
-            ('Performer:', '%performer%'),
-        )
-    }
+    def retranslate(self):
+        self.templates = {
+            'current_song_tooltip': self.tr(
+                '$if3(%paused%,[Paused] ,'
+                    '%stopped%,[Stopped] ,'
+                    '%connected%,[Connected] ,'
+                    '%disconnected%,[Disconnected])'
+                '$if2(%file%,%directory%,%playlist%)'
+            ),
+            'playlist_column2': self.tr('$time(%length%)'),
+            'playlist_tooltip': self.tr(
+                '$if($ne(%prio%,0),[High priority] ,)'
+                '$if2(%file%,%directory%,%playlist%)'
+            ),
+            'status': self.tr(
+                '$if(%disconnected%,,'
+                    '%totalcount% songs'
+                    '$if($gt(%totallength%,0),'
+                        '\\, $time(%totallength%) total,))'
+            ),
+            'statistics': (
+                (self.tr('Songs:'), self.tr('%songs%')),
+                (self.tr('Albums:'), self.tr('%albums%')),
+                (self.tr('Artists:'), self.tr('%artists%')),
+                (self.tr('Uptime:'), self.tr('$time(%uptime%)')),
+                (self.tr('DB playtime:'), self.tr('$time(%db_playtime%)')),
+                (self.tr('This instance:'), self.tr('$time(%playtime%)')),
+            ),
+            'details': (
+                (self.tr('%file%'), None),
+                (self.tr('Title:'), self.tr('%title%')),
+                (self.tr('Artist:'), self.tr('%artist%')),
+                (self.tr('Album:'), self.tr('%album%')),
+                (self.tr('Date:'), self.tr('%date%')),
+                (self.tr('Track:'), self.tr('%track%$if(%totaltracks%, / %totaltracks%,)')),
+                (self.tr('Disc:'), self.tr('%disc%$if(%totaldiscs%, / %totaldiscs%,)')),
+                (self.tr('Comment:'), self.tr('%comment%')),
+                (self.tr('Length:'), self.tr('$if(%length%,$time(%length%),)')),
+                (self.tr('Last modified:'), self.tr('%lastmodified%')),
+                (self.tr('Composer:'), self.tr('%composer%')),
+                (self.tr('Performer:'), self.tr('%performer%')),
+            )
+        }
 
     standard_tags = {'file', 'directory', 'playlist', 'filename', 'title',
         'artist', 'album', 'date', 'track', 'totaltracks', 'disc', 'totaldiscs',

@@ -2,7 +2,10 @@
 
 import re
 
+from PySide.QtGui import QApplication
+
 from . import functions
+
 
 IDENTIFIER = r'([_a-zA-Z][_a-zA-Z0-9]*)'
 
@@ -141,6 +144,15 @@ class Function(RegexElement):
         super().__init__(src, start, end)
         self.name = name.lower()
         self.args = []
+
+        self._ctx_additions = {
+            '__timefmt__': (
+                QApplication.translate('templates', '{}{}d {:02d}:{:02d}:{:02d}'),
+                QApplication.translate('templates', '{}{}:{:02d}:{:02d}'),
+                QApplication.translate('templates', '{}{:02d}:{:02d}'),
+            ),
+        }
+
         f = getattr(functions, 'lazy_' + self.name, None)
         if f is not None:
             self.function = f
@@ -175,6 +187,7 @@ class Function(RegexElement):
         return self.function(*args)
 
     def call_context(self, context):
+        context.update(self._ctx_additions)
         args = [a.render(context) for a in self.args]
         return self.function(context, *args)
 

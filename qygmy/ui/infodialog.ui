@@ -17,6 +17,18 @@
    </property>
    <item>
     <layout class="QHBoxLayout" name="h">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>8</number>
+     </property>
      <item>
       <layout class="QVBoxLayout" name="vv">
        <item>
@@ -68,10 +80,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
-     </property>
-     <property name="centerButtons">
-      <bool>true</bool>
+      <set>QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>

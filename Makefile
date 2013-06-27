@@ -1,11 +1,39 @@
 
-UIFILES = $(wildcard qygmy/ui/*.ui)
-PYUIFILES = $(UIFILES:.ui=.py)
-UIC = pyside-uic -x
+PY := $(wildcard qygmy/*.py qygmy/templates/*.py)
+UI := $(wildcard qygmy/ui/*.ui)
+TS := i18n/qygmy_pl.ts
 
-all: $(PYUIFILES)
+PRO := qygmy.pro
+
+UIPY := $(UI:.ui=.py)
+QM := $(TS:.ts=.qm)
+PY := $(PY) $(UIPY)
+
+UIC := pyside-uic -x
+LUPDATE := pyside-lupdate
+LRELEASE := lrelease -compress -silent -nounfinished
+
+all: ui ts
+
+ui: $(UIPY)
 
 %.py: %.ui
 	$(UIC) -o $@ $<
 
-.PHONY: all
+ts: $(QM)
+
+%.qm: %.ts
+	$(LRELEASE) $< -qm $@
+
+$(TS): $(PY)
+	@echo SOURCES = $^ >$(PRO)
+	@echo TRANSLATIONS = $@ >>$(PRO)
+	@echo $(LUPDATE) ... -ts $@
+	@$(LUPDATE) $(PRO)
+	@sed 's/filename="/filename="..\//g' <$@ >$@.tmp; mv -f $@.tmp $@
+	@-rm $(PRO)
+
+clean:
+	-rm -rf $(PRO) qygmy/ui/[!_]*.py i18n/*.qm {,*/{,*/}}__pycache__
+
+.PHONY: all ui ts clean
