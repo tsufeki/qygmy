@@ -131,10 +131,11 @@ class MPDCommandList:
 
 class Connection:
 
-    ERROR = re.compile(r'^\[([0-9]+)@([0-9]+)\] \{([^}]*)\} (.*)$')
+    MPD_COMMAND_ERROR_RE = re.compile(r'^\[([0-9]+)@([0-9]+)\] \{([^}]*)\} (.*)$')
+    MAX_MPD_ARGUMENTS = 36
 
     def parse_exception(self, exc):
-        m = self.ERROR.match(exc.args[0])
+        m = self.MPD_COMMAND_ERROR_RE.match(exc.args[0])
         if m is None:
             return '', '', '', str(exc)
         return m.groups()

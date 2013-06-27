@@ -24,6 +24,11 @@ class Qygmy(QMainWindow):
         self.setup_ui()
         self.timer.start(int(self.settings['gui']['interval']))
 
+        t = QTimer(self)
+        t.setSingleShot(True)
+        t.timeout.connect(self.really_scroll)
+        self.first_scroll_timer = t
+
     def connect_mpd(self):
         self.srv.connect_mpd(
             self.settings['connection']['host'],
@@ -167,6 +172,17 @@ class Qygmy(QMainWindow):
                 self.srv.state.value != 'play' or
                 self.settings['gui']['autoscroll'] != '1'):
             return
+        if hasattr(self, 'first_scroll_timer'):
+            self.first_scroll_pos = pos
+            self.first_scroll_timer.start()
+        else:
+            self.really_scroll(pos)
+
+    def really_scroll(self, pos=None):
+        if pos is None:
+            pos = self.first_scroll_pos
+            del self.first_scroll_timer
+            del self.first_scroll_pos
         index = self.srv.queue.index(pos, 0)
         if not self.ui.queue.rect().contains(self.ui.queue.visualRect(index)):
             self.ui.queue.scrollTo(index, QAbstractItemView.PositionAtCenter)
