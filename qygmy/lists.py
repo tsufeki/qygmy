@@ -8,8 +8,8 @@ from PySide.QtCore import *
 from .connection import *
 
 
-class QABCMeta(ABCMeta, QAbstractTableModel.__class__):
-    pass
+class QABCMeta(ABCMeta, QObject.__class__):
+    """A little hack to allow the use of ABCMeta."""
 
 
 class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
@@ -68,7 +68,6 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
     @abstractmethod
     def item_chosen(self, pos):
         """i.e. double-clicked or Return pressed."""
-        pass
 
     def sort_key(self, item):
         return (item.get('file', ''), item.get('directory', ''), item.get('playlist', ''))
@@ -197,7 +196,7 @@ class WritableMixin(metaclass=ABCMeta):
 
     @mpd_cmdlist
     def _remove(self, items):
-        for i in reversed(sorted(items)):
+        for i in reversed(sorted(items, key=lambda x: int(x['pos']))):
             self.remove_one(i)
 
     def move(self, items, pos):
