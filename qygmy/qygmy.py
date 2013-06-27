@@ -7,6 +7,7 @@ from .server import Server
 from .browser import Browser
 from .dialogs import Info, Settings
 from .ui.main import Ui_main
+from .__version__ import version
 
 
 class Qygmy(QMainWindow):
@@ -64,6 +65,7 @@ class Qygmy(QMainWindow):
             ('save', 'document-save'),
             ('settings', 'configure'),
             ('updatedb', 'view-refresh'),
+            ('about', 'applications-multimedia'),
             ('quit', 'application-exit'),
         ):
             getattr(self.ui, action).setIcon(QIcon.fromTheme(icon))
@@ -236,6 +238,24 @@ class Qygmy(QMainWindow):
                     self.srv.playlists.save_queue(name, True)
                     break
             else: break
+
+    @Slot()
+    def on_aboutqt_triggered(self):
+        QMessageBox.aboutQt(self)
+
+    @Slot()
+    def on_about_triggered(self):
+        QMessageBox.about(
+            self, self.tr('About Qygmy'),
+            self.tr(
+                '<h2>Qygmy</h2>'
+                '<p>version {version}</p>'
+                '<p>A simple MPD client written in Python and Qt/PySide.</p>'
+                '<p><a href="{link}">{link}</a></p>'
+            ).format(
+                version=version,
+                link='http://github.com/tsufeki/qygmy',
+        ))
 
 
 def main():
