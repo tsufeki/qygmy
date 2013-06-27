@@ -284,9 +284,6 @@
     <bool>false</bool>
    </property>
    <widget class="QMenu" name="context_menu">
-    <property name="title">
-     <string/>
-    </property>
     <property name="separatorsCollapsible">
      <bool>true</bool>
     </property>
@@ -313,31 +310,48 @@
      <addaction name="previous"/>
      <addaction name="next"/>
     </widget>
+    <widget class="QMenu" name="playlist_menu">
+     <property name="title">
+      <string>Pla&amp;ylist</string>
+     </property>
+     <property name="separatorsCollapsible">
+      <bool>true</bool>
+     </property>
+     <addaction name="add"/>
+     <addaction name="remove"/>
+     <addaction name="clear"/>
+     <addaction name="separator"/>
+     <addaction name="save"/>
+     <addaction name="randomize"/>
+     <addaction name="reverse"/>
+    </widget>
+    <widget class="QMenu" name="pboptions_menu">
+     <property name="title">
+      <string>Playback &amp;options</string>
+     </property>
+     <property name="separatorsCollapsible">
+      <bool>true</bool>
+     </property>
+     <addaction name="repeat"/>
+     <addaction name="shuffle"/>
+     <addaction name="single"/>
+     <addaction name="consume"/>
+    </widget>
     <addaction name="playback_menu"/>
+    <addaction name="playlist_menu"/>
+    <addaction name="pboptions_menu"/>
     <addaction name="volume_menu"/>
-    <addaction name="separator"/>
-    <addaction name="add"/>
-    <addaction name="remove"/>
-    <addaction name="clear"/>
-    <addaction name="separator"/>
-    <addaction name="repeat"/>
-    <addaction name="shuffle"/>
-    <addaction name="single"/>
-    <addaction name="consume"/>
     <addaction name="separator"/>
     <addaction name="highprio"/>
     <addaction name="normprio"/>
-    <addaction name="separator"/>
-    <addaction name="save"/>
-    <addaction name="randomize"/>
     <addaction name="details"/>
     <addaction name="separator"/>
-    <addaction name="statistics"/>
     <addaction name="updatedb"/>
     <addaction name="connect"/>
     <addaction name="disconnect"/>
-    <addaction name="settings"/>
+    <addaction name="statistics"/>
     <addaction name="separator"/>
+    <addaction name="settings"/>
     <addaction name="about"/>
     <addaction name="aboutqt"/>
     <addaction name="quit"/>
@@ -448,12 +462,9 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>R&amp;epeat</string>
+    <string>&amp;Repeat</string>
    </property>
    <property name="autoRepeat">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
     <bool>false</bool>
    </property>
   </action>
@@ -465,21 +476,15 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>S&amp;huffle</string>
+    <string>&amp;Shuffle</string>
    </property>
    <property name="autoRepeat">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
     <bool>false</bool>
    </property>
   </action>
   <action name="settings">
    <property name="text">
-    <string>Se&amp;ttings...</string>
-   </property>
-   <property name="toolTip">
-    <string>Settings...</string>
+    <string>&amp;Settings...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -515,7 +520,7 @@
   </action>
   <action name="disconnect">
    <property name="text">
-    <string>Disco&amp;nnect from MPD</string>
+    <string>Dis&amp;connect from MPD</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
@@ -526,7 +531,7 @@
   </action>
   <action name="connect">
    <property name="text">
-    <string>Co&amp;nnect to MPD</string>
+    <string>&amp;Connect to MPD</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
@@ -556,9 +561,6 @@
    <property name="autoRepeat">
     <bool>false</bool>
    </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
   </action>
   <action name="consume">
    <property name="checkable">
@@ -568,15 +570,12 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Rem&amp;ove songs after playback</string>
+    <string>Re&amp;move songs after playback</string>
    </property>
    <property name="iconText">
     <string>Consume</string>
    </property>
    <property name="autoRepeat">
-    <bool>false</bool>
-   </property>
-   <property name="iconVisibleInMenu">
     <bool>false</bool>
    </property>
   </action>
@@ -599,10 +598,7 @@
   </action>
   <action name="save">
    <property name="text">
-    <string>&amp;Save the current playlist...</string>
-   </property>
-   <property name="toolTip">
-    <string>Save the current playlist</string>
+    <string>&amp;Save...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
@@ -647,7 +643,7 @@
   </action>
   <action name="randomize">
    <property name="text">
-    <string>Randomi&amp;ze the playlist</string>
+    <string>Randomi&amp;ze</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
@@ -663,7 +659,7 @@
   </action>
   <action name="highprio">
    <property name="text">
-    <string>Hi&amp;gh priority</string>
+    <string>&amp;High priority</string>
    </property>
    <property name="toolTip">
     <string>Set high priority for selected songs</string>
@@ -680,7 +676,7 @@
   </action>
   <action name="normprio">
    <property name="text">
-    <string>Norma&amp;l priority</string>
+    <string>&amp;Normal priority</string>
    </property>
    <property name="toolTip">
     <string>Set normal priority for selected songs</string>
@@ -719,7 +715,7 @@
   </action>
   <action name="about">
    <property name="text">
-    <string>A&amp;bout Qygmy...</string>
+    <string>&amp;About Qygmy...</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
@@ -737,6 +733,14 @@
    </property>
    <property name="menuRole">
     <enum>QAction::AboutQtRole</enum>
+   </property>
+  </action>
+  <action name="reverse">
+   <property name="text">
+    <string>Re&amp;verse</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

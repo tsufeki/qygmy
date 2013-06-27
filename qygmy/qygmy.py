@@ -47,7 +47,7 @@ class Qygmy(QMainWindow):
         self.setWindowIcon(QIcon.fromTheme('applications-multimedia'))
         self.ui.settings_icon = QIcon.fromTheme('configure')
         self.ui.settings_icon_updating = QIcon.fromTheme('view-refresh')
-        for action, icon in (
+        for e, icon in (
             ('previous', 'media-skip-backward'),
             ('play', 'media-playback-start'),
             ('pause', 'media-playback-pause'),
@@ -67,8 +67,12 @@ class Qygmy(QMainWindow):
             ('updatedb', 'view-refresh'),
             ('about', 'applications-multimedia'),
             ('quit', 'application-exit'),
+            ('louder', 'audio-volume-high'),
+            ('quieter', 'audio-volume-low'),
+            ('playback_menu', 'media-playback-start'),
+            ('playlist_menu', 'text-plain'),
         ):
-            getattr(self.ui, action).setIcon(QIcon.fromTheme(icon))
+            getattr(self.ui, e).setIcon(QIcon.fromTheme(icon))
 
     def setup_widgets(self):
         self.ui.playback_toolbar.insertWidget(self.ui.volume, self.ui.progressbar)
@@ -121,6 +125,7 @@ class Qygmy(QMainWindow):
         self.ui.remove.triggered.connect(self.ui.queue.remove_selected)
         self.ui.clear.triggered.connect(self.srv.clear)
         self.ui.randomize.triggered.connect(self.srv.randomize_queue)
+        self.ui.reverse.triggered.connect(self.srv.queue.reverse)
         self.ui.updatedb.triggered.connect(self.srv.updatedb)
         self.ui.connect.triggered.connect(self.connect_mpd)
         self.ui.disconnect.triggered.connect(self.srv.disconnect_mpd)
@@ -186,13 +191,12 @@ class Qygmy(QMainWindow):
         self.ui.disconnect.setVisible(c)
         self.ui.play.setVisible(state != 'play')
         self.ui.pause.setVisible(state == 'play')
-        for action in ('previous', 'play', 'pause', 'stop', 'next', 'volume',
+        for e in ('previous', 'play', 'pause', 'stop', 'next', 'volume',
                 'add', 'clear', 'repeat', 'shuffle', 'single', 'consume',
                 'updatedb', 'save', 'randomize', 'details', 'statistics',
-                'louder', 'quieter'):
-            getattr(self.ui, action).setEnabled(c)
-        self.ui.playback_menu.setEnabled(c)
-        self.ui.volume_menu.setEnabled(c)
+                'louder', 'quieter', 'reverse',
+                'playback_menu', 'volume_menu', 'playlist_menu', 'pboptions_menu'):
+            getattr(self.ui, e).setEnabled(c)
         self.on_queue_selection_changed()
 
     @Slot(bool)

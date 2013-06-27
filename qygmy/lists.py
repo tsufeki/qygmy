@@ -305,6 +305,12 @@ class Queue(WritableMixin, SongList):
         if self.can_set_priority(positions, prio):
             self.conn.prioid(prio, *[self[i]['id'] for i in positions])
 
+    @mpd_cmdlist
+    def reverse(self):
+        n = len(self)
+        for i in range(n//2 + 1):
+            self.conn.swap(i, n-i-1)
+
     def item_chosen(self, pos):
         self._current_pos.send(pos)
 
