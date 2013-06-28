@@ -277,7 +277,7 @@ class Qygmy(QMainWindow):
                 '<p><a href="{link}">{link}</a></p>'
             ).format(
                 version=version,
-                link='http://github.com/tsufeki/qygmy',
+                link='https://github.com/tsufeki/qygmy',
         ))
 
     def busy(self):
@@ -295,15 +295,21 @@ class Qygmy(QMainWindow):
             QApplication.restoreOverrideCursor()
 
 
-def main():
+def main(translations_path='i18n'):
     import sys
     import os
 
-    translator = QTranslator()
-    translator.load('i18n/qygmy_pl')
-
     app = QApplication(sys.argv)
-    app.installTranslator(translator)
+    locale = QLocale.system().name()
+
+    qt_tr = QTranslator()
+    if qt_tr.load('qt_' + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
+        app.installTranslator(qt_tr)
+
+    qygmy_tr = QTranslator()
+    if qygmy_tr.load('qygmy_' + locale, translations_path):
+        app.installTranslator(qygmy_tr)
+
     m = Qygmy()
     m.show()
     m.connect_mpd()
