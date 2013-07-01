@@ -64,25 +64,25 @@ class Settings(QDialog):
                 'window_title': self.tr(
                     'Qygmy'
                     '$if(%playing%, / '
-                    '$if(%artist%,%artist% \u2014 ,)'
-                    '$if2(%title%,%filename%),)'
+                    '$if(%artist%,%artist% \u2014 )'
+                    '$if2(%title%,%filename%))'
                 ),
                 'progressbar': self.tr(
                     '$if3('
                         '%playing%%paused%,'
                             '$time(%elapsed%)'
-                            '$if($and(%total%,$gt(%total%,0)), / $time(%total%),),'
+                            '$if($and(%total%,$gt(%total%,0)), / $time(%total%)),'
                         '%stopped%,Stopped,'
                         '%connected%,Connected,'
                         'Disconnected)'
                 ),
                 'current_song': self.tr(
-                    '<span style="font-size: big; font-weight: bold">'
+                    '<span style="font-size: large; font-weight: bold">'
                         '$if2(%title%,%filename%)</span><br>'
-                    '%artist%$if(%album%, \u2014 %album%,)'
+                    '%artist%$if(%album%, \u2014 %album%)'
                 ),
                 'playlist_item': self.tr(
-                    '$if(%artist%,%artist% \u2014 ,)'
+                    '$if(%artist%,%artist% \u2014 )'
                     '$if2(%title%,%filename%)'
                 ),
             },

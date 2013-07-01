@@ -365,6 +365,7 @@ class Playlists(WritableMixin, BrowserList):
 
     def __init__(self, parent):
         super().__init__(parent, '')
+        self.NEW_PLAYLIST_NAME = self.tr('New playlist')
 
     @mpd_cmd(fallback=[])
     def ls(self, name):
@@ -382,7 +383,7 @@ class Playlists(WritableMixin, BrowserList):
             pos = None
         else:
             playlists = {s['playlist'] for s in self}
-            name = new = self.tr('New playlist')
+            name = new = self.NEW_PLAYLIST_NAME
             if name in playlists:
                 for i in range(2, 10000):
                     name = '{}_{}'.format(new, i)

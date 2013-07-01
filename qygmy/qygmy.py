@@ -247,7 +247,7 @@ class Qygmy(QMainWindow):
             name, ok = QInputDialog.getText(self,
                     self.tr('Save current playlist'),
                     self.tr('Playlist name:'),
-                    text=name if name else 'playlist')
+                    text=name if name else self.srv.playlists.NEW_PLAYLIST_NAME)
             if not ok:
                 break
             if not name:
@@ -255,7 +255,7 @@ class Qygmy(QMainWindow):
             elif self.srv.playlists.save_queue(name) is False:
                 ans = QMessageBox.question(self, self.tr('Error'),
                         self.tr('Playlist with such name already exists. '
-                        'Do you want to replace\xa0it?'),
+                        'Do you want to replace it?'),
                         QMessageBox.Yes | QMessageBox.No)
                 if ans == QMessageBox.Yes:
                     self.srv.playlists.save_queue(name, True)

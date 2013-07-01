@@ -30,7 +30,7 @@ $(TS): $(PY)
 	@echo TRANSLATIONS = $@ >>$(PRO)
 	@echo $(LUPDATE) ... -ts $@
 	@$(LUPDATE) $(PRO)
-	@sed 's/filename="/filename="..\//g' <$@ >$@.tmp; mv -f $@.tmp $@
+	@sed 's/filename="\([^.]\)/filename="..\/\1/g' <$@ >$@.tmp; mv -f $@.tmp $@
 	@-rm $(PRO)
 
 clean:

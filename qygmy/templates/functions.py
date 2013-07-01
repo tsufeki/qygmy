@@ -4,7 +4,7 @@ import re
 
 # Conditionals
 
-def lazy_if(cond, yes, no): return yes() if cond() else no()
+def lazy_if(cond, yes, no=lambda:''): return yes() if cond() else no()
 
 def lazy_if2(*args):
     """Return first non-empty argument."""

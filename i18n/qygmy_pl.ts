@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="pl">
+<!DOCTYPE TS>
+<TS version="2.0" language="pl">
 <context>
     <name>Browser</name>
     <message>
@@ -209,7 +210,7 @@
 <context>
     <name>Playlists</name>
     <message>
-        <location filename="../qygmy/lists.py" line="385"/>
+        <location filename="../qygmy/lists.py" line="369"/>
         <source>New playlist</source>
         <translation>Nowa lista</translation>
     </message>
@@ -232,11 +233,6 @@
         <translation>Nazwa listy:</translation>
     </message>
     <message>
-        <location filename="../qygmy/qygmy.py" line="257"/>
-        <source>Playlist with such name already exists. Do you want to replace&#xa0;it?</source>
-        <translation>Lista o tej nazwie już istnieje. Zastąpić?</translation>
-    </message>
-    <message>
         <location filename="../qygmy/qygmy.py" line="271"/>
         <source>About Qygmy</source>
         <translation>O Qygmy</translation>
@@ -246,27 +242,32 @@
         <source>&lt;h2&gt;Qygmy&lt;/h2&gt;&lt;p&gt;version {version}&lt;/p&gt;&lt;p&gt;A simple MPD client written in Python and Qt/PySide.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;{link}&quot;&gt;{link}&lt;/a&gt;&lt;/p&gt;</source>
         <translation>&lt;h2&gt;Qygmy&lt;/h2&gt;&lt;p&gt;wersja {version}&lt;/p&gt;&lt;p&gt;Prosty klient MPD napisany w Pythonie i Qt/PySide.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;{link}&quot;&gt;{link}&lt;/a&gt;&lt;/p&gt;</translation>
     </message>
+    <message>
+        <location filename="../qygmy/qygmy.py" line="257"/>
+        <source>Playlist with such name already exists. Do you want to replace it?</source>
+        <translation>Lista o tej nazwie już istnieje. Zastąpić?</translation>
+    </message>
 </context>
 <context>
     <name>Settings</name>
     <message>
         <location filename="../qygmy/dialogs.py" line="68"/>
-        <source>Qygmy$if(%playing%, / $if(%artist%,%artist% u2014 ,)$if2(%title%,%filename%),)</source>
+        <source>Qygmy$if(%playing%, / $if(%artist%,%artist% u2014 )$if2(%title%,%filename%))</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qygmy/dialogs.py" line="77"/>
-        <source>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%),),%stopped%,Stopped,%connected%,Connected,Disconnected)</source>
-        <translation>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%),),%stopped%,Zatrzymany,%connected%,Połączony,Rozłączony)</translation>
+        <source>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%)),%stopped%,Stopped,%connected%,Connected,Disconnected)</source>
+        <translation>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%)),%stopped%,Zatrzymany,%connected%,Połączony,Rozłączony)</translation>
     </message>
     <message>
         <location filename="../qygmy/dialogs.py" line="82"/>
-        <source>&lt;span style=&quot;font-size: big; font-weight: bold&quot;&gt;$if2(%title%,%filename%)&lt;/span&gt;&lt;br&gt;%artist%$if(%album%, u2014 %album%,)</source>
+        <source>&lt;span style=&quot;font-size: large; font-weight: bold&quot;&gt;$if2(%title%,%filename%)&lt;/span&gt;&lt;br&gt;%artist%$if(%album%, u2014 %album%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qygmy/dialogs.py" line="86"/>
-        <source>$if(%artist%,%artist% u2014 ,)$if2(%title%,%filename%)</source>
+        <source>$if(%artist%,%artist% u2014 )$if2(%title%,%filename%)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
