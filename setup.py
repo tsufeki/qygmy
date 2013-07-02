@@ -40,9 +40,9 @@ A simple MPD client written in Qt/PySide.
     package_data={
         'qygmy': ['translations/*.qm'],
     },
-    requires=[
-        'PySide (>=1.1.2)',
-        'python_mpd2 (>=0.5.1)',
+    install_requires=[
+        'PySide>=1.1.2',
+        'python_mpd2',
     ],
     scripts=['bin/qygmy'],
     classifiers=[
