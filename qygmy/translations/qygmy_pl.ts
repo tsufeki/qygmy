@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="pl">
+<!DOCTYPE TS><TS version="1.1" language="pl">
 <context>
     <name>Browser</name>
     <message>
@@ -251,22 +250,22 @@
 <context>
     <name>Settings</name>
     <message>
-        <location filename="../qygmy/dialogs.py" line="68"/>
+        <location filename="../qygmy/dialogs.py" line="70"/>
         <source>Qygmy$if(%playing%, / $if(%artist%,%artist% u2014 )$if2(%title%,%filename%))</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qygmy/dialogs.py" line="77"/>
+        <location filename="../qygmy/dialogs.py" line="79"/>
         <source>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%)),%stopped%,Stopped,%connected%,Connected,Disconnected)</source>
         <translation>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%)),%stopped%,Zatrzymany,%connected%,Połączony,Rozłączony)</translation>
     </message>
     <message>
-        <location filename="../qygmy/dialogs.py" line="82"/>
+        <location filename="../qygmy/dialogs.py" line="84"/>
         <source>&lt;span style=&quot;font-size: large; font-weight: bold&quot;&gt;$if2(%title%,%filename%)&lt;/span&gt;&lt;br&gt;%artist%$if(%album%, u2014 %album%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qygmy/dialogs.py" line="86"/>
+        <location filename="../qygmy/dialogs.py" line="88"/>
         <source>$if(%artist%,%artist% u2014 )$if2(%title%,%filename%)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -777,8 +776,8 @@
     </message>
     <message>
         <location filename="../qygmy/ui/settings.py" line="194"/>
-        <source>See &lt;a href=&quot;{templateslink}&quot;&gt;{templateslink}&lt;/a&gt; for help.</source>
-        <translation>Pomoc: &lt;a href=&quot;{templateslink}&quot;&gt;{templateslink}&lt;/a&gt;.</translation>
+        <source>Help:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;{templateslink}&quot;&gt;{templateslink}&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;{qthtmllink}&quot;&gt;{qthtmllink}&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</source>
+        <translation>Pomoc:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;{templateslink}&quot;&gt;{templateslink}&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;{qthtmllink}&quot;&gt;{qthtmllink}&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</translation>
     </message>
 </context>
 <context>

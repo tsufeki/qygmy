@@ -1,4 +1,7 @@
 __pycache__/
 *.py[co]
 *.pro
-mpd.py
+/MANIFEST
+/build/
+/dist/
+/mpd.py

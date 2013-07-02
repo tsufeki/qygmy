@@ -44,6 +44,8 @@ class Settings(QDialog):
     def __init__(self, main):
         super().__init__(main)
         self.main = main
+        self.ui = Ui_settings()
+        self.ui.setupUi(self)
         self.retranslate()
 
         self.conf = configparser.ConfigParser(interpolation=None)
@@ -51,7 +53,7 @@ class Settings(QDialog):
         self.conf.read_dict(self.environ_conf(), '<MPD_HOST>')
         self.conf.read(os.path.join(self.PATH, self.FILENAME), 'utf-8')
         self.validate(self)
-        self.setup_ui()
+        self.conf_to_ui()
 
     def retranslate(self):
         self.defaults = {
@@ -92,6 +94,10 @@ class Settings(QDialog):
             },
             'guistate': {},
         }
+        self.ui.retranslateUi(self)
+        self.ui.help_lb.setText(self.ui.help_lb.text().format(
+            templateslink='https://github.com/tsufeki/qygmy/wiki/Templates',
+            qthtmllink='https://qt-project.org/doc/qt-4.8/richtext-html-subset.html'))
 
     def environ_conf(self):
         if 'MPD_HOST' in os.environ:
@@ -105,14 +111,6 @@ class Settings(QDialog):
                 c['host'] = env
             return {'connection': c}
         return {}
-
-
-    def setup_ui(self):
-        self.ui = Ui_settings()
-        self.ui.setupUi(self)
-        self.ui.help_lb.setText(self.ui.help_lb.text().format(
-            templateslink='https://github.com/tsufeki/qygmy/wiki/Templates'))
-        self.conf_to_ui()
 
     def __getitem__(self, section):
         return self.conf[section]

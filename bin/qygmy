@@ -7,5 +7,12 @@ c = logging.StreamHandler()
 c.setLevel(logging.DEBUG)
 logger.addHandler(c)
 
+import sys
+import os
+path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+if os.path.isfile(os.path.join(path, 'Makefile')):
+    # Running from source
+    sys.path.insert(0, os.path.abspath(path))
+
 import qygmy.qygmy
 qygmy.qygmy.main()

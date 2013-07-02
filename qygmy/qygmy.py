@@ -295,9 +295,12 @@ class Qygmy(QMainWindow):
             QApplication.restoreOverrideCursor()
 
 
-def main(translations_path='i18n'):
+def main(translations_path=None):
     import sys
     import os
+
+    if translations_path is None:
+        translations_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'translations')
 
     app = QApplication(sys.argv)
     locale = QLocale.system().name()

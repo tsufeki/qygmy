@@ -1,0 +1,6 @@
+include README.md
+include Makefile
+exclude qygmy/ui/*.py
+include qygmy/ui/*.ui qygmy/ui/__init__.py
+exclude qygmy/translations/*.qm
+include qygmy/translations/qygmy_*.ts
