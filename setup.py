@@ -44,7 +44,7 @@ Simple MPD client written in Qt/PySide.
         #'PySide>=1.1.2',
         'python-mpd2',
     ],
-    scripts=['bin/qygmy'],
+    scripts=['bin/qygmyrun'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: X11 Applications :: Qt',
