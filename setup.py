@@ -71,6 +71,7 @@ setup(
     scripts=['bin/qygmyrun'],
     data_files=[
         ('share/applications', ['qygmy.desktop']),
+        ('share/man/man1', ['qygmy.1']),
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
