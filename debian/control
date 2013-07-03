@@ -1,0 +1,19 @@
+Source: qygmy
+Maintainer: tsufeki <tsufeki@ymail.com>
+Section: sound
+Priority: optional
+Build-Depends: python3, pyside-tools, qt4-linguist-tools, debhelper (>= 7.4.3)
+X-Python3-Version: >= 3.3
+Standards-Version: 3.9.4
+Homepage: https://github.com/tsufeki/qygmy
+
+Package: qygmy
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, python3-pyside.qtcore (>= 1.1.2-4),
+ python3-pyside.qtgui (>= 1.1.2-4), python3-mpd2
+Provides: mpd-client
+Suggests: mpd
+Description: Simple MPD client.
+ .
+ Simple MPD client written in Qt/PySide.
+ .
