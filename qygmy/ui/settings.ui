@@ -155,7 +155,7 @@
       <item>
        <widget class="QLabel" name="help_lb">
         <property name="text">
-         <string>Help:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;{templateslink}&quot;&gt;{templateslink}&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;{qthtmllink}&quot;&gt;{qthtmllink}&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</string>
+         <string>Help:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy/wiki/Templates&quot;&gt;https://github.com/tsufeki/qygmy/wiki/Templates&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&quot;&gt;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>

@@ -95,9 +95,6 @@ class Settings(QDialog):
             'guistate': {},
         }
         self.ui.retranslateUi(self)
-        self.ui.help_lb.setText(self.ui.help_lb.text().format(
-            templateslink='https://github.com/tsufeki/qygmy/wiki/Templates',
-            qthtmllink='https://qt-project.org/doc/qt-4.8/richtext-html-subset.html'))
 
     def environ_conf(self):
         if 'MPD_HOST' in os.environ:

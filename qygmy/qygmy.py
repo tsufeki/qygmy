@@ -273,12 +273,9 @@ class Qygmy(QMainWindow):
             self.tr(
                 '<h2>Qygmy</h2>'
                 '<p>version {version}</p>'
-                '<p>A simple MPD client written in Python and Qt/PySide.</p>'
-                '<p><a href="{link}">{link}</a></p>'
-            ).format(
-                version=version,
-                link='https://github.com/tsufeki/qygmy',
-        ))
+                '<p>Simple MPD client written in Python and Qt/PySide.</p>'
+                '<p><a href="https://github.com/tsufeki/qygmy">https://github.com/tsufeki/qygmy</a></p>'
+            ).format(version=version))
 
     def busy(self):
         self.busy_stack_real += 1

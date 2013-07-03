@@ -25,9 +25,9 @@ class clean(clean):
 setup(
     name = 'Qygmy',
     version = version,
-    description = "A simple MPD client.",
+    description = "Simple MPD client.",
     long_description = """
-A simple MPD client written in Qt/PySide.
+Simple MPD client written in Qt/PySide.
 """,
     author = 'tsufeki',
     author_email = 'tsufeki@ymail.com',
@@ -38,11 +38,11 @@ A simple MPD client written in Qt/PySide.
         'qygmy.ui',
     ],
     package_data={
-        'qygmy': ['translations/*.qm'],
+        'qygmy': ['translations/*.qm', 'gittimestamp.txt'],
     },
     install_requires=[
-        'PySide>=1.1.2',
-        'python_mpd2',
+        #'PySide>=1.1.2',
+        'python-mpd2',
     ],
     scripts=['bin/qygmy'],
     classifiers=[
