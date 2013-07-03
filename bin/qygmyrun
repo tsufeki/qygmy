@@ -3,9 +3,9 @@
 import logging
 logger = logging.getLogger('qygmy')
 logger.setLevel(logging.DEBUG)
-c = logging.StreamHandler()
-c.setLevel(logging.DEBUG)
-logger.addHandler(c)
+console = logging.StreamHandler()
+console.setLevel(logging.DEBUG)
+logger.addHandler(console)
 
 import sys
 import os
@@ -13,6 +13,11 @@ path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 if os.path.isfile(os.path.join(path, 'Makefile')):
     # Running from source
     sys.path.insert(0, os.path.abspath(path))
+
+if len(sys.argv) > 1 and sys.argv[1] == '--version':
+    from qygmy.__version__ import version
+    print(version)
+    sys.exit(0)
 
 import qygmy.qygmy
 qygmy.qygmy.main()

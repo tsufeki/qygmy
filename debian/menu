@@ -1,0 +1,7 @@
+?package(qygmy): \
+    needs="X11" \
+    section="Applications/Sound" \
+    title="Qygmy" \
+    longtitle="Qygmy - simple MPD client" \
+    hints="MPD,KDE,Qt" \
+    command="/usr/bin/qygmy"

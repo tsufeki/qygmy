@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Qygmy
+Name[pl]=Qygmy
+GenericName=MPD client
+GenericName[pl]=Klient MPD
+Comment=Simple MPD client written in Qt
+Comment[pl]=Prosty klient MPD napisany w Qt
+Exec=qygmy
+Icon=applications-multimedia
+Type=Application
+Terminal=false
+Categories=Qt;AudioVideo;Player
+StartupNotify=true

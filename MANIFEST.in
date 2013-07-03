@@ -4,4 +4,4 @@ exclude qygmy/ui/*.py
 include qygmy/ui/*.ui qygmy/ui/__init__.py
 exclude qygmy/translations/*.qm
 include qygmy/translations/qygmy_*.ts
-include debian/source/format debian/changelog debian/compat debian/control debian/links debian/rules
+include debian/source/format debian/changelog debian/compat debian/control debian/links debian/menu debian/rules

@@ -1,5 +1,5 @@
-qygmy (0.1a1~dev20130703102845-1) unstable; urgency=low
+qygmy (0.1a1~dev20130703111345-1) unstable; urgency=low
 
-  * Package created.
+  * Initial release.
 
- -- tsufeki <tsufeki@ymail.com>  Wed, 03 Jul 2013 12:29:48 +0200
+ -- tsufeki <tsufeki@ymail.com>  Wed, 03 Jul 2013 20:16:18 +0200
