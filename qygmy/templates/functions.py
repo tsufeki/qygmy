@@ -127,3 +127,11 @@ def context_time(ctx, seconds):
     else:
         return ctx['__timefmt__'][2].format(sign, m, s)
 
+def context_python(ctx, expression, imports=''):
+    modules = {'__builtins__': __builtins__}
+    if imports:
+        for m in imports.split():
+            topname = m.split('.', 1)[0]
+            modules[topname] = __import__(m)
+    return str(eval(expression, modules, ctx))
+
