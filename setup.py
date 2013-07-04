@@ -56,6 +56,7 @@ setup(
     author = 'tsufeki',
     author_email = 'tsufeki@ymail.com',
     url = 'https://github.com/tsufeki/qygmy',
+    licence='BSD',
     install_requires=[
         'PySide>=1.1.2',
         'python-mpd2',
@@ -74,7 +75,7 @@ setup(
         ('share/man/man1', ['qygmy.1']),
     ],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: X11 Applications :: Qt',
         'Intended Audience :: End Users/Desktop',
         'Programming Language :: Python :: 3',
