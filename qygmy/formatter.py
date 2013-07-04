@@ -40,6 +40,7 @@ class Formatter(QObject):
                         '\\, $time(%totallength%) total,))'
             ),
             'statistics': (
+                (self.tr('MPD version:'), self.tr('%mpdversion%')),
                 (self.tr('Songs:'), self.tr('%songs%')),
                 (self.tr('Albums:'), self.tr('%albums%')),
                 (self.tr('Artists:'), self.tr('%artists%')),
