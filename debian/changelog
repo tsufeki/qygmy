@@ -1,11 +1,5 @@
-qygmy (0.1a1~dev20130703193836-2) unstable; urgency=low
-
-  * Turn off pysupport.
-
- -- tsufeki <tsufeki@ymail.com>  Wed, 03 Jul 2013 21:53:41 +0200
-
-qygmy (0.1a1~dev20130703111345-1) unstable; urgency=low
+qygmy (1.0b1-1) unstable; urgency=low
 
   * Initial release.
 
- -- tsufeki <tsufeki@ymail.com>  Wed, 03 Jul 2013 20:16:18 +0200
+ -- tsufeki <tsufeki@ymail.com>  Thu, 04 Jul 2013 10:39:55 +0200
