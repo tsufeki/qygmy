@@ -122,7 +122,7 @@ class Formatter(QObject):
         pref = '$if(%bold%,<span style="font-weight: bold">,)'
         suff = '$if(%bold%,</span>,)'
         if isinstance(template, str):
-            return Template(pref + template + suff)
+            return Template(pref + template + suff, self.settings.tmplplugins)
         r = []
         for a, b in template:
             a = self._compile(a)

@@ -1,5 +1,7 @@
 
 import os
+import glob
+import importlib.machinery
 import configparser
 
 from PySide.QtCore import *
@@ -40,10 +42,12 @@ class Settings(QDialog):
 
     PATH = os.path.expanduser(os.path.join(os.environ.get('XDG_CONFIG_HOME', '~/.config'), 'qygmy'))
     FILENAME = 'qygmy.conf'
+    PLUGINS = 'tmplplugin_*.py'
 
     def __init__(self, main):
         super().__init__(main)
         self.main = main
+
         self.ui = Ui_settings()
         self.ui.setupUi(self)
         self.retranslate()
@@ -54,6 +58,7 @@ class Settings(QDialog):
         self.conf.read(os.path.join(self.PATH, self.FILENAME), 'utf-8')
         self.validate(self)
         self.conf_to_ui()
+        self.load_tmplplugins()
 
     def retranslate(self):
         self.defaults = {
@@ -108,6 +113,17 @@ class Settings(QDialog):
                 c['host'] = env
             return {'connection': c}
         return {}
+
+    def load_tmplplugins(self):
+        self.tmplplugins = []
+        for plugin in sorted(glob.glob(os.path.join(self.PATH, self.PLUGINS))):
+            try:
+                name = os.path.split(plugin)[1][:-3]
+                mod = importlib.machinery.SourceFileLoader(name, plugin).load_module()
+                if mod:
+                    self.tmplplugins.append(mod)
+            except Exception as e:
+                logger.error('{}: {}'.format(e.__class__.__name__, e))
 
     def __getitem__(self, section):
         return self.conf[section]
