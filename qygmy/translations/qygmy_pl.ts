@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="pl">
+<!DOCTYPE TS>
+<TS version="2.0" language="pl">
 <context>
     <name>Browser</name>
     <message>
@@ -776,8 +777,8 @@
     </message>
     <message>
         <location filename="../ui/settings.py" line="194"/>
-        <source>Help:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy/wiki/Templates&quot;&gt;https://github.com/tsufeki/qygmy/wiki/Templates&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&quot;&gt;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</source>
-        <translation>Pomoc:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy/wiki/Templates&quot;&gt;https://github.com/tsufeki/qygmy/wiki/Templates&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&quot;&gt;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</translation>
+        <source>Help:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy/blob/master/doc/templates.md&quot;&gt;https://github.com/tsufeki/qygmy/blob/master/doc/templates.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&quot;&gt;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</source>
+        <translation>Pomoc:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy/blob/master/doc/templates.md&quot;&gt;https://github.com/tsufeki/qygmy/blob/master/doc/templates.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&quot;&gt;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</translation>
     </message>
 </context>
 <context>

@@ -9,7 +9,7 @@ from distutils.command.clean import clean
 from distutils.command.sdist import sdist
 from distutils.spawn import spawn
 
-from qygmy.__version__ import version
+from qygmy.__version__ import version, version_info
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -51,13 +51,15 @@ class deb(sdist):
 setup(
     name = 'qygmy',
     version = version,
-    description = "Simple MPD client.",
-    long_description = """Simple MPD client written in Python and Qt/PySide.""",
+    description = "Simple graphical MPD client.",
+    long_description = """Simple graphical MPD client written in Python and Qt/PySide. It's interface
+is strongly inspired by Pygmy (the GTK client).""",
     author = 'tsufeki',
     author_email = 'tsufeki@ymail.com',
     url = 'https://github.com/tsufeki/qygmy',
-    licence='BSD',
-    install_requires=[
+    download_url = 'https://github.com/tsufeki/qygmy/archive/v{}.tar.gz'.format(version),
+    licence = 'BSD',
+    install_requires = [
         'PySide>=1.1.2',
         'python-mpd2',
     ],
@@ -66,23 +68,28 @@ setup(
         'qygmy.templates',
         'qygmy.ui',
     ],
-    package_data={
+    package_data = {
         'qygmy': ['translations/*.qm', 'gittimestamp.txt'],
     },
-    scripts=['bin/qygmyrun'],
-    data_files=[
+    scripts = ['bin/qygmyrun'],
+    data_files = [
         ('share/applications', ['qygmy.desktop']),
         ('share/man/man1', ['qygmy.1']),
     ],
-    classifiers=[
-        'Development Status :: 4 - Beta',
+    classifiers = [
+        {
+            'alpha': 'Development Status :: 3 - Alpha',
+            'beta':  'Development Status :: 4 - Beta',
+            'rc':    'Development Status :: 4 - Beta',
+            'final': 'Development Status :: 5 - Production/Stable',
+        }[version_info[3]],
         'Environment :: X11 Applications :: Qt',
         'Intended Audience :: End Users/Desktop',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Topic :: Multimedia :: Sound/Audio',
     ],
-    cmdclass={
+    cmdclass = {
         'clean': clean,
         'build': build,
         'deb': deb,
