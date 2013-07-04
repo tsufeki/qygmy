@@ -1,8 +1,12 @@
-Qygmy's templates heavily borrow from [MusicBrainz Picard's scripting language][1], which in turn is inspired by Foobar2000.
+Qygmy's templates heavily borrow from [MusicBrainz Picard's scripting language][1],
+which in turn is inspired by Foobar2000.
 
 [1]: http://musicbrainz.org/doc/MusicBrainz_Picard/Documentation/Scripting
 
-Syntax consists of three main elements: text (copied as is), variables and functions. Additionally, current song and playlist item templates allow HTML ([the subset supported by Qt][2]).
+Syntax consists of three main elements: text (copied as is), variables and
+functions. Additionally, current song and playlist item templates allow HTML
+([the subset supported by Qt][2]). Special characters (`%`, `$`, `(`, `)`, `,`
+and `\ ` itself) have to be escaped with a backslash, e.g. `$if(%album%,%album% \(%date%\))`.
 
 [2]: https://qt-project.org/doc/qt-4.8/richtext-html-subset.html
 
@@ -10,12 +14,16 @@ Syntax consists of three main elements: text (copied as is), variables and funct
 Variables
 =========
 
-Variable consists of a variable's name between two percent signs, e.g. `%title%`. Unrecognized names are resolved to empty string. Names are case-insensitive. All values are strings.
+Variable consists of a variable's name between two percent signs, e.g. `%title%`.
+Unrecognized names are resolved to empty string. Names are case-insensitive.
+All values are strings.
 
-State and metadata variables listed below are available in all templates, with the following exceptions:
+State and metadata variables listed below are available in all templates, with
+the following exceptions:
 
 1. Playlist item template does not support state variables.
-2. Progress bar template additionally supports `%elapsed%` and `%total%` (in seconds, see `$time()`).
+2. Progress bar template additionally supports `%elapsed%` and `%total%` (in
+seconds, see `$time()`).
 
 State variables
 ---------------
@@ -31,19 +39,25 @@ Exactly one of those is set to `1`.
 Song metadata variables
 -----------------------
 
-- `%file%`, `%directory%`, `%playlist%`: one of those is set to the item's full path, depending on it's type.
+- `%file%`, `%directory%`, `%playlist%`: one of those is set to the item's
+    full path, depending on it's type.
 - `%filename%`: file name part of the above.
 - `%prio%`: current priority (0-255, only for current queue items).
 - `%length%`: length of the song in seconds (see `$time()`).
 - `%track%`, `%totaltracks%`, `%disc%`, `%totaldiscs%`
 - `%lastmodified%`: last modification date.
-- All tags recognized by MPD: `%title%`, `%artist%`, `%album%`, `%date%`, `%comment%`, `%composer%`, `%performer%`, etc.
+- All tags recognized by MPD: `%title%`, `%artist%`, `%album%`, `%date%`,
+    `%comment%`, `%composer%`, `%performer%`, etc.
 
 
 Functions
 =========
 
-Function names are case-insensitive. Functions take and return only strings. Non-existing function, bad format when an integer is needed, etc. are all errors and results in `##error: xxxxx##` message. In boolean context, empty string is interpreted as false and everything else as true. Standard true value is `1`.
+Function names are case-insensitive. Functions take and return only strings.
+Non-existing function, bad format when an integer is needed, etc. are all
+errors and results in `##error: xxxxx##` message. In boolean context, empty
+string is interpreted as false and everything else as true. Standard true
+value is `1`.
 
 String operations
 -----------------
@@ -55,7 +69,8 @@ String operations
 - `$num(num,length)`: the number `num` padded to `length` with zeros.
 - `$replace(text,search,replace)`: replace occurrences of `search` with `replace`.
 - `$in(x,y)`: true iff `x` is a substring of `y`.
-- `$trim(text,chars)`: strip `chars` from the beginning and end of `text`. `chars` may be omitted, defaults to whitespace then.
+- `$trim(text,chars)`: strip `chars` from the beginning and end of `text`.
+    `chars` may be omitted, defaults to whitespace then.
 - `$len(text)`: the length of `text`.
 
 Regular expressions
@@ -65,7 +80,8 @@ See [regular expressions syntax help][3].
 
 [3]: http://docs.python.org/3/library/re.html#regular-expression-syntax
 
-- `$rsearch(text,pattern)`: return the first matched group, or the entire match if it doesn't exist.
+- `$rsearch(text,pattern)`: return the first matched group, or the entire match
+    if it doesn't exist.
 - `$rreplace(text,pattern,replace)`: regular expression replace.
 
 Integer arithmetic
@@ -99,9 +115,11 @@ Conditionals
 
 Arguments in the following functions are evaluated only as needed:
 
-- `$if(condition,if_true,if_false)`: return `if_true` if `condition` is true, `if_false` otherwise.
+- `$if(condition,if_true,if_false)`: return `if_true` if `condition` is true,
+    `if_false` otherwise.
 - `$if2(a1,a2,...)`: return the first non-empty argument.
-- `$if3(cond1,val1,cond2,val2,...,val_else)`: return the first `val<i>` for which `cond<i>` is true, or `val_else` if all `cond<i>` are false.
+- `$if3(cond1,val1,cond2,val2,...,val_else)`: return the first `val<i>` for
+    which `cond<i>` is true, or `val_else` if all `cond<i>` are false.
 - `$or(x,y)`: `x or y`
 - `$and(x,y)`: `x and y`
 - `$noop(...)`: do nothing, return empty string.
@@ -109,6 +127,7 @@ Arguments in the following functions are evaluated only as needed:
 Operations on variables
 -----------------------
 
-- `$get(name,default)`: return the value of the variable `%name%`, or `default` if it's empty or non-existing.
+- `$get(name,default)`: return the value of the variable `%name%`, or `default`
+    if it's empty or non-existing.
 - `$set(name,value)`: set `%name%` to `value`.
 - `$unset(name)`: unset `%name%`.
