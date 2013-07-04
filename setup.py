@@ -53,7 +53,8 @@ setup(
     version = version,
     description = "Simple graphical MPD client.",
     long_description = """Simple graphical MPD client written in Python and Qt/PySide. It's interface
-is strongly inspired by Pygmy (the GTK client).""",
+is strongly inspired by Pygmy (the GTK client). Qygmy's most remarkable
+feature is its powerful template engine, allowing highly customizable display.""",
     author = 'tsufeki',
     author_email = 'tsufeki@ymail.com',
     url = 'https://github.com/tsufeki/qygmy',

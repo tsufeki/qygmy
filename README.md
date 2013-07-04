@@ -1,7 +1,11 @@
 Qygmy
 =====
 
-Qygmy is a simple MPD client written is Python 3 and Qt/PySide.
+Qygmy is a simple MPD client written is Python 3 and Qt/PySide. Qygmy's most
+remarkable feature is its powerful template engine, allowing highly
+customizable display.
+
+![Sample screenshot](http://i.imgur.com/xWqxhqp.png)
 
 Requirements
 ------------

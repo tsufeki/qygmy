@@ -22,4 +22,5 @@ Provides: mpd-client
 Suggests: mpd
 Description: Simple graphical MPD client.
  Simple graphical MPD client written in Python and Qt/PySide. It's interface
- is strongly inspired by Pygmy (the GTK client).
+ is strongly inspired by Pygmy (the GTK client). Qygmy's most remarkable
+ feature is its powerful template engine, allowing highly customizable display.
