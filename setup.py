@@ -58,7 +58,7 @@ is strongly inspired by Pygmy (the GTK client).""",
     author_email = 'tsufeki@ymail.com',
     url = 'https://github.com/tsufeki/qygmy',
     download_url = 'https://github.com/tsufeki/qygmy/archive/v{}.tar.gz'.format(version),
-    licence = 'BSD',
+    license = 'BSD',
     install_requires = [
         'PySide>=1.1.2',
         'python-mpd2',
