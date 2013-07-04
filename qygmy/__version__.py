@@ -3,7 +3,7 @@ import os
 import datetime
 import subprocess
 
-version_info = (1, 0, 0, 'alpha', 1)
+version_info = (1, 0, 0, 'beta', 1)
 
 def _get_version():
     v = '%s.%s' % version_info[:2]
