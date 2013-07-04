@@ -112,3 +112,9 @@ Operations on variables
 - `$get(name,default)`: return the value of the variable `%name%`, or `default` if it's empty or non-existing.
 - `$set(name,value)`: set `%name%` to `value`.
 - `$unset(name)`: unset `%name%`.
+
+`$python()`
+-----------
+
+- `$python(expr,imports)`: evaluate an arbitrary python expression `expr`.
+    `imports` is a space-separated list of modules to import (can be omitted).
