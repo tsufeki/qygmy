@@ -56,7 +56,7 @@ Functions
 Function names are case-insensitive. Functions take and return only strings.
 Non-existing function, bad format when an integer is needed, etc. are all
 errors and results in `##error: xxxxx##` message. In boolean context, empty
-string is interpreted as false and everything else as true. Standard true
+string is interpreted as false and everything else as true. Canonical true
 value is `1`.
 
 String operations
