@@ -32,178 +32,188 @@
         <translation>$if(%disconnected%,,%totalcount% utworów$if($gt(%totallength%,0),\, razem $time(%totallength%),))</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="42"/>
+        <location filename="../formatter.py" line="43"/>
         <source>Songs:</source>
         <translation>Plików:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="42"/>
+        <location filename="../formatter.py" line="43"/>
         <source>%songs%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="43"/>
+        <location filename="../formatter.py" line="44"/>
         <source>Albums:</source>
         <translation>Albumów:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="43"/>
+        <location filename="../formatter.py" line="44"/>
         <source>%albums%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="44"/>
+        <location filename="../formatter.py" line="45"/>
         <source>Artists:</source>
         <translation>Artystów:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="44"/>
+        <location filename="../formatter.py" line="45"/>
         <source>%artists%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="45"/>
+        <location filename="../formatter.py" line="46"/>
         <source>Uptime:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="45"/>
+        <location filename="../formatter.py" line="46"/>
         <source>$time(%uptime%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="46"/>
+        <location filename="../formatter.py" line="47"/>
         <source>DB playtime:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="46"/>
+        <location filename="../formatter.py" line="47"/>
         <source>$time(%db_playtime%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="47"/>
+        <location filename="../formatter.py" line="48"/>
         <source>This instance:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="47"/>
+        <location filename="../formatter.py" line="48"/>
         <source>$time(%playtime%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="50"/>
+        <location filename="../formatter.py" line="51"/>
         <source>%file%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="51"/>
+        <location filename="../formatter.py" line="52"/>
         <source>Title:</source>
         <translation>Tytuł:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="51"/>
+        <location filename="../formatter.py" line="52"/>
         <source>%title%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="52"/>
+        <location filename="../formatter.py" line="53"/>
         <source>Artist:</source>
         <translation>Artysta:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="52"/>
+        <location filename="../formatter.py" line="53"/>
         <source>%artist%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="53"/>
+        <location filename="../formatter.py" line="54"/>
         <source>Album:</source>
         <translation>Album:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="53"/>
+        <location filename="../formatter.py" line="54"/>
         <source>%album%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="54"/>
+        <location filename="../formatter.py" line="55"/>
         <source>Date:</source>
         <translation>Data:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="54"/>
+        <location filename="../formatter.py" line="55"/>
         <source>%date%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="55"/>
+        <location filename="../formatter.py" line="56"/>
         <source>Track:</source>
         <translation>Ścieżka:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="55"/>
+        <location filename="../formatter.py" line="56"/>
         <source>%track%$if(%totaltracks%, / %totaltracks%,)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="56"/>
+        <location filename="../formatter.py" line="57"/>
         <source>Disc:</source>
         <translation>Dysk:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="56"/>
+        <location filename="../formatter.py" line="57"/>
         <source>%disc%$if(%totaldiscs%, / %totaldiscs%,)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="57"/>
+        <location filename="../formatter.py" line="58"/>
         <source>Comment:</source>
         <translation>Komentarz:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="57"/>
+        <location filename="../formatter.py" line="58"/>
         <source>%comment%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="58"/>
+        <location filename="../formatter.py" line="59"/>
         <source>Length:</source>
         <translation>Czas:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="58"/>
+        <location filename="../formatter.py" line="59"/>
         <source>$if(%length%,$time(%length%),)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="59"/>
+        <location filename="../formatter.py" line="60"/>
         <source>Last modified:</source>
         <translation>Ostatnio zmodyfikowany:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="59"/>
+        <location filename="../formatter.py" line="60"/>
         <source>%lastmodified%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="60"/>
+        <location filename="../formatter.py" line="61"/>
         <source>Composer:</source>
         <translation>Kompozytor:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="60"/>
+        <location filename="../formatter.py" line="61"/>
         <source>%composer%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="61"/>
+        <location filename="../formatter.py" line="62"/>
         <source>Performer:</source>
         <translation>Wykonawca:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="61"/>
+        <location filename="../formatter.py" line="62"/>
         <source>%performer%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatter.py" line="42"/>
+        <source>MPD version:</source>
+        <translation>Wersja MPD:</translation>
+    </message>
+    <message>
+        <location filename="../formatter.py" line="42"/>
+        <source>%mpdversion%</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -88,5 +88,7 @@ class Server(ProperConnection, QObject):
 
     @mpd_cmd(fallback={})
     def statistics(self):
-        return self.conn.stats()
+        stats = self.conn.stats()
+        stats['mpdversion'] = self.conn.mpd_version
+        return stats
 
