@@ -30,7 +30,7 @@ Installation
 
   `.deb`s can be build from source using:
 
-        python3 ./setup.py deb
+        python3 ./setup.py bdist_deb
 
   [2]: https://github.com/Mic92/python-mpd2/blob/master/INSTALL.rst#debian
   [3]: https://pypi.python.org/pypi/qygmy
