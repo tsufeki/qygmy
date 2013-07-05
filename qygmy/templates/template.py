@@ -154,6 +154,7 @@ class Function(RegexElement):
             ),
         }
 
+        self.call = None
         for module in reversed(self.template.functions):
             f = getattr(module, 'lazycontext_' + self.name, None)
             if f is not None:
@@ -205,11 +206,12 @@ class Function(RegexElement):
         return self.function(context, *args)
 
     def render(self, context):
+        if self.call is None:
+            raise TemplateError("function '${}' is not defined".format(self.name))
         try:
             return self.call(context)
         except Exception as e:
             raise TemplateError(str(e)) from e
-        raise TemplateError('no such function: {!r}'.format(self.name))
 
     def __repr__(self):
         s = 'Function('
