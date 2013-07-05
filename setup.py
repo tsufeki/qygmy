@@ -8,6 +8,7 @@ from distutils.cmd import Command
 from distutils.command.build import build
 from distutils.command.clean import clean
 from distutils.command.sdist import sdist
+from distutils import archive_util
 
 from qygmy.__version__ import version, version_info
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,47 +17,37 @@ SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 class build(build):
 
     def run(self):
-        if not self.dry_run:
-            os.chdir(SRC_DIR)
+        oldcwd = os.getcwd()
+        os.chdir(SRC_DIR)
         self.spawn(['make'])
         super().run()
+        os.chdir(oldcwd)
 
 
 class clean(clean):
 
     def run(self):
-        if not self.dry_run:
-            os.chdir(SRC_DIR)
+        oldcwd = os.getcwd()
+        os.chdir(SRC_DIR)
         self.spawn(['make', 'clean'])
         super().run()
+        os.chdir(oldcwd)
 
 
 class sdist(sdist):
 
     def finalize_options(self):
-        self.ensure_string_list('formats')
-        if self.formats is None or self.manifest_only:
-            self.make_xztar = False
-        else:
-            self.make_tar = 'tar' in self.formats
-            self.make_xztar = 'xztar' in self.formats
-        if self.make_xztar:
-            self.formats.remove('xztar')
-            if not self.make_tar:
-                self.formats.append('tar')
+        archive_util.ARCHIVE_FORMATS['xztar'] = (None, [], "xz'd tar-file")
         super().finalize_options()
+        del archive_util.ARCHIVE_FORMATS['xztar']
 
-    def run(self):
-        super().run()
-        if self.make_xztar:
-            name = self.distribution.get_name()
-            version = self.distribution.get_version()
-            tar = os.path.join(self.dist_dir, name + '-' + version + '.tar')
-            if os.path.isfile(tar):
-                xz_opts = '-zf'
-                if self.make_tar:
-                    xz_opts += 'k' # keep .tar
-                self.spawn(['xz', xz_opts, tar])
+    def make_archive(self, base_name, format, root_dir=None, base_dir=None):
+        if format != 'xztar':
+            return super().make_archive(base_name, format, root_dir, base_dir)
+        tar = super().make_archive(base_name, 'tar', root_dir, base_dir)
+        xz_opts = '-zfk'
+        self.spawn(['xz', xz_opts, tar])
+        return tar + '.xz'
 
 
 class bdist_deb(Command):
@@ -72,8 +63,12 @@ class bdist_deb(Command):
 
     def finalize_options(self):
         self.set_undefined_options('bdist', ('dist_dir', 'dist_dir'))
+        self.dist_dir = os.path.abspath(self.dist_dir)
 
     def run(self):
+        saved_dist_files = self.distribution.dist_files[:]
+        oldcwd = os.getcwd()
+        os.chdir(SRC_DIR)
         sdist_cmd = self.reinitialize_command('sdist')
         sdist_cmd.formats = ['xztar']
         sdist_cmd.dist_dir = self.dist_dir
@@ -81,6 +76,8 @@ class bdist_deb(Command):
 
         self.spawn(['make', 'dchrelease'])
         sdist_cmd.run()
+        print('%%%', self.distribution.dist_files[-1])
+        self.distribution.dist_files = saved_dist_files
 
         name = self.distribution.get_name()
         version = self.distribution.get_version()
@@ -90,20 +87,21 @@ class bdist_deb(Command):
         debversion = version.replace('.dev', '~dev')
         origtar = name + '_' + debversion + '.orig.' + ext
 
-        if not self.dry_run:
-            os.chdir(self.dist_dir)
+        os.chdir(self.dist_dir)
         self.spawn(['tar', 'xvf', tar])
         if not self.dry_run:
             os.rename(tar, origtar)
             os.chdir(sourcedir)
         self.spawn(['debuild'])
         if not self.dry_run:
-            os.chdir('..')
+            os.chdir(self.dist_dir)
             shutil.rmtree(sourcedir, True)
             for i in glob.glob(name + '_' + debversion + '-*.build'):
                 os.remove(i)
         deb = sorted(glob.glob(name + '_' + debversion + '-*_all.deb'))[-1]
-        self.distribution.dist_files.append(('bdist_deb', 'any', deb))
+        debfull = os.path.abspath(os.path.join(self.dist_dir, deb))
+        self.distribution.dist_files.append(('bdist_dumb', 'any', debfull))
+        os.chdir(oldcwd)
 
 
 setup(
