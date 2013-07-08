@@ -25,6 +25,7 @@ class Browser(QMainWindow):
         self.ui.search_results.setup(self.srv.search)
         self.ui.search_button.setDefaultAction(self.ui.search)
         self.srv.state.changed.connect(self.on_state_changed)
+        self.ui.updatedb.triggered.connect(self.srv.updatedb)
         self.ui.close.triggered.connect(self.close)
 
         try:
@@ -44,6 +45,7 @@ class Browser(QMainWindow):
             ('close', 'window-close'),
             ('search', 'edit-find'),
             ('copy', 'edit-copy'),
+            ('updatedb', 'view-refresh'),
         ):
             getattr(self.ui, action).setIcon(QIcon.fromTheme(icon))
         for i, icon in enumerate(['folder-sound', 'document-multiple', 'edit-find']):
@@ -75,7 +77,7 @@ class Browser(QMainWindow):
     def on_state_changed(self, state):
         c = state != 'disconnect'
         for act in ('search', 'add', 'addplay', 'replace', 'replaceplay',
-                'remove', 'rename', 'copy', 'details'):
+                'remove', 'rename', 'copy', 'details', 'updatedb'):
             getattr(self.ui, act).setEnabled(c)
         self.ui.dbpath.setEnabled(c)
         self.ui.plpath.setEnabled(c)

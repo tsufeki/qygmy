@@ -413,6 +413,7 @@
     <addaction name="copy"/>
     <addaction name="details"/>
     <addaction name="separator"/>
+    <addaction name="updatedb"/>
     <addaction name="close"/>
    </widget>
    <addaction name="context_menu"/>
@@ -534,6 +535,11 @@
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="updatedb">
+   <property name="text">
+    <string>&amp;Update the database</string>
    </property>
   </action>
  </widget>
