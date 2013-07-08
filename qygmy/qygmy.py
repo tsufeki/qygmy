@@ -70,6 +70,7 @@ class Qygmy(QMainWindow):
             ('add', 'list-add'),
             ('remove', 'list-remove'),
             ('clear', 'edit-clear-list'),
+            ('copy', 'edit-copy'),
             ('repeat', 'media-playlist-repeat'),
             ('shuffle', 'media-playlist-shuffle'),
             ('single', 'go-last'),
@@ -138,6 +139,7 @@ class Qygmy(QMainWindow):
         self.ui.add.triggered.connect(self.browser.activateWindow)
         self.ui.remove.triggered.connect(self.ui.queue.remove_selected)
         self.ui.clear.triggered.connect(self.srv.clear)
+        self.ui.copy.triggered.connect(self.ui.queue.copy_selected)
         self.ui.randomize.triggered.connect(self.srv.randomize_queue)
         self.ui.reverse.triggered.connect(self.srv.queue.reverse)
         self.ui.updatedb.triggered.connect(self.srv.updatedb)
@@ -193,6 +195,7 @@ class Qygmy(QMainWindow):
         e.accept()
         self.ui.highprio.setEnabled(self.ui.queue.can_set_priority(1))
         self.ui.normprio.setEnabled(self.ui.queue.can_set_priority(0))
+        self.ui.copy.setEnabled(self.ui.queue.can_copy())
         self.ui.details.setEnabled(self.ui.queue.details() is not None)
         self.ui.context_menu.popup(e.globalPos())
 

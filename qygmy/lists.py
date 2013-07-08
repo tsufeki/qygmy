@@ -65,6 +65,9 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
     def can_set_priority(self, positions, prio):
         return False
 
+    def can_copy(self, positions):
+        return False
+
     @abstractmethod
     def item_chosen(self, pos):
         """i.e. double-clicked or Return pressed."""
@@ -191,6 +194,13 @@ class WritableMixin(metaclass=ABCMeta):
     @abstractmethod
     def remove_one(self, item):
         pass
+
+    def can_copy(self, positions):
+        return len(positions) > 0
+
+    def copy(self, positions):
+        if self.can_copy(positions):
+            self.add([self[i] for i in positions], max(positions) + 1)
 
     @mpd_cmd
     def move(self, items, pos):
@@ -420,6 +430,9 @@ class Playlists(WritableMixin, BrowserList):
             self.conn.rm(item['playlist'])
         else:
             self.conn.playlistdelete(self.current.value, item['pos'])
+
+    def can_copy(self, positions):
+        return False if self.current.value == '' else super().can_copy(positions)
 
     def move_one(self, item, pos):
         if self.current.value != '':
