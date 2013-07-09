@@ -145,10 +145,10 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
 class WritableMixin(metaclass=ABCMeta):
 
     @mpd_cmd(fallback=False)
-    def add(self, items, pos=None, extra=None):
+    def add(self, items, pos=None, **kwargs):
         a = []
-        for i in sorted(items, key=self.sort_key):
-            if 'file' in i or self.can_add_directly(i, pos):
+        for i in items:
+            if 'file' in i or self.can_add_directly(i, pos, **kwargs):
                 a.append(i)
             elif 'directory' in i:
                 a.extend(self.parent.database.ls(i['directory'], recursive=True))
@@ -158,18 +158,20 @@ class WritableMixin(metaclass=ABCMeta):
             return False
         if pos is not None:
             a = reversed(a)
+        last = len(self)
         with self.mpd_cmdlist:
             for i in a:
-                self.add_one(i, pos, extra)
+                self.add_one(i, pos, last, **kwargs)
+                last += 1
         self.refresh()
         return True
 
     @abstractmethod
-    def can_add_directly(self, item, pos):
+    def can_add_directly(self, item, pos, **kwargs):
         return True
 
     @abstractmethod
-    def add_one(self, item, pos, extra):
+    def add_one(self, item, pos, last, **kwargs):
         pass
 
     def can_remove(self, positions):
@@ -261,10 +263,10 @@ class Queue(WritableMixin, SongList):
         return self.conn.playlistinfo()
 
     @mpd_cmd(fallback=False)
-    def add(self, items, pos=None, play=False, replace=False):
+    def add(self, items, pos=None, play=False, replace=False, high_priority=False):
         if replace:
             self.conn.clear()
-        r = super().add(items, pos)
+        r = super().add(items, pos, high_priority=high_priority)
         if play and r:
             if replace:
                 playpos = 0
@@ -273,17 +275,20 @@ class Queue(WritableMixin, SongList):
             self.conn.play(playpos)
         return r
 
-    def can_add_directly(self, item, pos):
-        return 'file' in item or ('playlist' in item and pos is None)
+    def can_add_directly(self, item, pos, high_priority):
+        return 'file' in item or ('playlist' in item and pos is None and not high_priority)
 
-    def add_one(self, item, pos, _):
-        if 'playlist' in item and pos is None:
+    def add_one(self, item, pos, last, high_priority):
+        if 'playlist' in item and pos is None and not high_priority:
             self.conn.load(item['playlist'])
         elif 'file' in item:
             if pos is None:
+                pos = last
                 self.conn.add(item['file'])
             else:
                 self.conn.addid(item['file'], pos)
+            if high_priority:
+                self.conn.prio(1, pos)
 
     def remove_one(self, item):
         self.conn.deleteid(item['id'])
@@ -327,9 +332,10 @@ class BrowserList(SongList):
     def can_add_to_queue(self, positions):
         return len(positions) > 0
 
-    def add_to_queue(self, positions, play=False, replace=False):
+    def add_to_queue(self, positions, play=False, replace=False, high_priority=False):
         if self.can_add_to_queue(positions):
-            self.parent.queue.add([self[i] for i in positions], play=play, replace=replace)
+            self.parent.queue.add([self[i] for i in sorted(positions)],
+                    play=play, replace=replace, high_priority=high_priority)
 
     def item_chosen(self, pos):
         self.add_to_queue([pos])
@@ -374,12 +380,10 @@ class Playlists(WritableMixin, BrowserList):
         return sorted(self.conn.listplaylists(), key=self.sort_key)
 
     def add(self, items, pos=None):
-        extra = {}
-        extra['last'] = len(self)
         if self.current.value != '':
-            extra['name'] = self.current.value
+            name = self.current.value
         elif pos is not None:
-            extra['name'] = self[pos]['playlist']
+            name = self[pos]['playlist']
             pos = None
         else:
             playlists = {s['playlist'] for s in self}
@@ -389,20 +393,18 @@ class Playlists(WritableMixin, BrowserList):
                     name = '{}_{}'.format(new, i)
                     if name not in playlists:
                         break
-            extra['name'] = name
-        return super().add(items, pos, extra=extra)
+            pos = None
+        return super().add(items, pos, name=name)
 
-    def can_add_directly(self, item, pos):
+    def can_add_directly(self, item, pos, name):
         return 'file' in item
 
-    def add_one(self, item, pos, extra):
+    def add_one(self, item, pos, last, name):
         if 'file' not in item:
             return
-        name = extra['name']
         if pos is not None:
             self.conn.playlistadd(name, item['file'])
-            self.conn.playlistmove(name, extra['last'], pos)
-            extra['last'] += 1
+            self.conn.playlistmove(name, last, pos)
         else:
             self.conn.playlistadd(name, item['file'])
 
