@@ -263,10 +263,10 @@ class Queue(WritableMixin, SongList):
         return self.conn.playlistinfo()
 
     @mpd_cmd(fallback=False)
-    def add(self, items, pos=None, play=False, replace=False, high_priority=False):
+    def add(self, items, pos=None, play=False, replace=False, priority=0):
         if replace:
             self.conn.clear()
-        r = super().add(items, pos, high_priority=high_priority)
+        r = super().add(items, pos, priority=priority)
         if play and r:
             if replace:
                 playpos = 0
@@ -275,11 +275,11 @@ class Queue(WritableMixin, SongList):
             self.conn.play(playpos)
         return r
 
-    def can_add_directly(self, item, pos, high_priority):
-        return 'file' in item or ('playlist' in item and pos is None and not high_priority)
+    def can_add_directly(self, item, pos, priority):
+        return 'file' in item or ('playlist' in item and pos is None and priority == 0)
 
-    def add_one(self, item, pos, last, high_priority):
-        if 'playlist' in item and pos is None and not high_priority:
+    def add_one(self, item, pos, last, priority):
+        if 'playlist' in item and pos is None and priority == 0:
             self.conn.load(item['playlist'])
         elif 'file' in item:
             if pos is None:
@@ -287,8 +287,8 @@ class Queue(WritableMixin, SongList):
                 self.conn.add(item['file'])
             else:
                 self.conn.addid(item['file'], pos)
-            if high_priority:
-                self.conn.prio(1, pos)
+            if priority != 0:
+                self.conn.prio(priority, pos)
 
     def remove_one(self, item):
         self.conn.deleteid(item['id'])
@@ -332,10 +332,10 @@ class BrowserList(SongList):
     def can_add_to_queue(self, positions):
         return len(positions) > 0
 
-    def add_to_queue(self, positions, play=False, replace=False, high_priority=False):
+    def add_to_queue(self, positions, play=False, replace=False, priority=0):
         if self.can_add_to_queue(positions):
             self.parent.queue.add([self[i] for i in sorted(positions)],
-                    play=play, replace=replace, high_priority=high_priority)
+                    play=play, replace=replace, priority=priority)
 
     def item_chosen(self, pos):
         self.add_to_queue([pos])
