@@ -147,7 +147,7 @@ class WritableMixin(metaclass=ABCMeta):
     @mpd_cmd(fallback=False)
     def add(self, items, pos=None, extra=None):
         a = []
-        for i in sorted(items, key=self.sort_key):
+        for i in items:
             if 'file' in i or self.can_add_directly(i, pos):
                 a.append(i)
             elif 'directory' in i:
@@ -228,7 +228,7 @@ class WritableMixin(metaclass=ABCMeta):
         d = pickle.loads(data.data(self.MIMETYPE).data())
         if d['source'] == id(self):
             if row is None:
-                return False
+                row = len(self) - 1
             self.move(d['items'], row)
         else:
             self.add(d['items'], row)
@@ -329,7 +329,8 @@ class BrowserList(SongList):
 
     def add_to_queue(self, positions, play=False, replace=False):
         if self.can_add_to_queue(positions):
-            self.parent.queue.add([self[i] for i in positions], play=play, replace=replace)
+            self.parent.queue.add([self[i] for i in sorted(positions)],
+                    play=play, replace=replace)
 
     def item_chosen(self, pos):
         self.add_to_queue([pos])
