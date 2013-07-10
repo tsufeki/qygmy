@@ -63,7 +63,9 @@ class Browser(QMainWindow):
 
     def contextMenuEvent(self, e):
         e.accept()
-        self.ui.add.setVisible(self.current_view.can_add_to_queue())
+        can_add = self.current_view.can_add_to_queue()
+        for act in ('add', 'addplay', 'replace', 'replaceplay'):
+            getattr(self.ui, act).setVisible(can_add)
         self.ui.remove.setVisible(self.current_view.can_remove())
         self.ui.rename.setVisible(self.current_view.can_rename())
         self.ui.details.setVisible(self.current_view.details() is not None)
