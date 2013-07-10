@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="pl">
+<!DOCTYPE TS><TS version="1.1" language="pl">
 <context>
     <name>Browser</name>
     <message>
-        <location filename="../browser.py" line="117"/>
+        <location filename="../browser.py" line="122"/>
         <source>Details</source>
         <translation>Szczegóły</translation>
     </message>
@@ -220,7 +219,7 @@
 <context>
     <name>Playlists</name>
     <message>
-        <location filename="../lists.py" line="369"/>
+        <location filename="../lists.py" line="370"/>
         <source>New playlist</source>
         <translation>Nowa lista</translation>
     </message>
@@ -259,6 +258,74 @@
     </message>
 </context>
 <context>
+    <name>SearchTags</name>
+    <message>
+        <location filename="../lists.py" line="471"/>
+        <source>Title</source>
+        <translation>Tytuł</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="472"/>
+        <source>Artist</source>
+        <translation>Artysta</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="473"/>
+        <source>Album</source>
+        <translation>Album</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="474"/>
+        <source>Genre</source>
+        <translation>Gatunek</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="475"/>
+        <source>Comment</source>
+        <translation>Komentarz</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="476"/>
+        <source>Composer</source>
+        <translation>Kompozytor</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="477"/>
+        <source>Performer</source>
+        <translation>Wykonawca</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="478"/>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="479"/>
+        <source>Track</source>
+        <translation>Ścieżka</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="480"/>
+        <source>Disc</source>
+        <translation>Dysk</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="484"/>
+        <source>Any</source>
+        <translation>Wszystko</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="485"/>
+        <source>File name</source>
+        <translation>Nazwa pliku</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="481"/>
+        <source>Name</source>
+        <translation>Nazwa</translation>
+    </message>
+</context>
+<context>
     <name>Settings</name>
     <message>
         <location filename="../dialogs.py" line="70"/>
@@ -292,137 +359,107 @@
 <context>
     <name>browser</name>
     <message>
-        <location filename="../ui/browser.py" line="238"/>
+        <location filename="../ui/browser.py" line="232"/>
         <source>Music database</source>
         <translation>Baza muzyki</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="239"/>
+        <location filename="../ui/browser.py" line="233"/>
         <source>&amp;Database</source>
         <translation>&amp;Baza</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="240"/>
+        <location filename="../ui/browser.py" line="234"/>
         <source>&amp;Playlists</source>
         <translation>&amp;Listy</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="241"/>
+        <location filename="../ui/browser.py" line="235"/>
         <source>Tag to search</source>
         <translation>Szukany tag</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="242"/>
-        <source>Any</source>
-        <translation>Wszystko</translation>
-    </message>
-    <message>
-        <location filename="../ui/browser.py" line="243"/>
-        <source>Title</source>
-        <translation>Tytuł</translation>
-    </message>
-    <message>
-        <location filename="../ui/browser.py" line="244"/>
-        <source>Artist</source>
-        <translation>Artysta</translation>
-    </message>
-    <message>
-        <location filename="../ui/browser.py" line="245"/>
-        <source>Album</source>
-        <translation>Album</translation>
-    </message>
-    <message>
-        <location filename="../ui/browser.py" line="246"/>
-        <source>Comment</source>
-        <translation>Komentarz</translation>
-    </message>
-    <message>
-        <location filename="../ui/browser.py" line="247"/>
-        <source>File name</source>
-        <translation>Nazwa pliku</translation>
-    </message>
-    <message>
-        <location filename="../ui/browser.py" line="248"/>
+        <location filename="../ui/browser.py" line="236"/>
         <source>&amp;Search</source>
         <translation>&amp;Szukaj</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="249"/>
+        <location filename="../ui/browser.py" line="237"/>
         <source>&amp;Add selected</source>
         <translation>&amp;Dodaj zaznaczone</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="250"/>
+        <location filename="../ui/browser.py" line="238"/>
         <source>Add selected songs to the current playlist</source>
         <translation>Dodaj zaznaczone utwory do głównej listy</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="251"/>
+        <location filename="../ui/browser.py" line="239"/>
         <source>&amp;Close</source>
         <translation>&amp;Zamknij</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="252"/>
+        <location filename="../ui/browser.py" line="240"/>
         <source>Close this window</source>
         <translation>Zamknij to okno</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="253"/>
+        <location filename="../ui/browser.py" line="241"/>
         <source>Ctrl+W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="254"/>
+        <location filename="../ui/browser.py" line="242"/>
         <source>Search</source>
         <translation>Szukaj</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="255"/>
+        <location filename="../ui/browser.py" line="243"/>
         <source>&amp;Remove selected</source>
         <translation>&amp;Usuń zaznaczone</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="256"/>
+        <location filename="../ui/browser.py" line="244"/>
         <source>Del</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="257"/>
+        <location filename="../ui/browser.py" line="245"/>
         <source>Add selected and &amp;play</source>
         <translation>Dodaj zaznaczone i &amp;odtwarzaj</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="258"/>
+        <location filename="../ui/browser.py" line="246"/>
         <source>Shift+Return</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="259"/>
+        <location filename="../ui/browser.py" line="247"/>
         <source>Song &amp;details...</source>
         <translation>&amp;Szczegóły...</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="260"/>
+        <location filename="../ui/browser.py" line="248"/>
         <source>Ctrl+I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="261"/>
+        <location filename="../ui/browser.py" line="249"/>
         <source>Re&amp;name</source>
         <translation>Zmień &amp;nazwę</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="262"/>
+        <location filename="../ui/browser.py" line="250"/>
         <source>F2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="263"/>
+        <location filename="../ui/browser.py" line="251"/>
         <source>R&amp;eplace the current playlist</source>
         <translation>Za&amp;stąp główną listę</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="264"/>
+        <location filename="../ui/browser.py" line="252"/>
         <source>Rep&amp;lace and play</source>
         <translation>Zas&amp;tąp i odtwarzaj</translation>
     </message>

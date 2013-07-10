@@ -27,7 +27,7 @@
     <item>
      <widget class="ChangeDuringDragTabWidget" name="tabs">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -246,41 +246,11 @@
              <string>Tag to search</string>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>-1</number>
             </property>
             <property name="sizeAdjustPolicy">
              <enum>QComboBox::AdjustToContents</enum>
             </property>
-            <item>
-             <property name="text">
-              <string>Any</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Title</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Artist</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Album</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Comment</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>File name</string>
-             </property>
-            </item>
            </widget>
           </item>
           <item>

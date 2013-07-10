@@ -24,6 +24,8 @@ class Browser(QMainWindow):
         self.ui.plpath.clicked.connect(self.srv.playlists.cd)
         self.ui.search_results.setup(self.srv.search)
         self.ui.search_button.setDefaultAction(self.ui.search)
+        self.ui.what.setModel(self.srv.search.search_tags)
+        self.ui.what.model().modelReset.connect(lambda: self.ui.what.setCurrentIndex(0))
         self.srv.state.changed.connect(self.on_state_changed)
 
         try:
@@ -87,7 +89,8 @@ class Browser(QMainWindow):
 
     @Slot()
     def on_search_triggered(self):
-        self.srv.search.cd((self.ui.what.currentIndex(), self.ui.query.text()))
+        self.srv.search.cd((self.ui.what.itemData(self.ui.what.currentIndex()),
+            self.ui.query.text()))
 
     @Slot()
     def on_add_triggered(self, play=False, replace=False):
