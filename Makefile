@@ -34,16 +34,16 @@ $(TS): $(PY)
 	-rm $(PRO)
 
 dch:
-	srcver=`./bin/qygmyrun --version | sed 's/\.dev/~dev/'` \
+	srcver=`./bin/qygmyrun --version | sed -e 's/\.dev/~dev/' -e 's/[a-c]/~\0/'` \
 	dchver=`dpkg-parsechangelog --count 1 | grep '^Version: ' | sed 's/^Version:\s\+\([^-]\+\)-.*$$/\1/'` \
 	sh -c 'if [ $$srcver != $$dchver ]; then $(DCH) -m -v $$srcver-1; else $(DCH) -m -i; fi'
 
 dchcreate:
 	-rm debian/changelog
-	$(DCH) -M --create -v `./bin/qygmyrun --version | sed 's/\.dev/~dev/'`-1
+	$(DCH) -M --create -v `./bin/qygmyrun --version | sed -e 's/\.dev/~dev/' -e 's/[a-c]/~\0/'`-1
 
 dchrelease:
-	srcver=`./bin/qygmyrun --version | sed 's/\.dev/~dev/'` \
+	srcver=`./bin/qygmyrun --version | sed -e 's/\.dev/~dev/' -e 's/[a-c]/~\0/'` \
 	dchver=`dpkg-parsechangelog --count 1 | grep '^Version: ' | sed 's/^Version:\s\+\([^-]\+\)-.*$$/\1/'` \
 	sh -c 'if [ $$srcver != $$dchver ]; then $(DCH) -m -v $$srcver-1; fi'
 

@@ -76,7 +76,6 @@ class bdist_deb(Command):
 
         self.spawn(['make', 'dchrelease'])
         sdist_cmd.run()
-        print('%%%', self.distribution.dist_files[-1])
         self.distribution.dist_files = saved_dist_files
 
         name = self.distribution.get_name()

@@ -9,7 +9,7 @@ from .ui.infodialog import Ui_infodialog
 from .ui.settings import Ui_settings
 
 import logging
-logger = logging.getLogger('qygmy')
+log = logging.getLogger('qygmy')
 
 
 class Info(QDialog):
@@ -51,7 +51,11 @@ class Settings(QDialog):
         self.conf = configparser.ConfigParser(interpolation=None)
         self.conf.read_dict(self.defaults, '<defaults>')
         self.conf.read_dict(self.environ_conf(), '<MPD_HOST>')
-        self.conf.read(os.path.join(self.PATH, self.FILENAME), 'utf-8')
+        try:
+            self.conf.read(os.path.join(self.PATH, self.FILENAME), 'utf-8')
+        except (configparser.Error, ValueError, OSError) as e:
+            log.error('{}: {}'.format(e.__class__.__name__, e))
+            self.conf._join_multiline_values()
         self.validate(self)
         self.conf_to_ui()
 
@@ -97,8 +101,8 @@ class Settings(QDialog):
         self.ui.retranslateUi(self)
 
     def environ_conf(self):
-        if 'MPD_HOST' in os.environ:
-            env = os.environ['MPD_HOST']
+        env = os.environ.get('MPD_HOST')
+        if env:
             c = {}
             if '@' in env:
                 c['password'], env = env.rsplit('@', 1)
@@ -106,6 +110,10 @@ class Settings(QDialog):
                 env, c['port'] = env.rsplit(':', 1)
             if env:
                 c['host'] = env
+            if 'port' not in c:
+                port = os.environ.get('MPD_PORT')
+                if port:
+                    c['port'] = port
             return {'connection': c}
         return {}
 
@@ -201,7 +209,7 @@ class Settings(QDialog):
             with open(os.path.join(self.PATH, self.FILENAME), 'w', encoding='utf-8') as f:
                 self.conf.write(f)
         except OSError as e:
-            logger.error('{}: {}'.format(e.__class__.__name__, e))
+            log.error('{}: {}'.format(e.__class__.__name__, e))
 
     @classmethod
     def validate_int(cls, string, imin, imax, default):

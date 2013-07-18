@@ -6,7 +6,7 @@ import mpd
 from PySide.QtCore import *
 
 import logging
-logger = logging.getLogger('qygmy')
+log = logging.getLogger('qygmy')
 
 
 class State(QObject):
@@ -151,7 +151,7 @@ class Connection:
             # raises an exception (python-mpd2 bug(?)).
             self.conn._reset()
             self.state.update('disconnect')
-        logger.error('{}: {}'.format(exc.__class__.__name__, exc))
+        log.error('{}: {}'.format(exc.__class__.__name__, exc))
         msg = None
         if isinstance(exc, mpd.CommandError):
             errno, cmdno, cmd, msg = self.parse_exception(exc)

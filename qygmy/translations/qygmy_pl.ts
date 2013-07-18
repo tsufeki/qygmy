@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="pl">
+<!DOCTYPE TS><TS version="1.1" language="pl">
 <context>
     <name>Browser</name>
     <message>
-        <location filename="../browser.py" line="117"/>
+        <location filename="../browser.py" line="119"/>
         <source>Details</source>
         <translation>Szczegóły</translation>
     </message>
@@ -220,7 +219,7 @@
 <context>
     <name>Playlists</name>
     <message>
-        <location filename="../lists.py" line="369"/>
+        <location filename="../lists.py" line="370"/>
         <source>New playlist</source>
         <translation>Nowa lista</translation>
     </message>
@@ -261,22 +260,22 @@
 <context>
     <name>Settings</name>
     <message>
-        <location filename="../dialogs.py" line="70"/>
+        <location filename="../dialogs.py" line="74"/>
         <source>Qygmy$if(%playing%, / $if(%artist%,%artist% u2014 )$if2(%title%,%filename%))</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../dialogs.py" line="79"/>
+        <location filename="../dialogs.py" line="83"/>
         <source>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%)),%stopped%,Stopped,%connected%,Connected,Disconnected)</source>
         <translation>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%)),%stopped%,Zatrzymany,%connected%,Połączony,Rozłączony)</translation>
     </message>
     <message>
-        <location filename="../dialogs.py" line="84"/>
+        <location filename="../dialogs.py" line="88"/>
         <source>&lt;span style=&quot;font-size: large; font-weight: bold&quot;&gt;$if2(%title%,%filename%)&lt;/span&gt;&lt;br&gt;%artist%$if(%album%, u2014 %album%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../dialogs.py" line="88"/>
+        <location filename="../dialogs.py" line="92"/>
         <source>$if(%artist%,%artist% u2014 )$if2(%title%,%filename%)</source>
         <translation type="unfinished"></translation>
     </message>

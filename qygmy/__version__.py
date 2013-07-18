@@ -3,18 +3,20 @@ import os
 import datetime
 import subprocess
 
-version_info = (1, 0, 0, 'rc', 2)
+version_info = (1, 0, 0, 'final', 0)
 
 def _get_version():
     v = '%s.%s' % version_info[:2]
     if version_info[2] != 0:
         v += '.%s' % version_info[2]
-    v += '%s%s' % ({
+    v += {
         'alpha': 'a',
         'beta': 'b',
         'rc': 'c',
         'final': '',
-    }[version_info[3]], version_info[4])
+    }[version_info[3]]
+    if version_info[3] != 'final' and version_info[4] != 0:
+        v += str(version_info[4])
 
     repo_dir = os.path.dirname(os.path.abspath(__file__))
     timestamp_file = os.path.join(repo_dir, 'gittimestamp.txt')
