@@ -46,7 +46,7 @@ class sdist(sdist):
         if format != 'xztar':
             return super().make_archive(base_name, format, root_dir, base_dir)
         tar = super().make_archive(base_name, 'tar', root_dir, base_dir)
-        xz_opts = '-zfk'
+        xz_opts = '-zf'
         self.spawn(['xz', xz_opts, tar])
         return tar + '.xz'
 
