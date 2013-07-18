@@ -3,7 +3,7 @@ Template functions plugins
 
 You can add additional functions to be used in templates. Such plugin is
 a regular python module named `tmplplugin_<plugin name>.py` and placed in
-the `$XDG_CONFIG_HOME/qygmy/` directory (which usually means `~/.config/qygmy/`.
+the `$XDG_CONFIG_HOME/qygmy/` directory (which usually means `~/.config/qygmy/`).
 
 Python function's name prefix determines how it will be called.
 
@@ -36,7 +36,7 @@ def lazycontext_ifdef(ctx, name, yes, no):
     return no()
 ```
 
-```.txt
+```plain
 $cat(aaa,bbb) -> aaa bbb
 $myif(1,aaa,$nonexistingfunction(bbb)) -> aaa
 $myget(title) -> Yellow Submarine
