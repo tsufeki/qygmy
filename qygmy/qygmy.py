@@ -217,7 +217,7 @@ class Qygmy(QMainWindow):
                 'add', 'clear', 'repeat', 'shuffle', 'single', 'consume',
                 'updatedb', 'save', 'randomize', 'details', 'statistics',
                 'louder', 'quieter', 'reverse',
-                'playback_menu', 'volume_menu', 'playlist_menu'):
+                'playback_menu', 'volume_menu', 'playlist_menu', 'outputs_menu'):
             getattr(self.ui, e).setEnabled(c)
         self.on_queue_selection_changed()
 
@@ -227,6 +227,16 @@ class Qygmy(QMainWindow):
             self.ui.settings.setIcon(self.ui.settings_icon_updating)
         else:
             self.ui.settings.setIcon(self.ui.settings_icon)
+
+    @Slot()
+    def on_outputs_menu_aboutToShow(self):
+        self.ui.outputs_menu.clear()
+        for name, oid, enabled in self.srv.outputs():
+            a = QAction(name, self.ui.outputs_menu)
+            a.setCheckable(True)
+            a.setChecked(enabled)
+            a.triggered[bool].connect(lambda enable, oid=oid: self.srv.enable_output(oid, enable))
+            self.ui.outputs_menu.addAction(a)
 
     @Slot()
     def on_queue_selection_changed(self):

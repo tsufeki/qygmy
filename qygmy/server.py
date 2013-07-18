@@ -92,3 +92,17 @@ class Server(ProperConnection, QObject):
         stats['mpdversion'] = self.conn.mpd_version
         return stats
 
+    @mpd_cmd(fallback=[])
+    def outputs(self):
+        return sorted((
+            i.get('outputname', i['outputid']),
+            int(i['outputid']),
+            i['outputenabled'] == '1') for i in self.conn.outputs())
+
+    @mpd_cmd
+    def enable_output(self, outputid, enable=True):
+        if enable:
+            self.conn.enableoutput(outputid)
+        else:
+            self.conn.disableoutput(outputid)
+

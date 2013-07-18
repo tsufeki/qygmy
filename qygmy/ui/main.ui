@@ -334,9 +334,18 @@
      <addaction name="randomize"/>
      <addaction name="reverse"/>
     </widget>
+    <widget class="QMenu" name="outputs_menu">
+     <property name="title">
+      <string>Audio &amp;outputs</string>
+     </property>
+     <property name="separatorsCollapsible">
+      <bool>true</bool>
+     </property>
+    </widget>
     <addaction name="playback_menu"/>
     <addaction name="playlist_menu"/>
     <addaction name="volume_menu"/>
+    <addaction name="outputs_menu"/>
     <addaction name="separator"/>
     <addaction name="highprio"/>
     <addaction name="normprio"/>
