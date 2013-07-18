@@ -59,11 +59,14 @@ class RegexElement(Element):
 
 class Backslash(RegexElement):
 
-    regex = re.compile(r'\\(.)')
+    newlines = ('\n', '\r\n', '\r')
+    regex = re.compile(r'\\({}|.)'.format('|'.join(newlines)))
 
     def __init__(self, src, start, end, char):
         super().__init__(src, start, end)
         self.char = char
+        if char in self.newlines:
+            self.char = ''
 
     def render(self, context):
         return self.char
