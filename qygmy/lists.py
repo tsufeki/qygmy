@@ -473,24 +473,76 @@ class Playlists(WritableMixin, BrowserList):
         return False
 
 
-class Search(BrowserList):
-
-    search_tags = [
-        'any',
-        'title',
-        'artist',
-        'album',
-        'comment',
-        'file',
-    ]
+class SearchTags(RelayingConnection, QAbstractListModel):
 
     def __init__(self, parent):
-        super().__init__(parent, (0, ''))
+        super().__init__(parent)
+        self.tags = []
+        self.retranslate()
+        self.state.changed2.connect(self._update)
+
+    def retranslate(self):
+        self.standard_tags = [
+            ('title', self.tr('Title')),
+            ('artist', self.tr('Artist')),
+            ('album', self.tr('Album')),
+            ('genre', self.tr('Genre')),
+            ('comment', self.tr('Comment')),
+            ('composer', self.tr('Composer')),
+            ('performer', self.tr('Performer')),
+            ('date', self.tr('Date')),
+            ('track', self.tr('Track')),
+            ('disc', self.tr('Disc')),
+            ('name', self.tr('Name')),
+        ]
+        self.special_tags = [
+            ('any', self.tr('Any')),
+            ('file', self.tr('File name')),
+        ]
+
+    @mpd_cmd(fallback=[])
+    def _tag_types(self):
+        return (t.lower() for t in self.conn.tagtypes())
+
+    def _update(self, newstate, oldstate):
+        if newstate != 'disconnect' and oldstate == 'disconnect':
+            self.beginResetModel()
+            self.tags = []
+            tags = set(self._tag_types())
+            for t in self.special_tags:
+                tags.discard(t[0])
+            self.tags.append(self.special_tags[0])
+            for t in self.standard_tags:
+                if t[0] in tags:
+                    self.tags.append(t)
+                    tags.discard(t[0])
+            self.tags.append(self.special_tags[1])
+            for t in sorted(tags):
+                if not t.startswith('musicbrainz_'):
+                    self.tags.append((t, t))
+            self.endResetModel()
+
+    def rowCount(self, parent=None):
+        return len(self.tags)
+
+    def data(self, index, role=Qt.DisplayRole):
+        i = index.row()
+        if 0 <= i < self.rowCount():
+            if role == Qt.DisplayRole:
+                return self.tags[i][1]
+            elif role == Qt.UserRole:
+                return self.tags[i][0]
+
+
+class Search(BrowserList):
+
+    def __init__(self, parent):
+        super().__init__(parent, ('', ''))
+        self.search_tags = SearchTags(self)
 
     @mpd_cmd(fallback=[])
     def ls(self, query):
-        if query[1] == '':
+        if query[0] in ('', None) or query[1] in ('', None):
             return []
-        return sorted(self.conn.search(self.search_tags[query[0]], query[1]),
-                key=self.sort_key)
+        return sorted(self.conn.search(query[0], query[1]), key=self.sort_key)
 

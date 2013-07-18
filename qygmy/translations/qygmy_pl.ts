@@ -258,6 +258,74 @@
     </message>
 </context>
 <context>
+    <name>SearchTags</name>
+    <message>
+        <location filename="../lists.py" line="471"/>
+        <source>Title</source>
+        <translation>Tytuł</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="472"/>
+        <source>Artist</source>
+        <translation>Artysta</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="473"/>
+        <source>Album</source>
+        <translation>Album</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="474"/>
+        <source>Genre</source>
+        <translation>Gatunek</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="475"/>
+        <source>Comment</source>
+        <translation>Komentarz</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="476"/>
+        <source>Composer</source>
+        <translation>Kompozytor</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="477"/>
+        <source>Performer</source>
+        <translation>Wykonawca</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="478"/>
+        <source>Date</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="479"/>
+        <source>Track</source>
+        <translation>Ścieżka</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="480"/>
+        <source>Disc</source>
+        <translation>Dysk</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="484"/>
+        <source>Any</source>
+        <translation>Wszystko</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="485"/>
+        <source>File name</source>
+        <translation>Nazwa pliku</translation>
+    </message>
+    <message>
+        <location filename="../lists.py" line="481"/>
+        <source>Name</source>
+        <translation>Nazwa</translation>
+    </message>
+</context>
+<context>
     <name>Settings</name>
     <message>
         <location filename="../dialogs.py" line="79"/>
