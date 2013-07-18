@@ -3,6 +3,7 @@
 import os
 import glob
 import shutil
+import re
 from distutils.core import setup
 from distutils.cmd import Command
 from distutils.command.build import build
@@ -83,7 +84,7 @@ class bdist_deb(Command):
         ext = 'tar.xz'
         sourcedir = name + '-' + version
         tar = sourcedir + '.' + ext
-        debversion = version.replace('.dev', '~dev')
+        debversion = re.sub(r'([a-c])', r'~\1', version.replace('.dev', '~dev'))
         origtar = name + '_' + debversion + '.orig.' + ext
 
         os.chdir(self.dist_dir)
