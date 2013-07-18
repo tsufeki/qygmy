@@ -162,6 +162,9 @@ class SonglistView(QTreeView):
     def can_set_priority(self, prio):
         return self.model().can_set_priority(self.selection(), prio)
 
+    def can_copy(self):
+        return self.model().can_copy(self.selection())
+
     def add_selected_to_queue(self, play=False, replace=False):
         self.model().add_to_queue(self.selection(), play, replace)
 
@@ -177,6 +180,9 @@ class SonglistView(QTreeView):
 
     def set_priority(self, prio):
         self.model().set_priority(self.selection(), prio)
+
+    def copy_selected(self):
+        self.model().copy(self.selection())
 
 class PathBar(QWidget):
 

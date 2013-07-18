@@ -25,6 +25,7 @@ class Browser(QMainWindow):
         self.ui.search_results.setup(self.srv.search)
         self.ui.search_button.setDefaultAction(self.ui.search)
         self.srv.state.changed.connect(self.on_state_changed)
+        self.ui.close.triggered.connect(self.close)
 
         try:
             if 'browser_geometry' in self.main.settings['guistate']:
@@ -42,6 +43,7 @@ class Browser(QMainWindow):
             ('remove', 'edit-delete'),
             ('close', 'window-close'),
             ('search', 'edit-find'),
+            ('copy', 'edit-copy'),
         ):
             getattr(self.ui, action).setIcon(QIcon.fromTheme(icon))
         for i, icon in enumerate(['folder-sound', 'document-multiple', 'edit-find']):
@@ -68,22 +70,19 @@ class Browser(QMainWindow):
             getattr(self.ui, act).setVisible(can_add)
         self.ui.remove.setVisible(self.current_view.can_remove())
         self.ui.rename.setVisible(self.current_view.can_rename())
+        self.ui.copy.setVisible(self.current_view.can_copy())
         self.ui.details.setVisible(self.current_view.details() is not None)
         self.ui.context_menu.popup(e.globalPos())
 
     def on_state_changed(self, state):
         c = state != 'disconnect'
         for act in ('search', 'add', 'addplay', 'replace', 'replaceplay',
-                'remove', 'rename', 'details'):
+                'remove', 'rename', 'copy', 'details'):
             getattr(self.ui, act).setEnabled(c)
         self.ui.dbpath.setEnabled(c)
         self.ui.plpath.setEnabled(c)
         self.ui.what.setEnabled(c)
         self.ui.query.setEnabled(c)
-
-    @Slot()
-    def on_close_triggered(self):
-        self.close()
 
     @Slot()
     def on_search_triggered(self):
@@ -112,6 +111,10 @@ class Browser(QMainWindow):
     @Slot()
     def on_rename_triggered(self):
         self.current_view.rename_selected()
+
+    @Slot()
+    def on_copy_triggered(self):
+        self.current_view.copy_selected()
 
     @Slot()
     def on_details_triggered(self):

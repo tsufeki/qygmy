@@ -328,6 +328,7 @@
      <addaction name="add"/>
      <addaction name="remove"/>
      <addaction name="clear"/>
+     <addaction name="copy"/>
      <addaction name="separator"/>
      <addaction name="save"/>
      <addaction name="randomize"/>
@@ -733,6 +734,14 @@
   <action name="reverse">
    <property name="text">
     <string>Re&amp;verse</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="copy">
+   <property name="text">
+    <string>C&amp;opy selected</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
