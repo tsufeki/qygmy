@@ -3,7 +3,7 @@
 <context>
     <name>Browser</name>
     <message>
-        <location filename="../browser.py" line="122"/>
+        <location filename="../browser.py" line="123"/>
         <source>Details</source>
         <translation>Szczegóły</translation>
     </message>
@@ -434,6 +434,11 @@
         <location filename="../ui/browser.py" line="273"/>
         <source>&amp;Update the database</source>
         <translation>Odśwież &amp;bazę</translation>
+    </message>
+    <message>
+        <location filename="../ui/browser.py" line="269"/>
+        <source>Add with &amp;high priority</source>
+        <translation>Dodaj z &amp;wysokim priorytetem</translation>
     </message>
 </context>
 <context>

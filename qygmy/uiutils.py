@@ -159,14 +159,14 @@ class SonglistView(QTreeView):
     def can_rename(self):
         return self.model().can_rename(self.selection())
 
-    def can_set_priority(self, prio):
-        return self.model().can_set_priority(self.selection(), prio)
+    def can_set_priority(self, priority):
+        return self.model().can_set_priority(self.selection(), priority)
 
     def can_copy(self):
         return self.model().can_copy(self.selection())
 
-    def add_selected_to_queue(self, play=False, replace=False):
-        self.model().add_to_queue(self.selection(), play, replace)
+    def add_selected_to_queue(self, play=False, replace=False, priority=0):
+        self.model().add_to_queue(self.selection(), play, replace, priority)
 
     def remove_selected(self):
         self.model().remove(self.selection())

@@ -68,7 +68,7 @@ class Browser(QMainWindow):
     def contextMenuEvent(self, e):
         e.accept()
         can_add = self.current_view.can_add_to_queue()
-        for act in ('add', 'addplay', 'replace', 'replaceplay'):
+        for act in ('add', 'addplay', 'replace', 'replaceplay', 'addhighprio'):
             getattr(self.ui, act).setVisible(can_add)
         self.ui.remove.setVisible(self.current_view.can_remove())
         self.ui.rename.setVisible(self.current_view.can_rename())
@@ -79,7 +79,7 @@ class Browser(QMainWindow):
     def on_state_changed(self, state):
         c = state != 'disconnect'
         for act in ('search', 'add', 'addplay', 'replace', 'replaceplay',
-                'remove', 'rename', 'copy', 'details', 'updatedb'):
+                'addhighprio', 'remove', 'rename', 'copy', 'details', 'updatedb'):
             getattr(self.ui, act).setEnabled(c)
         self.ui.dbpath.setEnabled(c)
         self.ui.plpath.setEnabled(c)
@@ -91,8 +91,8 @@ class Browser(QMainWindow):
         self.srv.search.cd((self.ui.what.currentIndex(), self.ui.query.text()))
 
     @Slot()
-    def on_add_triggered(self, play=False, replace=False):
-        self.current_view.add_selected_to_queue(play, replace)
+    def on_add_triggered(self, play=False, replace=False, priority=0):
+        self.current_view.add_selected_to_queue(play, replace, priority)
 
     @Slot()
     def on_addplay_triggered(self):
@@ -105,6 +105,10 @@ class Browser(QMainWindow):
     @Slot()
     def on_replaceplay_triggered(self):
         self.on_add_triggered(True, True)
+
+    @Slot()
+    def on_addhighprio_triggered(self):
+        self.on_add_triggered(priority=1)
 
     @Slot()
     def on_remove_triggered(self):
