@@ -1,3 +1,6 @@
+Templates
+=========
+
 Qygmy's templates heavily borrow from [MusicBrainz Picard's scripting language][1],
 which in turn is inspired by Foobar2000.
 
@@ -12,7 +15,7 @@ and `\ ` itself) have to be escaped with a backslash, e.g. `$if(%album%,%album% 
 
 
 Variables
-=========
+---------
 
 Variable consists of a variable's name between two percent signs, e.g. `%title%`.
 Unrecognized names are resolved to empty string. Names are case-insensitive.
@@ -25,8 +28,7 @@ the following exceptions:
 2. Progress bar template additionally supports `%elapsed%` and `%total%` (in
 seconds, see `$time()`).
 
-State variables
----------------
+### State variables
 
 - `%playing%`
 - `%paused%`
@@ -36,8 +38,7 @@ State variables
 
 Exactly one of those is set to `1`.
 
-Song metadata variables
------------------------
+### Song metadata variables
 
 - `%file%`, `%directory%`, `%playlist%`: one of those is set to the item's
     full path, depending on it's type.
@@ -51,7 +52,7 @@ Song metadata variables
 
 
 Functions
-=========
+---------
 
 Function names are case-insensitive. Functions take and return only strings.
 Non-existing function, bad format when an integer is needed, etc. are all
@@ -59,8 +60,7 @@ errors and results in `##error: xxxxx##` message. In boolean context, empty
 string is interpreted as false and everything else as true. Canonical true
 value is `1`.
 
-String operations
------------------
+### String operations
 
 - `$upper(text)`: convert to upper case.
 - `$lower(text)`: convert to lower case.
@@ -73,8 +73,7 @@ String operations
     `chars` may be omitted, defaults to whitespace then.
 - `$len(text)`: the length of `text`.
 
-Regular expressions
--------------------
+### Regular expressions
 
 See [regular expressions syntax help][3].
 
@@ -84,8 +83,7 @@ See [regular expressions syntax help][3].
     if it doesn't exist.
 - `$rreplace(text,pattern,replace)`: regular expression replace.
 
-Integer arithmetic
-------------------
+### Integer arithmetic
 
 Arguments of those functions are converted to integers.
 
@@ -101,13 +99,11 @@ Arguments of those functions are converted to integers.
 - `$gt(x,y)`: `x > y`
 - `$gte(x,y)`: `x >= y`
 
-`$time()`
----------
+### `$time()`
 
 - `$time(seconds)`: format `seconds` as time, e.g. `$time(3678)` is `1:01:18`.
 
-Conditionals
-------------
+### Conditionals
 
 - `$eq(x,y)`: true iff `x` and `y` are equal (as strings).
 - `$ne(x,y)`: true iff `x` and `y` are not equal.
@@ -124,16 +120,14 @@ Arguments in the following functions are evaluated only as needed:
 - `$and(x,y)`: `x and y`
 - `$noop(...)`: do nothing, return empty string.
 
-Operations on variables
------------------------
+### Operations on variables
 
 - `$get(name,default)`: return the value of the variable `%name%`, or `default`
     if it's empty or non-existing.
 - `$set(name,value)`: set `%name%` to `value`.
 - `$unset(name)`: unset `%name%`.
 
-`$python()`
------------
+### `$python()`
 
 - `$python(expr,imports)`: evaluate an arbitrary python expression `expr`.
     `imports` is a space-separated list of modules to import (can be omitted).
