@@ -85,6 +85,7 @@ class Server(ProperConnection, QObject):
     def updatedb(self):
         if not self.updating_db.value:
             self.conn.update()
+            self.updating_db.update(True) # so we don't miss even super-short updates
 
     @mpd_cmd(fallback={})
     def statistics(self):

@@ -219,7 +219,7 @@
 <context>
     <name>Playlists</name>
     <message>
-        <location filename="../lists.py" line="385"/>
+        <location filename="../lists.py" line="393"/>
         <source>New playlist</source>
         <translation>Nowa lista</translation>
     </message>
@@ -260,67 +260,67 @@
 <context>
     <name>SearchTags</name>
     <message>
-        <location filename="../lists.py" line="485"/>
+        <location filename="../lists.py" line="493"/>
         <source>Title</source>
         <translation>Tytuł</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="486"/>
+        <location filename="../lists.py" line="494"/>
         <source>Artist</source>
         <translation>Artysta</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="487"/>
+        <location filename="../lists.py" line="495"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="488"/>
+        <location filename="../lists.py" line="496"/>
         <source>Genre</source>
         <translation>Gatunek</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="489"/>
+        <location filename="../lists.py" line="497"/>
         <source>Comment</source>
         <translation>Komentarz</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="490"/>
+        <location filename="../lists.py" line="498"/>
         <source>Composer</source>
         <translation>Kompozytor</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="491"/>
+        <location filename="../lists.py" line="499"/>
         <source>Performer</source>
         <translation>Wykonawca</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="492"/>
+        <location filename="../lists.py" line="500"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="493"/>
+        <location filename="../lists.py" line="501"/>
         <source>Track</source>
         <translation>Ścieżka</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="494"/>
+        <location filename="../lists.py" line="502"/>
         <source>Disc</source>
         <translation>Dysk</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="498"/>
+        <location filename="../lists.py" line="506"/>
         <source>Any</source>
         <translation>Wszystko</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="499"/>
+        <location filename="../lists.py" line="507"/>
         <source>File name</source>
         <translation>Nazwa pliku</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="495"/>
+        <location filename="../lists.py" line="503"/>
         <source>Name</source>
         <translation>Nazwa</translation>
     </message>

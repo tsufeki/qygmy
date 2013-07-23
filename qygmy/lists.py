@@ -339,6 +339,14 @@ class Queue(WritableMixin, SongList):
 
 class BrowserList(SongList):
 
+    def __init__(self, parent, current, state_class=State):
+        super().__init__(parent, current, state_class)
+        self.parent.updating_db.changed2.connect(self._updating_db_changed)
+
+    def _updating_db_changed(self, new, old):
+        if old and not new:
+            self.refresh()
+
     def can_add_to_queue(self, positions):
         return len(positions) > 0
 

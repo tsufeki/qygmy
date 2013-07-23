@@ -28,6 +28,7 @@ class State(QObject):
         if self._value != new_value or force:
             old_value = self._value
             self._value = new_value
+            log.debug('{} changed: {!r} -> {!r}'.format(self.objectName(), old_value, new_value))
             self.changed.emit(self._value)
             self.changed2.emit(self._value, old_value)
 
