@@ -328,22 +328,22 @@
 <context>
     <name>Settings</name>
     <message>
-        <location filename="../dialogs.py" line="79"/>
+        <location filename="../dialogs.py" line="117"/>
         <source>Qygmy$if(%playing%, / $if(%artist%,%artist% u2014 )$if2(%title%,%filename%))</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../dialogs.py" line="88"/>
+        <location filename="../dialogs.py" line="126"/>
         <source>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%)),%stopped%,Stopped,%connected%,Connected,Disconnected)</source>
         <translation>$if3(%playing%%paused%,$time(%elapsed%)$if($and(%total%,$gt(%total%,0)), / $time(%total%)),%stopped%,Zatrzymany,%connected%,Połączony,Rozłączony)</translation>
     </message>
     <message>
-        <location filename="../dialogs.py" line="93"/>
+        <location filename="../dialogs.py" line="131"/>
         <source>&lt;span style=&quot;font-size: large; font-weight: bold&quot;&gt;$if2(%title%,%filename%)&lt;/span&gt;&lt;br&gt;%artist%$if(%album%, u2014 %album%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../dialogs.py" line="97"/>
+        <location filename="../dialogs.py" line="135"/>
         <source>$if(%artist%,%artist% u2014 )$if2(%title%,%filename%)</source>
         <translation type="unfinished"></translation>
     </message>

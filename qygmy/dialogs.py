@@ -38,11 +38,42 @@ class Info(QDialog):
         super().exec_()
 
 
+class QygmyConfigParser(configparser.ConfigParser):
+
+    def __init__(self, **kwargs):
+        super().__init__(interpolation=None, **kwargs)
+
+    def write(self, fp, space_around_delimiters=True):
+        for sn, s in self.items():
+            for k, v in s.items():
+                if '\n' in v or '\r' in v:
+                   s[k] = (''.join(('"', v.replace('\\', '\\\\')
+                            .replace('\n', '\\n').replace('\r', '\\r'), '"')))
+        super().write(fp, space_around_delimiters)
+        self._unescape_nl()
+
+    def read(self, filenames, encoding=None):
+        r = super().read(filenames, encoding)
+        self._unescape_nl()
+        return r
+
+    def read_file(self, f, source=None):
+        super().read_file(f, source)
+        self._unescape_nl()
+
+    def _unescape_nl(self):
+        for sn, s in self.items():
+            for k, v in s.items():
+                if len(v) > 2 and v[0] == v[-1] == '"':
+                    s[k] = (v[1:-1].replace('\\n', '\n').replace('\\r', '\r')
+                            .replace('\\\\', '\\'))
+
+
 class Settings(QDialog):
 
-    PATH = os.path.expanduser(os.path.join(os.environ.get('XDG_CONFIG_HOME', '~/.config'), 'qygmy'))
-    FILENAME = 'qygmy.conf'
-    PLUGINS = 'tmplplugin_*.py'
+    directory = 'qygmy'
+    cfg_file = 'qygmy.conf'
+    plugins_glob = 'tmplplugin_*.py'
 
     def __init__(self, main):
         super().__init__(main)
@@ -52,11 +83,18 @@ class Settings(QDialog):
         self.ui.setupUi(self)
         self.retranslate()
 
-        self.conf = configparser.ConfigParser(interpolation=None)
+        self.conf = QygmyConfigParser()
         self.conf.read_dict(self.defaults, '<defaults>')
         self.conf.read_dict(self.environ_conf(), '<MPD_HOST>')
+        self.cfg_dirs = [os.path.expanduser(os.environ.get('XDG_CONFIG_HOME', '~/.config'))]
+        more = os.environ.get('XDG_CONFIG_DIRS', '')
+        if more == '':
+            more = '/etc/xdg'
+        self.cfg_dirs.extend(d for d in more.split(':') if d and d[0] == '/')
+        self.cfg_dirs = [os.path.join(d, self.directory) for d in self.cfg_dirs]
+        cfg_files = [os.path.join(d, self.cfg_file) for d in self.cfg_dirs]
         try:
-            self.conf.read(os.path.join(self.PATH, self.FILENAME), 'utf-8')
+            self.conf.read(cfg_files, 'utf-8')
         except (configparser.Error, ValueError, OSError) as e:
             log.error('{}: {}'.format(e.__class__.__name__, e))
             self.conf._join_multiline_values()
@@ -124,14 +162,15 @@ class Settings(QDialog):
 
     def load_tmplplugins(self):
         self.tmplplugins = []
-        for plugin in sorted(glob.glob(os.path.join(self.PATH, self.PLUGINS))):
-            try:
-                name = os.path.split(plugin)[1][:-3]
-                mod = importlib.machinery.SourceFileLoader(name, plugin).load_module()
-                if mod:
-                    self.tmplplugins.append(mod)
-            except Exception as e:
-                logger.error('{}: {}'.format(e.__class__.__name__, e))
+        for d in self.cfg_dirs:
+            for f in sorted(glob.glob(os.path.join(d, self.plugins_glob))):
+                try:
+                    name = os.path.split(f)[1][:-3]
+                    mod = importlib.machinery.SourceFileLoader(name, f).load_module()
+                    if mod:
+                        self.tmplplugins.append(mod)
+                except Exception as e:
+                    logger.error('{}: {}'.format(e.__class__.__name__, e))
 
     def __getitem__(self, section):
         return self.conf[section]
@@ -221,8 +260,9 @@ class Settings(QDialog):
 
     def save(self):
         try:
-            os.makedirs(self.PATH, exist_ok=True)
-            with open(os.path.join(self.PATH, self.FILENAME), 'w', encoding='utf-8') as f:
+            cfg_dir = self.cfg_dirs[0]
+            os.makedirs(cfg_dir, exist_ok=True)
+            with open(os.path.join(cfg_dir, self.cfg_file), 'w', encoding='utf-8') as f:
                 self.conf.write(f)
         except OSError as e:
             log.error('{}: {}'.format(e.__class__.__name__, e))
