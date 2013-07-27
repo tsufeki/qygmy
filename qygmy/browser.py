@@ -2,6 +2,7 @@
 from PySide.QtCore import *
 from PySide.QtGui import *
 
+from .dialogs import input_url
 from .ui.browser import Ui_browser
 
 
@@ -75,13 +76,15 @@ class Browser(QMainWindow):
         self.ui.remove.setVisible(self.current_view.can_remove())
         self.ui.rename.setVisible(self.current_view.can_rename())
         self.ui.copy.setVisible(self.current_view.can_copy())
+        self.ui.addurl.setVisible(self.current_view.model().can_add_url())
         self.ui.details.setVisible(self.current_view.details() is not None)
         self.ui.context_menu.popup(e.globalPos())
 
     def on_state_changed(self, state):
         c = state != 'disconnect'
         for act in ('search', 'add', 'addplay', 'replace', 'replaceplay',
-                'addhighprio', 'remove', 'rename', 'copy', 'details', 'updatedb'):
+                'addhighprio', 'remove', 'rename', 'copy', 'addurl', 'details',
+                'updatedb'):
             getattr(self.ui, act).setEnabled(c)
         self.ui.dbpath.setEnabled(c)
         self.ui.plpath.setEnabled(c)
@@ -124,6 +127,13 @@ class Browser(QMainWindow):
     @Slot()
     def on_copy_triggered(self):
         self.current_view.copy_selected()
+
+    @Slot()
+    def on_addurl_triggered(self):
+        if self.current_view.model().can_add_url():
+            url = input_url(self)
+            if url:
+                self.current_view.model().add_url(url)
 
     @Slot()
     def on_details_triggered(self):

@@ -5,7 +5,7 @@ from PySide.QtGui import *
 from .formatter import Formatter
 from .server import Server
 from .browser import Browser
-from .dialogs import Info, Settings
+from .dialogs import Info, Settings, input_url
 from .ui.main import Ui_main
 from .__version__ import version
 
@@ -214,9 +214,9 @@ class Qygmy(QMainWindow):
         self.ui.play.setVisible(state != 'play')
         self.ui.pause.setVisible(state == 'play')
         for e in ('previous', 'play', 'pause', 'stop', 'next', 'volume',
-                'add', 'clear', 'repeat', 'shuffle', 'single', 'consume',
-                'updatedb', 'save', 'randomize', 'details', 'statistics',
-                'louder', 'quieter', 'reverse',
+                'add', 'addurl', 'clear', 'repeat', 'shuffle', 'single',
+                'consume', 'updatedb', 'save', 'randomize', 'details',
+                'statistics', 'louder', 'quieter', 'reverse',
                 'playback_menu', 'volume_menu', 'playlist_menu', 'outputs_menu'):
             getattr(self.ui, e).setEnabled(c)
         self.on_queue_selection_changed()
@@ -252,6 +252,12 @@ class Qygmy(QMainWindow):
     @Slot()
     def on_statistics_triggered(self):
         self.info.exec_('statistics', self.srv.statistics(), 'MPD statistics')
+
+    @Slot()
+    def on_addurl_triggered(self):
+        url = input_url(self)
+        if url:
+            self.srv.queue.add_url(url)
 
     @Slot()
     def on_save_triggered(self):

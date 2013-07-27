@@ -38,6 +38,15 @@ class Info(QDialog):
         super().exec_()
 
 
+def input_url(parent):
+    url, ok = QInputDialog.getText(parent,
+            QApplication.translate('input_url', 'Add URL'),
+            QApplication.translate('input_url', 'URL:'))
+    if ok and url:
+        return url
+    return None
+
+
 class QygmyConfigParser(configparser.ConfigParser):
 
     def __init__(self, **kwargs):
@@ -126,11 +135,13 @@ class Settings(QDialog):
                         'Disconnected)'
                 ),
                 'current_song': self.tr(
+                    '$if(%name%,[%name%] )'
                     '<span style="font-size: large; font-weight: bold">'
                         '$if2(%title%,%filename%)</span><br>'
                     '%artist%$if(%album%, \u2014 %album%)'
                 ),
                 'playlist_item': self.tr(
+                    '$if(%name%,[%name%] )'
                     '$if(%artist%,%artist% \u2014 )'
                     '$if2(%title%,%filename%)'
                 ),

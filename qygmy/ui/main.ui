@@ -318,6 +318,14 @@
      <addaction name="louder"/>
      <addaction name="quieter"/>
     </widget>
+    <widget class="QMenu" name="outputs_menu">
+     <property name="title">
+      <string>Audio &amp;outputs</string>
+     </property>
+     <property name="separatorsCollapsible">
+      <bool>true</bool>
+     </property>
+    </widget>
     <widget class="QMenu" name="playlist_menu">
      <property name="title">
       <string>Pla&amp;ylist</string>
@@ -326,6 +334,7 @@
       <bool>true</bool>
      </property>
      <addaction name="add"/>
+     <addaction name="addurl"/>
      <addaction name="remove"/>
      <addaction name="clear"/>
      <addaction name="copy"/>
@@ -333,14 +342,6 @@
      <addaction name="save"/>
      <addaction name="randomize"/>
      <addaction name="reverse"/>
-    </widget>
-    <widget class="QMenu" name="outputs_menu">
-     <property name="title">
-      <string>Audio &amp;outputs</string>
-     </property>
-     <property name="separatorsCollapsible">
-      <bool>true</bool>
-     </property>
     </widget>
     <addaction name="playback_menu"/>
     <addaction name="playlist_menu"/>
@@ -751,6 +752,20 @@
   <action name="copy">
    <property name="text">
     <string>C&amp;opy selected</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="addurl">
+   <property name="text">
+    <string>Add &amp;URL...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>

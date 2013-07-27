@@ -68,6 +68,9 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
     def can_copy(self, positions):
         return False
 
+    def can_add_url(self):
+        return False
+
     @abstractmethod
     def item_chosen(self, pos):
         """i.e. double-clicked or Return pressed."""
@@ -176,6 +179,12 @@ class WritableMixin(metaclass=ABCMeta):
     @abstractmethod
     def add_one(self, item, pos, last, **kwargs):
         pass
+
+    def can_add_url(self):
+        return True
+
+    def add_url(self, url):
+        self.add([{'file': url}])
 
     def can_remove(self, positions):
         return len(positions) > 0

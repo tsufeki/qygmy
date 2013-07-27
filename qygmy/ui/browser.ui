@@ -382,6 +382,7 @@
     <addaction name="remove"/>
     <addaction name="rename"/>
     <addaction name="copy"/>
+    <addaction name="addurl"/>
     <addaction name="details"/>
     <addaction name="separator"/>
     <addaction name="updatedb"/>
@@ -518,7 +519,21 @@
   </action>
   <action name="updatedb">
    <property name="text">
-    <string>&amp;Update the database</string>
+    <string>Update the data&amp;base</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="addurl">
+   <property name="text">
+    <string>Add &amp;URL...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>

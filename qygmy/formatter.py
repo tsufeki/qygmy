@@ -50,6 +50,7 @@ class Formatter(QObject):
             ),
             'details': (
                 (self.tr('%file%'), None),
+                (self.tr('Name:'), self.tr('%name%')),
                 (self.tr('Title:'), self.tr('%title%')),
                 (self.tr('Artist:'), self.tr('%artist%')),
                 (self.tr('Album:'), self.tr('%album%')),
@@ -64,7 +65,7 @@ class Formatter(QObject):
             )
         }
 
-    standard_tags = {'file', 'directory', 'playlist', 'filename', 'title',
+    standard_tags = {'file', 'directory', 'playlist', 'filename', 'name', 'title',
         'artist', 'album', 'date', 'track', 'totaltracks', 'disc', 'totaldiscs',
         'comment', 'length', 'lastmodified', 'composer', 'performer',
     }
@@ -80,7 +81,7 @@ class Formatter(QObject):
             song['prio'] = '0'
         for key in ['file', 'directory', 'playlist']:
             if key in song:
-                filename = song[key].rsplit('/', 1)[-1]
+                filename = song[key].rstrip('/').rsplit('/', 1)[-1]
                 if filename:
                     song['filename'] = filename
         if 'time' in song:

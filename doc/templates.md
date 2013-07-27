@@ -47,8 +47,9 @@ Exactly one of those is set to `1`.
 - `%length%`: length of the song in seconds (see `$time()`).
 - `%track%`, `%totaltracks%`, `%disc%`, `%totaldiscs%`
 - `%lastmodified%`: last modification date.
+- `%name%`: defined e.g. in HTTP streams.
 - All tags recognized by MPD: `%title%`, `%artist%`, `%album%`, `%date%`,
-    `%comment%`, `%composer%`, `%performer%`, etc.
+    `%comment%`, `%composer%`, `%performer%` etc.
 
 
 Functions
