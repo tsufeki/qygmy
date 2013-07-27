@@ -25,9 +25,17 @@ class Server(ProperConnection, QObject):
         self.playlists = Playlists(self)
         self.search = Search(self)
 
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_state)
+
     def _seek(self, time):
         if self.state.value != 'stop':
-            self.conn.seek(self.queue.current_pos, time)
+            self.conn.seek(self.queue.current_pos.value, time)
+
+    def start_timer(self, interval=500):
+        if self.timer.isActive():
+            self.timer.stop()
+        self.timer.start(interval)
 
     def update_state(self):
         s, c = {'state': 'disconnect'}, {}
@@ -51,7 +59,7 @@ class Server(ProperConnection, QObject):
         self.updating_db.update('updating_db' in s)
 
         self.queue.current.update(s.get('playlist'))
-        self.queue._current_pos.update(s.get('song'))
+        self.queue.current_pos.update(s.get('song'))
 
     @mpd_cmd(ignore_conn=True)
     def connect_mpd(self, host, port, password=None):

@@ -255,8 +255,7 @@ class Settings(QDialog):
             self.main.srv.playlists.refresh_format()
             self.main.srv.search.refresh_format()
         if 'interval' in changed:
-            self.main.timer.stop()
-            self.main.timer.start(int(self.conf['gui']['interval']))
+            self.main.srv.start_timer(int(self.conf['gui']['interval']))
 
     def save(self):
         try:

@@ -14,7 +14,7 @@ class QABCMeta(ABCMeta, QObject.__class__):
 
 class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
 
-    current_pos = -1
+    current_pos = type('current_pos', (), {'value': -1})()
 
     def __init__(self, parent, current, state_class=State):
         super().__init__(parent)
@@ -103,16 +103,16 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
         if 0 <= r < len(self):
             if role == Qt.DisplayRole:
                 return self.main.fmt.playlist_item(
-                        self[r], c, r == self.current_pos)
+                        self[r], c, r == self.current_pos.value)
             elif role == Qt.ToolTipRole:
                 return self.main.fmt.playlist_tooltip(
-                        self[r], c, r == self.current_pos)
+                        self[r], c, r == self.current_pos.value)
             elif role == Qt.DecorationRole:
                 return self.main.fmt.playlist_icon(
-                        self[r], c, r == self.current_pos)
+                        self[r], c, r == self.current_pos.value)
             elif role == Qt.BackgroundRole:
                 return self.main.fmt.playlist_background(
-                        self[r], c, r == self.current_pos)
+                        self[r], c, r == self.current_pos.value)
         return None
 
     def flags(self, index):
@@ -257,12 +257,8 @@ class Queue(WritableMixin, SongList):
 
     def __init__(self, parent):
         super().__init__(parent, -1)
-        State.create(self, '_current_pos', -1, 'play')
-        self._current_pos.changed2.connect(self._update_current_pos)
-
-    @property
-    def current_pos(self):
-        return self._current_pos.value
+        State.create(self, 'current_pos', -1, 'play')
+        self.current_pos.changed2.connect(self._update_current_pos)
 
     def refresh(self):
         self.update_state()
@@ -327,7 +323,7 @@ class Queue(WritableMixin, SongList):
                 self.conn.swap(i, n-i-1)
 
     def item_chosen(self, pos):
-        self._current_pos.send(pos)
+        self.current_pos.send(pos)
 
     def _update_current_pos(self, new, old):
         for i in {old, new}:

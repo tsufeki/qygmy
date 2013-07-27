@@ -20,9 +20,8 @@ class Qygmy(QMainWindow):
         self.srv = Server(self)
         self.info = Info(self)
         self.browser = Browser(self)
-        self.timer = QTimer(self)
         self.setup_ui()
-        self.timer.start(int(self.settings['gui']['interval']))
+        self.srv.start_timer(int(self.settings['gui']['interval']))
 
     def connect_mpd(self):
         self.srv.connect_mpd(
@@ -108,7 +107,6 @@ class Qygmy(QMainWindow):
         vb.setPopupMode(QToolButton.InstantPopup)
 
     def setup_signals(self):
-        self.timer.timeout.connect(self.srv.update_state)
         self.ui.play.triggered.connect(self.srv.play)
         self.ui.pause.triggered.connect(self.srv.pause)
         self.ui.stop.triggered.connect(self.srv.stop)
