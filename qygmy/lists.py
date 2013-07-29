@@ -306,7 +306,7 @@ class Queue(WritableMixin, SongList):
 
     @mpd_cmd
     def reverse(self):
-        with mpd_cmdlist:
+        with self.mpd_cmdlist:
             n = len(self)
             for i in range(n//2 + 1):
                 self.conn.swap(i, n-i-1)
