@@ -14,7 +14,7 @@ class QABCMeta(ABCMeta, QObject.__class__):
 
 class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
 
-    current_pos = -1
+    current_pos = type('current_pos', (), {'value': -1})()
 
     def __init__(self, parent, current, state_class=State):
         super().__init__(parent)
@@ -106,16 +106,16 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
         if 0 <= r < len(self):
             if role == Qt.DisplayRole:
                 return self.main.fmt.playlist_item(
-                        self[r], c, r == self.current_pos)
+                        self[r], c, r == self.current_pos.value)
             elif role == Qt.ToolTipRole:
                 return self.main.fmt.playlist_tooltip(
-                        self[r], c, r == self.current_pos)
+                        self[r], c, r == self.current_pos.value)
             elif role == Qt.DecorationRole:
                 return self.main.fmt.playlist_icon(
-                        self[r], c, r == self.current_pos)
+                        self[r], c, r == self.current_pos.value)
             elif role == Qt.BackgroundRole:
                 return self.main.fmt.playlist_background(
-                        self[r], c, r == self.current_pos)
+                        self[r], c, r == self.current_pos.value)
         return None
 
     def flags(self, index):
@@ -165,7 +165,7 @@ class WritableMixin(metaclass=ABCMeta):
         if pos is not None:
             a = reversed(a)
         last = len(self)
-        with self.mpd_cmdlist:
+        with self.mpd_cmdlist():
             for i in a:
                 self.add_one(i, pos, last, **kwargs)
                 last += 1
@@ -197,7 +197,7 @@ class WritableMixin(metaclass=ABCMeta):
                 i = self[pos].copy()
                 i['pos'] = str(pos)
                 items.append(i)
-            with self.mpd_cmdlist:
+            with self.mpd_cmdlist():
                 for i in reversed(sorted(items, key=lambda x: int(x['pos']))):
                     self.remove_one(i)
             self.refresh()
@@ -222,7 +222,7 @@ class WritableMixin(metaclass=ABCMeta):
         b = (i for i in items if int(i['pos']) > pos)
         apos = pos
         bpos = pos + (0 if len(a) == 0 else 1)
-        with self.mpd_cmdlist:
+        with self.mpd_cmdlist():
             for i in reversed(a):
                 if apos != i['pos']:
                     self.move_one(i, apos)
@@ -266,12 +266,8 @@ class Queue(WritableMixin, SongList):
 
     def __init__(self, parent):
         super().__init__(parent, -1)
-        State.create(self, '_current_pos', -1, 'play')
-        self._current_pos.changed2.connect(self._update_current_pos)
-
-    @property
-    def current_pos(self):
-        return self._current_pos.value
+        State.create(self, 'current_pos', -1, 'play')
+        self.current_pos.changed2.connect(self._update_current_pos)
 
     def refresh(self):
         self.update_state()
@@ -323,23 +319,23 @@ class Queue(WritableMixin, SongList):
         if self.can_set_priority(positions, prio):
             ids = [self[i]['id'] for i in positions]
             batch_size = self.MAX_MPD_ARGUMENTS - 1
-            with self.mpd_cmdlist:
+            with self.mpd_cmdlist():
                 for k in range((len(ids) - 1) // batch_size + 1):
                     b = ids[k * batch_size:(k+1) * batch_size]
                     self.conn.prioid(prio, *b)
 
     @mpd_cmd
     def reverse(self):
-        with mpd_cmdlist:
+        with self.mpd_cmdlist():
             n = len(self)
             for i in range(n//2 + 1):
                 self.conn.swap(i, n-i-1)
 
     def item_chosen(self, pos):
-        self._current_pos.send(pos)
+        self.current_pos.send(pos)
 
     def _update_current_pos(self, new, old):
-        for i in {old, new}:
+        for i in (old, new):
             if 0 <= i < len(self):
                 index1 = self.index(i, 0)
                 index2 = self.index(i, self.columnCount() - 1)

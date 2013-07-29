@@ -121,13 +121,17 @@ def not_callable(*args):
     raise TypeError("Not callable")
 
 
-class MPDCommandList:
-    def __init__(self, conn):
-        self.conn = conn
-    def __enter__(self):
-        self.conn.command_list_ok_begin()
-    def __exit__(self, *exc):
-        self.conn.command_list_end()
+def mpd_cmdlist_context_manager(connection):
+    class MPDCommandList:
+        conn = connection
+
+        def __enter__(self):
+            self.conn.command_list_ok_begin()
+            return self
+
+        def __exit__(self, *exc):
+            self.retval = self.conn.command_list_end()
+    return MPDCommandList
 
 
 class Connection:
@@ -169,7 +173,7 @@ class ProperConnection(Connection):
         super().__init__(main)
         self.main = main
         self.conn = mpd.MPDClient()
-        self.mpd_cmdlist = MPDCommandList(self.conn)
+        self.mpd_cmdlist = mpd_cmdlist_context_manager(self.conn)
         State.create(self, 'state', 'disconnect', not_callable)
 
     def update_state(self):
