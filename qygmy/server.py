@@ -39,14 +39,14 @@ class Server(ProperConnection, QObject):
 
     def update_state(self):
         s, c = {'state': 'disconnect'}, {}
-        if self.state.value != 'disconnect':
-            try:
-                self.conn.command_list_ok_begin()
-                self.conn.status()
-                self.conn.currentsong()
-                s, c = self.conn.command_list_end()
-            except (mpd.MPDError, OSError) as e:
-                self.handle_error(e)
+        try:
+            if self.state.value != 'disconnect':
+                with self.mpd_cmdlist() as cl:
+                    self.conn.status()
+                    self.conn.currentsong()
+                s, c = cl.retval
+        except (mpd.MPDError, OSError) as e:
+            self.handle_error(e)
 
         self.state.update(s['state'])
         self.times.update(s.get('time', ':').split(':'))
