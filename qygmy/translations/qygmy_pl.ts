@@ -229,7 +229,7 @@
 <context>
     <name>Playlists</name>
     <message>
-        <location filename="../lists.py" line="402"/>
+        <location filename="../lists.py" line="398"/>
         <source>New playlist</source>
         <translation>Nowa lista</translation>
     </message>
@@ -237,32 +237,32 @@
 <context>
     <name>Qygmy</name>
     <message>
-        <location filename="../qygmy.py" line="274"/>
+        <location filename="../qygmy.py" line="272"/>
         <source>Error</source>
         <translation>Błąd</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="266"/>
+        <location filename="../qygmy.py" line="264"/>
         <source>Save current playlist</source>
         <translation>Zapisz listę</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="267"/>
+        <location filename="../qygmy.py" line="265"/>
         <source>Playlist name:</source>
         <translation>Nazwa listy:</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="290"/>
+        <location filename="../qygmy.py" line="288"/>
         <source>About Qygmy</source>
         <translation>O Qygmy</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="276"/>
+        <location filename="../qygmy.py" line="274"/>
         <source>Playlist with such name already exists. Do you want to replace it?</source>
         <translation>Lista o tej nazwie już istnieje. Zastąpić?</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="296"/>
+        <location filename="../qygmy.py" line="294"/>
         <source>&lt;h2&gt;Qygmy&lt;/h2&gt;&lt;p&gt;version {version}&lt;/p&gt;&lt;p&gt;Simple MPD client written in Python and Qt/PySide.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy&quot;&gt;https://github.com/tsufeki/qygmy&lt;/a&gt;&lt;/p&gt;</source>
         <translation>&lt;h2&gt;Qygmy&lt;/h2&gt;&lt;p&gt;wersja {version}&lt;/p&gt;&lt;p&gt;Prosty klient MPD napisany w Pythonie i Qt/PySide.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy&quot;&gt;https://github.com/tsufeki/qygmy&lt;/a&gt;&lt;/p&gt;</translation>
     </message>
@@ -270,67 +270,67 @@
 <context>
     <name>SearchTags</name>
     <message>
-        <location filename="../lists.py" line="502"/>
+        <location filename="../lists.py" line="498"/>
         <source>Title</source>
         <translation>Tytuł</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="503"/>
+        <location filename="../lists.py" line="499"/>
         <source>Artist</source>
         <translation>Artysta</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="504"/>
+        <location filename="../lists.py" line="500"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="505"/>
+        <location filename="../lists.py" line="501"/>
         <source>Genre</source>
         <translation>Gatunek</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="506"/>
+        <location filename="../lists.py" line="502"/>
         <source>Comment</source>
         <translation>Komentarz</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="507"/>
+        <location filename="../lists.py" line="503"/>
         <source>Composer</source>
         <translation>Kompozytor</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="508"/>
+        <location filename="../lists.py" line="504"/>
         <source>Performer</source>
         <translation>Wykonawca</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="509"/>
+        <location filename="../lists.py" line="505"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="510"/>
+        <location filename="../lists.py" line="506"/>
         <source>Track</source>
         <translation>Ścieżka</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="511"/>
+        <location filename="../lists.py" line="507"/>
         <source>Disc</source>
         <translation>Dysk</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="515"/>
+        <location filename="../lists.py" line="511"/>
         <source>Any</source>
         <translation>Wszystko</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="516"/>
+        <location filename="../lists.py" line="512"/>
         <source>File name</source>
         <translation>Nazwa pliku</translation>
     </message>
     <message>
-        <location filename="../lists.py" line="512"/>
+        <location filename="../lists.py" line="508"/>
         <source>Name</source>
         <translation>Nazwa</translation>
     </message>
