@@ -95,10 +95,11 @@ class PathState(State):
         return v.strip('/')
 
 
-def mpd_cmd(method=None, ignore_conn=False, fallback=None):
+def mpd_cmd(method=None, *, ignore_conn=False, fallback=None, refresh=True):
     if method is None:
         def decorator(method):
-            return mpd_cmd(method, ignore_conn, fallback)
+            return mpd_cmd(method, ignore_conn=ignore_conn, fallback=fallback,
+                    refresh=refresh)
         return decorator
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
@@ -108,7 +109,8 @@ def mpd_cmd(method=None, ignore_conn=False, fallback=None):
                 ret = method(self, *args, **kwargs)
             except (mpd.MPDError, OSError) as e:
                 self.handle_error(e)
-        self.update_state()
+        if refresh:
+            self.refresh()
         return ret
     return wrapper
 
@@ -176,7 +178,7 @@ class ProperConnection(Connection):
         self.mpd_cmdlist = mpd_cmdlist_context_manager(self.conn)
         State.create(self, 'state', 'disconnect', not_callable)
 
-    def update_state(self):
+    def refresh(self):
         pass
 
 
@@ -201,6 +203,6 @@ class RelayingConnection(Connection):
     def state(self):
         return self.parent.state
 
-    def update_state(self):
-        self.parent.update_state()
+    def refresh(self):
+        self.parent.refresh()
 

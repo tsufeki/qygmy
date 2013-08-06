@@ -38,9 +38,6 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
     def __iter__(self):
         return iter(self.items)
 
-    def refresh(self):
-        self.current.update(self.current.value, force=True)
-
     def refresh_format(self):
         self.beginResetModel()
         self.endResetModel()
@@ -169,7 +166,6 @@ class WritableMixin(metaclass=ABCMeta):
             for i in a:
                 self.add_one(i, pos, last, **kwargs)
                 last += 1
-        self.refresh()
         return True
 
     @abstractmethod
@@ -200,7 +196,6 @@ class WritableMixin(metaclass=ABCMeta):
             with self.mpd_cmdlist():
                 for i in reversed(sorted(items, key=lambda x: int(x['pos']))):
                     self.remove_one(i)
-            self.refresh()
 
     @abstractmethod
     def remove_one(self, item):
@@ -231,7 +226,6 @@ class WritableMixin(metaclass=ABCMeta):
                 if bpos != i['pos']:
                     self.move_one(i, bpos)
                 bpos += 1
-        self.refresh()
 
     @abstractmethod
     def move_one(self, item, pos):
@@ -270,14 +264,14 @@ class Queue(WritableMixin, SongList):
         self.current_pos.changed2.connect(self._update_current_pos)
 
     def refresh(self):
-        self.update_state()
+        super().refresh()
         self.refresh_format()
 
-    @mpd_cmd(fallback=[])
+    @mpd_cmd(fallback=[], refresh=False)
     def ls(self, _=None):
         return self.conn.playlistinfo()
 
-    @mpd_cmd(fallback=False)
+    @mpd_cmd(fallback=False, refresh=False)
     def add(self, items, pos=None, play=False, replace=False, priority=0):
         if replace:
             self.conn.clear()
@@ -352,6 +346,9 @@ class BrowserList(SongList):
         if old and not new:
             self.refresh()
 
+    def refresh(self):
+        self.current.update(self.current.value, force=True)
+
     def can_add_to_queue(self, positions):
         return len(positions) > 0
 
@@ -378,7 +375,7 @@ class Database(BrowserList):
         else:
             super().item_chosen(pos)
 
-    @mpd_cmd(fallback=[])
+    @mpd_cmd(fallback=[], refresh=False)
     def ls(self, path, recursive=False):
         l = self.conn.lsinfo(path)
         r = []
@@ -396,7 +393,7 @@ class Playlists(WritableMixin, BrowserList):
         super().__init__(parent, '')
         self.NEW_PLAYLIST_NAME = self.tr('New playlist')
 
-    @mpd_cmd(fallback=[])
+    @mpd_cmd(fallback=[], refresh=False)
     def ls(self, name):
         if name != '':
             return self.conn.listplaylistinfo(name)
@@ -453,7 +450,7 @@ class Playlists(WritableMixin, BrowserList):
         if self.current.value != '':
             self.conn.playlistmove(self.current.value, item['pos'], pos)
 
-    @mpd_cmd
+    @mpd_cmd(refresh=False)
     def save_queue(self, name, replace=False):
         try:
             self.conn.save(name)
@@ -475,7 +472,7 @@ class Playlists(WritableMixin, BrowserList):
         else:
             return super().data(index, role)
 
-    @mpd_cmd(fallback=False)
+    @mpd_cmd(fallback=False, refresh=False)
     def setData(self, index, value, role=Qt.EditRole):
         r, c = index.row(), index.column()
         if role == Qt.EditRole and c == 0:
@@ -513,27 +510,30 @@ class SearchTags(RelayingConnection, QAbstractListModel):
             ('file', self.tr('File name')),
         ]
 
-    @mpd_cmd(fallback=[])
+    def refresh(self):
+        self.beginResetModel()
+        self.tags = []
+        tags = set(self._tag_types())
+        for t in self.special_tags:
+            tags.discard(t[0])
+        self.tags.append(self.special_tags[0])
+        for t in self.standard_tags:
+            if t[0] in tags:
+                self.tags.append(t)
+                tags.discard(t[0])
+        self.tags.append(self.special_tags[1])
+        for t in sorted(tags):
+            if not t.startswith('musicbrainz_'):
+                self.tags.append((t, t))
+        self.endResetModel()
+
+    @mpd_cmd(fallback=[], refresh=False)
     def _tag_types(self):
         return (t.lower() for t in self.conn.tagtypes())
 
     def _update(self, newstate, oldstate):
         if newstate != 'disconnect' and oldstate == 'disconnect':
-            self.beginResetModel()
-            self.tags = []
-            tags = set(self._tag_types())
-            for t in self.special_tags:
-                tags.discard(t[0])
-            self.tags.append(self.special_tags[0])
-            for t in self.standard_tags:
-                if t[0] in tags:
-                    self.tags.append(t)
-                    tags.discard(t[0])
-            self.tags.append(self.special_tags[1])
-            for t in sorted(tags):
-                if not t.startswith('musicbrainz_'):
-                    self.tags.append((t, t))
-            self.endResetModel()
+            self.refresh()
 
     def rowCount(self, parent=None):
         return len(self.tags)
@@ -553,7 +553,7 @@ class Search(BrowserList):
         super().__init__(parent, ('', ''))
         self.search_tags = SearchTags(self)
 
-    @mpd_cmd(fallback=[])
+    @mpd_cmd(fallback=[], refresh=False)
     def ls(self, query):
         if query[0] in ('', None) or query[1] in ('', None):
             return []

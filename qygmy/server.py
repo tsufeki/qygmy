@@ -26,7 +26,7 @@ class Server(ProperConnection, QObject):
         self.search = Search(self)
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_state)
+        self.timer.timeout.connect(self.refresh)
 
     def _seek(self, time):
         if self.state.value != 'stop':
@@ -37,16 +37,15 @@ class Server(ProperConnection, QObject):
             self.timer.stop()
         self.timer.start(interval)
 
-    def update_state(self):
-        s, c = {'state': 'disconnect'}, {}
-        try:
-            if self.state.value != 'disconnect':
-                with self.mpd_cmdlist() as cl:
-                    self.conn.status()
-                    self.conn.currentsong()
-                s, c = cl.retval
-        except (mpd.MPDError, OSError) as e:
-            self.handle_error(e)
+    @mpd_cmd(fallback=({'state': 'disconnect'}, {}), refresh=False)
+    def retrieve_state(self):
+        with self.mpd_cmdlist() as cl:
+            self.conn.status()
+            self.conn.currentsong()
+        return cl.retval
+
+    def refresh(self):
+        s, c = self.retrieve_state()
 
         self.state.update(s['state'])
         self.times.update(s.get('time', ':').split(':'))
@@ -95,13 +94,13 @@ class Server(ProperConnection, QObject):
             self.conn.update()
             self.updating_db.update(True) # so we don't miss even super-short updates
 
-    @mpd_cmd(fallback={})
+    @mpd_cmd(fallback={}, refresh=False)
     def statistics(self):
         stats = self.conn.stats()
         stats['mpdversion'] = self.conn.mpd_version
         return stats
 
-    @mpd_cmd(fallback=[])
+    @mpd_cmd(fallback=[], refresh=False)
     def outputs(self):
         return sorted((
             i.get('outputname', i['outputid']),
