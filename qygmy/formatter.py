@@ -119,16 +119,18 @@ class Formatter(QObject):
             'total': str(total),
         }
 
-    def _compile(self, template):
-        pref = '$if(%bold%,<span style="font-weight: bold">,)'
-        suff = '$if(%bold%,</span>,)'
+    def _compile(self, template, boldable, tmplmodules):
         if isinstance(template, str):
-            return Template(pref + template + suff, self.settings.tmplplugins)
+            if boldable:
+                pref = '$if(%bold%,<span style="font-weight: bold">,)'
+                suff = '$if(%bold%,</span>,)'
+                template = pref + template + suff
+            return Template(template, tmplmodules + self.settings.tmplplugins)
         r = []
         for a, b in template:
-            a = self._compile(a)
+            a = self._compile(a, boldable, tmplmodules)
             if b is not None:
-                b = self._compile(b)
+                b = self._compile(b, boldable, tmplmodules)
             r.append((a, b))
         return tuple(r)
 
@@ -143,15 +145,17 @@ class Formatter(QObject):
             r.append((a, b))
         return r
 
-    def render(self, name, context, bold=False):
+    def render(self, name, context, bold=None, tmplmodules=[]):
         tmpl = self._tmplcache.get(name)
         if tmpl is None:
             if name in self.settings['format']:
                 t = self.settings['format'][name]
             else:
                 t = self.templates[name]
-            tmpl = self._tmplcache[name] = self._compile(t)
-        context['bold'] = '1' if bold else ''
+            tmpl = self._tmplcache[name] = self._compile(t, bold is not None,
+                    tmplmodules)
+        if bold is not None:
+            context['bold'] = '1' if bold else ''
         return self._render(tmpl, context)
 
     def clear_cache(self):
@@ -198,6 +202,19 @@ class Formatter(QObject):
     def playlist_background(self, song, column, is_current):
         if song.get('prio', '0') != '0':
             return self._high_prio_background
+
+    _REVERSED = '\U000f6eec'
+
+    class _Reversed:
+        @staticmethod
+        def f_reversed(s):
+            return Formatter._REVERSED + s + Formatter._REVERSED
+
+    def sort_order(self, song):
+        return self.render('sort_order',
+                self._prepare_song(song, html=False),
+                tmplmodules=[self._Reversed]
+            ).split(self._REVERSED)
 
     def status(self, state, totallength, totalcount):
         context = {'totallength': str(totallength), 'totalcount': str(totalcount)}

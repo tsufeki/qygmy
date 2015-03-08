@@ -72,8 +72,12 @@ class SongList(RelayingConnection, QAbstractTableModel, metaclass=QABCMeta):
     def item_chosen(self, pos):
         """i.e. double-clicked or Return pressed."""
 
-    def sort_key(self, item):
-        return (item.get('file', ''), item.get('directory', ''), item.get('playlist', ''))
+    def sorted(self, items):
+        items = [(self.main.fmt.sort_order(item), item) for item in items]
+        cols = min((len(i[0]) for i in items), default=0)
+        for i in range(cols - 1, -1, -1):
+            items.sort(key=lambda kitem: kitem[0][i], reverse=i % 2 == 1)
+        return [item[1] for item in items]
 
     def _reset(self, newstate, oldstate):
         if newstate == 'disconnect' or oldstate == 'disconnect':
@@ -347,6 +351,7 @@ class BrowserList(SongList):
             self.refresh()
 
     def refresh(self):
+        super().refresh()
         self.current.update(self.current.value, force=True)
 
     def can_add_to_queue(self, positions):
@@ -379,7 +384,7 @@ class Database(BrowserList):
     def ls(self, path, recursive=False):
         l = self.conn.lsinfo(path)
         r = []
-        for e in sorted(l, key=self.sort_key):
+        for e in self.sorted(l):
             if 'file' in e or (not recursive and 'directory' in e):
                 r.append(e)
             elif 'directory' in e:
@@ -397,7 +402,7 @@ class Playlists(WritableMixin, BrowserList):
     def ls(self, name):
         if name != '':
             return self.conn.listplaylistinfo(name)
-        return sorted(self.conn.listplaylists(), key=self.sort_key)
+        return self.sorted(self.conn.listplaylists())
 
     def add(self, items, pos=None):
         if self.current.value != '':
@@ -511,6 +516,7 @@ class SearchTags(RelayingConnection, QAbstractListModel):
         ]
 
     def refresh(self):
+        super().refresh()
         self.beginResetModel()
         self.tags = []
         tags = set(self._tag_types())
@@ -557,5 +563,5 @@ class Search(BrowserList):
     def ls(self, query):
         if query[0] in ('', None) or query[1] in ('', None):
             return []
-        return sorted(self.conn.search(query[0], query[1]), key=self.sort_key)
+        return self.sorted(self.conn.search(query[0], query[1]))
 

@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>562</width>
     <height>480</height>
    </rect>
   </property>
@@ -176,6 +176,18 @@
       </item>
       <item>
        <widget class="QTabWidget" name="tabs">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>540</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
@@ -294,6 +306,34 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="tab5">
+         <attribute name="title">
+          <string>Sort order</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="vf5">
+          <item>
+           <widget class="QPlainTextEdit" name="sort_order">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>120</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>DejaVu Sans Mono</family>
+             </font>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -311,6 +351,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>host</tabstop>
+  <tabstop>port</tabstop>
+  <tabstop>password</tabstop>
+  <tabstop>autoscroll</tabstop>
+  <tabstop>interval</tabstop>
+  <tabstop>tabs</tabstop>
+  <tabstop>current_song</tabstop>
+  <tabstop>playlist_item</tabstop>
+  <tabstop>progressbar</tabstop>
+  <tabstop>window_title</tabstop>
+  <tabstop>sort_order</tabstop>
+  <tabstop>buttonbox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -320,8 +374,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>252</x>
+     <y>475</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -336,8 +390,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>320</x>
+     <y>475</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

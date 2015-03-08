@@ -145,6 +145,11 @@ class Settings(QDialog):
                     '$if(%artist%,%artist% \u2014 )'
                     '$if2(%title%,%filename%)'
                 ),
+                'sort_order': self.tr(
+                    '%file%\n'
+                    '%directory%\n'
+                    '%playlist%\n'
+                ),
             },
             'gui': {
                 'autoscroll': '1',
@@ -220,6 +225,7 @@ class Settings(QDialog):
         self.ui.progressbar.setPlainText(f['progressbar'])
         self.ui.current_song.setPlainText(f['current_song'])
         self.ui.playlist_item.setPlainText(f['playlist_item'])
+        self.ui.sort_order.setPlainText(f['sort_order'])
         self.ui.autoscroll.setChecked(g['autoscroll'] == '1')
         self.ui.interval.setValue(int(g['interval']))
 
@@ -235,6 +241,7 @@ class Settings(QDialog):
                 'progressbar': self.ui.progressbar.toPlainText(),
                 'current_song': self.ui.current_song.toPlainText(),
                 'playlist_item': self.ui.playlist_item.toPlainText(),
+                'sort_order': self.ui.sort_order.toPlainText(),
             },
             'gui': {
                 'autoscroll': '1' if self.ui.autoscroll.isChecked() else '0',
@@ -254,7 +261,7 @@ class Settings(QDialog):
         if not {'host', 'port', 'password'}.isdisjoint(changed) and self.main.srv.state != 'disconnect':
             self.main.srv.disconnect_mpd()
             self.main.connect_mpd()
-        if not {'window_title', 'progressbar', 'current_song', 'playlist_item'}.isdisjoint(changed):
+        if not {'window_title', 'progressbar', 'current_song', 'playlist_item', 'sort_order'}.isdisjoint(changed):
             self.main.fmt.clear_cache()
         if not {'window_title', 'current_song'}.isdisjoint(changed):
             self.main.update_current_song()
@@ -262,6 +269,11 @@ class Settings(QDialog):
             self.main.update_progressbar()
         if 'playlist_item' in changed:
             self.main.srv.queue.refresh_format()
+        if 'sort_order' in changed:
+            self.main.srv.database.refresh()
+            self.main.srv.playlists.refresh()
+            self.main.srv.search.refresh()
+        elif 'playlist_item' in changed:
             self.main.srv.database.refresh_format()
             self.main.srv.playlists.refresh_format()
             self.main.srv.search.refresh_format()

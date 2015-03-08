@@ -119,7 +119,7 @@ Arguments in the following functions are evaluated only as needed:
     which `cond<i>` is true, or `val_else` if all `cond<i>` are false.
 - `$or(x,y)`: `x or y`
 - `$and(x,y)`: `x and y`
-- `$noop(...)`: do nothing, return empty string.
+- `$noop(...)`: do nothing, return empty string. Can be used for comments.
 
 ### Operations on variables
 
@@ -132,4 +132,10 @@ Arguments in the following functions are evaluated only as needed:
 
 - `$python(expr,imports)`: evaluate an arbitrary python expression `expr`.
     `imports` is a space-separated list of modules to import (can be omitted).
+
+### Sort order
+
+The following function is defined only during the sort order evaluation:
+
+- `$reversed(arg)`: use `arg` as a sort key, but in reversed order.
 

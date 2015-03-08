@@ -784,6 +784,10 @@
    <header>..uiutils</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>queue</tabstop>
+  <tabstop>volume_slider</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
