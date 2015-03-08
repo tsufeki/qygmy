@@ -154,6 +154,7 @@ class Settings(QDialog):
             'gui': {
                 'autoscroll': '1',
                 'interval': '500',
+                'show_mpdscribble': '0',
             },
             'guistate': {},
         }
@@ -228,6 +229,7 @@ class Settings(QDialog):
         self.ui.sort_order.setPlainText(f['sort_order'])
         self.ui.autoscroll.setChecked(g['autoscroll'] == '1')
         self.ui.interval.setValue(int(g['interval']))
+        self.ui.show_mpdscribble.setChecked(g['show_mpdscribble'] == '1')
 
     def ui_to_dict(self):
         return {
@@ -246,6 +248,7 @@ class Settings(QDialog):
             'gui': {
                 'autoscroll': '1' if self.ui.autoscroll.isChecked() else '0',
                 'interval': str(self.ui.interval.value()),
+                'show_mpdscribble': '1' if self.ui.show_mpdscribble.isChecked() else '0',
             },
         }
 
@@ -306,4 +309,5 @@ class Settings(QDialog):
         c['port'] = self.validate_int(c['port'], 1, 2**16, self.defaults['connection']['port'])
         g['autoscroll'] = '1' if g['autoscroll'] == '1' else '0'
         g['interval'] = self.validate_int(g['interval'], 100, 3600000, self.defaults['gui']['interval'])
+        g['show_mpdscribble'] = '1' if g['show_mpdscribble'] == '1' else '0'
 

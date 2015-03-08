@@ -114,3 +114,11 @@ class Server(ProperConnection, QObject):
         else:
             self.conn.disableoutput(outputid)
 
+    @mpd_cmd
+    def send_message(self, channel, message):
+        self.conn.sendmessage(channel, message)
+
+    def mpdscribble_love(self):
+        self.send_message('mpdscribble', 'love')
+
+

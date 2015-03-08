@@ -85,6 +85,7 @@ class Qygmy(QMainWindow):
             ('quieter', 'audio-volume-low'),
             ('playback_menu', 'media-playback-start'),
             ('playlist_menu', 'text-plain'),
+            ('mpdscribble_love', 'emblem-favorite'),
         ):
             getattr(self.ui, e).setIcon(QIcon.fromTheme(icon))
 
@@ -147,6 +148,7 @@ class Qygmy(QMainWindow):
         self.ui.quit.triggered.connect(self.close)
         self.ui.highprio.triggered.connect(lambda: self.ui.queue.set_priority(1))
         self.ui.normprio.triggered.connect(lambda: self.ui.queue.set_priority(0))
+        self.ui.mpdscribble_love.triggered.connect(self.srv.mpdscribble_love)
 
     def error(self, message):
         QMessageBox.critical(self, self.tr('Error'), self.tr(message))
@@ -193,6 +195,7 @@ class Qygmy(QMainWindow):
         e.accept()
         self.ui.highprio.setEnabled(self.ui.queue.can_set_priority(1))
         self.ui.normprio.setEnabled(self.ui.queue.can_set_priority(0))
+        self.ui.mpdscribble_love.setVisible(self.settings['gui']['show_mpdscribble'] == '1')
         self.ui.copy.setEnabled(self.ui.queue.can_copy())
         self.ui.details.setEnabled(self.ui.queue.details() is not None)
         self.ui.context_menu.popup(e.globalPos())

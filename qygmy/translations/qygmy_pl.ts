@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="pl">
+<!DOCTYPE TS><TS version="1.1" language="pl">
 <context>
     <name>Browser</name>
     <message>
@@ -238,32 +237,32 @@
 <context>
     <name>Qygmy</name>
     <message>
-        <location filename="../qygmy.py" line="272"/>
+        <location filename="../qygmy.py" line="275"/>
         <source>Error</source>
         <translation>Błąd</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="264"/>
+        <location filename="../qygmy.py" line="267"/>
         <source>Save current playlist</source>
         <translation>Zapisz listę</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="265"/>
+        <location filename="../qygmy.py" line="268"/>
         <source>Playlist name:</source>
         <translation>Nazwa listy:</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="288"/>
+        <location filename="../qygmy.py" line="291"/>
         <source>About Qygmy</source>
         <translation>O Qygmy</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="274"/>
+        <location filename="../qygmy.py" line="277"/>
         <source>Playlist with such name already exists. Do you want to replace it?</source>
         <translation>Lista o tej nazwie już istnieje. Zastąpić?</translation>
     </message>
     <message>
-        <location filename="../qygmy.py" line="294"/>
+        <location filename="../qygmy.py" line="297"/>
         <source>&lt;h2&gt;Qygmy&lt;/h2&gt;&lt;p&gt;version {version}&lt;/p&gt;&lt;p&gt;Simple MPD client written in Python and Qt/PySide.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy&quot;&gt;https://github.com/tsufeki/qygmy&lt;/a&gt;&lt;/p&gt;</source>
         <translation>&lt;h2&gt;Qygmy&lt;/h2&gt;&lt;p&gt;wersja {version}&lt;/p&gt;&lt;p&gt;Prosty klient MPD napisany w Pythonie i Qt/PySide.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy&quot;&gt;https://github.com/tsufeki/qygmy&lt;/a&gt;&lt;/p&gt;</translation>
     </message>
@@ -532,382 +531,392 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../ui/main.py" line="341"/>
+        <location filename="../ui/main.py" line="344"/>
         <source>&amp;Playback</source>
         <translation>&amp;Odtwarzanie</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="342"/>
+        <location filename="../ui/main.py" line="345"/>
         <source>&amp;Volume</source>
         <translation>&amp;Głośność</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="344"/>
+        <location filename="../ui/main.py" line="347"/>
         <source>Pla&amp;ylist</source>
         <translation>&amp;Lista</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="345"/>
+        <location filename="../ui/main.py" line="348"/>
         <source>P&amp;revious</source>
         <translation>Pop&amp;rzedni</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="346"/>
+        <location filename="../ui/main.py" line="349"/>
         <source>Previous song</source>
         <translation>Poprzedni utwór</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="347"/>
+        <location filename="../ui/main.py" line="350"/>
         <source>Ctrl+P</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="348"/>
+        <location filename="../ui/main.py" line="351"/>
         <source>&amp;Play</source>
         <translation>&amp;Odtwarzaj</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="376"/>
+        <location filename="../ui/main.py" line="379"/>
         <source>Space</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="350"/>
+        <location filename="../ui/main.py" line="353"/>
         <source>&amp;Stop</source>
         <translation>&amp;Zatrzymaj</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="351"/>
+        <location filename="../ui/main.py" line="354"/>
         <source>Ctrl+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="352"/>
+        <location filename="../ui/main.py" line="355"/>
         <source>&amp;Next</source>
         <translation>&amp;Następny</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="353"/>
+        <location filename="../ui/main.py" line="356"/>
         <source>Next Song</source>
         <translation>Następny utwór</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="354"/>
+        <location filename="../ui/main.py" line="357"/>
         <source>Ctrl+N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="355"/>
+        <location filename="../ui/main.py" line="358"/>
         <source>&amp;Add...</source>
         <translation>&amp;Dodaj...</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="356"/>
+        <location filename="../ui/main.py" line="359"/>
         <source>Add to playlist...</source>
         <translation>Dodaj do listy...</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="357"/>
+        <location filename="../ui/main.py" line="360"/>
         <source>Ctrl+L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="358"/>
+        <location filename="../ui/main.py" line="361"/>
         <source>&amp;Remove</source>
         <translation>&amp;Usuń</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="359"/>
+        <location filename="../ui/main.py" line="362"/>
         <source>Remove selected</source>
         <translation>Usuń zaznaczone</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="360"/>
+        <location filename="../ui/main.py" line="363"/>
         <source>Del</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="361"/>
+        <location filename="../ui/main.py" line="364"/>
         <source>R&amp;epeat</source>
         <translation>Po&amp;wtarzaj</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="362"/>
+        <location filename="../ui/main.py" line="365"/>
         <source>S&amp;huffle</source>
         <translation>&amp;Losowo</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="363"/>
+        <location filename="../ui/main.py" line="366"/>
         <source>&amp;Settings...</source>
         <translation>&amp;Ustawienia...</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="364"/>
+        <location filename="../ui/main.py" line="367"/>
         <source>Ctrl+O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="365"/>
+        <location filename="../ui/main.py" line="368"/>
         <source>Volume</source>
         <translation>Głośność</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="366"/>
+        <location filename="../ui/main.py" line="369"/>
         <source>&amp;Clear</source>
         <translation>&amp;Opróżnij</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="367"/>
+        <location filename="../ui/main.py" line="370"/>
         <source>Clear playlist</source>
         <translation>Opróżnij listę</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="368"/>
+        <location filename="../ui/main.py" line="371"/>
         <source>Dis&amp;connect from MPD</source>
         <translation>Rozłą&amp;cz z MPD</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="369"/>
+        <location filename="../ui/main.py" line="372"/>
         <source>&amp;Connect to MPD</source>
         <translation>Połą&amp;cz z MPD</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="370"/>
+        <location filename="../ui/main.py" line="373"/>
         <source>&amp;Update the database</source>
         <translation>Odśwież &amp;bazę</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="371"/>
+        <location filename="../ui/main.py" line="374"/>
         <source>S&amp;ingle track mode</source>
         <translation>&amp;Tryb pojedynczego utworu</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="372"/>
+        <location filename="../ui/main.py" line="375"/>
         <source>Single</source>
         <translation>Pojedyn.</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="373"/>
+        <location filename="../ui/main.py" line="376"/>
         <source>Re&amp;move songs after playback</source>
         <translation>U&amp;suń po odtworzeniu</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="374"/>
+        <location filename="../ui/main.py" line="377"/>
         <source>Consume</source>
         <translation>Usuń po</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="375"/>
+        <location filename="../ui/main.py" line="378"/>
         <source>&amp;Pause</source>
         <translation>P&amp;auzuj</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="377"/>
+        <location filename="../ui/main.py" line="380"/>
         <source>&amp;Save...</source>
         <translation>&amp;Zapisz</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="378"/>
+        <location filename="../ui/main.py" line="381"/>
         <source>Ctrl+T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="379"/>
+        <location filename="../ui/main.py" line="382"/>
         <source>Song &amp;details...</source>
         <translation>&amp;Szczegóły</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="380"/>
+        <location filename="../ui/main.py" line="383"/>
         <source>Ctrl+I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="381"/>
+        <location filename="../ui/main.py" line="384"/>
         <source>&amp;Quit</source>
         <translation>&amp;Wyjście</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="382"/>
+        <location filename="../ui/main.py" line="385"/>
         <source>Ctrl+Q</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="383"/>
+        <location filename="../ui/main.py" line="386"/>
         <source>Randomi&amp;ze</source>
         <translation>&amp;Wymieszaj</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="384"/>
+        <location filename="../ui/main.py" line="387"/>
         <source>&amp;MPD statistics...</source>
         <translation>Statystyki &amp;MPD...</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="385"/>
+        <location filename="../ui/main.py" line="388"/>
         <source>&amp;High priority</source>
         <translation>Wysoki &amp;priorytet</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="386"/>
+        <location filename="../ui/main.py" line="389"/>
         <source>Set high priority for selected songs</source>
         <translation>Odtwórz zaznaczone z wyższym priorytetem</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="387"/>
+        <location filename="../ui/main.py" line="390"/>
         <source>Ctrl+H</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="388"/>
+        <location filename="../ui/main.py" line="391"/>
         <source>&amp;Normal priority</source>
         <translation>&amp;Normalny priorytet</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="389"/>
+        <location filename="../ui/main.py" line="392"/>
         <source>Set normal priority for selected songs</source>
         <translation>Odtwórz zaznaczone ze zwykłym priorytetem</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="390"/>
+        <location filename="../ui/main.py" line="393"/>
         <source>Ctrl+J</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="391"/>
+        <location filename="../ui/main.py" line="394"/>
         <source>&amp;Louder</source>
         <translation>&amp;Głośniej</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="392"/>
+        <location filename="../ui/main.py" line="395"/>
         <source>Ctrl+E</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="393"/>
+        <location filename="../ui/main.py" line="396"/>
         <source>&amp;Quieter</source>
         <translation>&amp;Ciszej</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="394"/>
+        <location filename="../ui/main.py" line="397"/>
         <source>Ctrl+D</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="395"/>
+        <location filename="../ui/main.py" line="398"/>
         <source>&amp;About Qygmy...</source>
         <translation>O &amp;Qygmy...</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="396"/>
+        <location filename="../ui/main.py" line="399"/>
         <source>About Qt...</source>
         <translation>O Qt...</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="397"/>
+        <location filename="../ui/main.py" line="400"/>
         <source>Re&amp;verse</source>
         <translation>Odw&amp;róć</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="398"/>
+        <location filename="../ui/main.py" line="401"/>
         <source>C&amp;opy selected</source>
         <translation>&amp;Kopiuj zaznaczone</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="343"/>
+        <location filename="../ui/main.py" line="346"/>
         <source>Audio &amp;outputs</source>
         <translation>Wyjścia &amp;audio</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="399"/>
+        <location filename="../ui/main.py" line="402"/>
         <source>Add &amp;URL...</source>
         <translation>Dodaj UR&amp;L...</translation>
     </message>
     <message>
-        <location filename="../ui/main.py" line="400"/>
+        <location filename="../ui/main.py" line="403"/>
         <source>Ctrl+U</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/main.py" line="404"/>
+        <source>Love the current song</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>settings</name>
     <message>
-        <location filename="../ui/settings.py" line="218"/>
+        <location filename="../ui/settings.py" line="228"/>
         <source>Settings</source>
         <translation>Ustawienia</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="219"/>
+        <location filename="../ui/settings.py" line="229"/>
         <source>MPD connection</source>
         <translation>Łączenie z MPD</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="220"/>
+        <location filename="../ui/settings.py" line="230"/>
         <source>Host:</source>
         <translation>Host:</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="221"/>
+        <location filename="../ui/settings.py" line="231"/>
         <source>Port:</source>
         <translation>Port:</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="222"/>
+        <location filename="../ui/settings.py" line="232"/>
         <source>Password:</source>
         <translation>Hasło:</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="223"/>
+        <location filename="../ui/settings.py" line="233"/>
         <source>Interface options</source>
         <translation>Opcje interfejsu</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="224"/>
+        <location filename="../ui/settings.py" line="234"/>
         <source>Auto-scroll on song change:</source>
         <translation>Przewijaj automatycznie przy zmianie utworu:</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="225"/>
+        <location filename="../ui/settings.py" line="235"/>
         <source>Updating interval:</source>
         <translation>Okres odświeżania:</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="226"/>
+        <location filename="../ui/settings.py" line="236"/>
         <source> ms</source>
         <translation> ms</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="227"/>
+        <location filename="../ui/settings.py" line="238"/>
         <source>Formatting</source>
         <translation>Formatowanie</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="229"/>
+        <location filename="../ui/settings.py" line="240"/>
         <source>Current song</source>
         <translation>Aktualny utwór</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="230"/>
+        <location filename="../ui/settings.py" line="241"/>
         <source>Playlist item</source>
         <translation>Element listy</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="231"/>
+        <location filename="../ui/settings.py" line="242"/>
         <source>Progress bar</source>
         <translation>Pasek</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="232"/>
+        <location filename="../ui/settings.py" line="243"/>
         <source>Window title</source>
         <translation>Tytuł okna</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="228"/>
+        <location filename="../ui/settings.py" line="239"/>
         <source>Help:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy/blob/master/doc/templates.md&quot;&gt;https://github.com/tsufeki/qygmy/blob/master/doc/templates.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&quot;&gt;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</source>
         <translation>Pomoc:&lt;ul style=&quot;margin: 0&quot;&gt;&lt;li&gt;&lt;a href=&quot;https://github.com/tsufeki/qygmy/blob/master/doc/templates.md&quot;&gt;https://github.com/tsufeki/qygmy/blob/master/doc/templates.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&quot;&gt;https://qt-project.org/doc/qt-4.8/richtext-html-subset.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</translation>
     </message>
     <message>
-        <location filename="../ui/settings.py" line="233"/>
+        <location filename="../ui/settings.py" line="244"/>
         <source>Sort order</source>
         <translation>Sortowanie</translation>
+    </message>
+    <message>
+        <location filename="../ui/settings.py" line="237"/>
+        <source>Show mpdscribble&apos;s commands:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -350,6 +350,7 @@
     <addaction name="separator"/>
     <addaction name="highprio"/>
     <addaction name="normprio"/>
+    <addaction name="mpdscribble_love"/>
     <addaction name="details"/>
     <addaction name="separator"/>
     <addaction name="updatedb"/>
@@ -769,6 +770,11 @@
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="mpdscribble_love">
+   <property name="text">
+    <string>Love the current song</string>
    </property>
   </action>
  </widget>
