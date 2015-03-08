@@ -334,6 +334,19 @@
       </widget>
      </widget>
     </item>
+    <item>
+     <widget class="QLabel" name="status">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -390,6 +403,7 @@
    </widget>
    <addaction name="context_menu"/>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <action name="add">
    <property name="text">
     <string>&amp;Add selected</string>

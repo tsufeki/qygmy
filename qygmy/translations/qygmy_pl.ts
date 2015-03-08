@@ -4,7 +4,7 @@
 <context>
     <name>Browser</name>
     <message>
-        <location filename="../browser.py" line="141"/>
+        <location filename="../browser.py" line="151"/>
         <source>Details</source>
         <translation>Szczegóły</translation>
     </message>
@@ -32,199 +32,204 @@
         <translation>$if(%disconnected%,,%totalcount% utworów$if($gt(%totallength%,0),\, razem $time(%totallength%),))</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="43"/>
+        <location filename="../formatter.py" line="49"/>
         <source>Songs:</source>
         <translation>Plików:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="43"/>
+        <location filename="../formatter.py" line="49"/>
         <source>%songs%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="44"/>
+        <location filename="../formatter.py" line="50"/>
         <source>Albums:</source>
         <translation>Albumów:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="44"/>
+        <location filename="../formatter.py" line="50"/>
         <source>%albums%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="45"/>
+        <location filename="../formatter.py" line="51"/>
         <source>Artists:</source>
         <translation>Artystów:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="45"/>
+        <location filename="../formatter.py" line="51"/>
         <source>%artists%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="46"/>
+        <location filename="../formatter.py" line="52"/>
         <source>Uptime:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="46"/>
+        <location filename="../formatter.py" line="52"/>
         <source>$time(%uptime%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="47"/>
+        <location filename="../formatter.py" line="53"/>
         <source>DB playtime:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="47"/>
+        <location filename="../formatter.py" line="53"/>
         <source>$time(%db_playtime%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="48"/>
+        <location filename="../formatter.py" line="54"/>
         <source>This instance:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="48"/>
+        <location filename="../formatter.py" line="54"/>
         <source>$time(%playtime%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="51"/>
+        <location filename="../formatter.py" line="57"/>
         <source>%file%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="53"/>
+        <location filename="../formatter.py" line="59"/>
         <source>Title:</source>
         <translation>Tytuł:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="53"/>
+        <location filename="../formatter.py" line="59"/>
         <source>%title%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="54"/>
+        <location filename="../formatter.py" line="60"/>
         <source>Artist:</source>
         <translation>Artysta:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="54"/>
+        <location filename="../formatter.py" line="60"/>
         <source>%artist%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="55"/>
+        <location filename="../formatter.py" line="61"/>
         <source>Album:</source>
         <translation>Album:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="55"/>
+        <location filename="../formatter.py" line="61"/>
         <source>%album%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="56"/>
+        <location filename="../formatter.py" line="62"/>
         <source>Date:</source>
         <translation>Data:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="56"/>
+        <location filename="../formatter.py" line="62"/>
         <source>%date%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="57"/>
+        <location filename="../formatter.py" line="63"/>
         <source>Track:</source>
         <translation>Ścieżka:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="57"/>
+        <location filename="../formatter.py" line="63"/>
         <source>%track%$if(%totaltracks%, / %totaltracks%,)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="58"/>
+        <location filename="../formatter.py" line="64"/>
         <source>Disc:</source>
         <translation>Dysk:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="58"/>
+        <location filename="../formatter.py" line="64"/>
         <source>%disc%$if(%totaldiscs%, / %totaldiscs%,)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="59"/>
+        <location filename="../formatter.py" line="65"/>
         <source>Comment:</source>
         <translation>Komentarz:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="59"/>
+        <location filename="../formatter.py" line="65"/>
         <source>%comment%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="60"/>
+        <location filename="../formatter.py" line="66"/>
         <source>Length:</source>
         <translation>Czas:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="60"/>
+        <location filename="../formatter.py" line="66"/>
         <source>$if(%length%,$time(%length%),)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="61"/>
+        <location filename="../formatter.py" line="67"/>
         <source>Last modified:</source>
         <translation>Ostatnio zmodyfikowany:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="61"/>
+        <location filename="../formatter.py" line="67"/>
         <source>%lastmodified%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="62"/>
+        <location filename="../formatter.py" line="68"/>
         <source>Composer:</source>
         <translation>Kompozytor:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="62"/>
+        <location filename="../formatter.py" line="68"/>
         <source>%composer%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="63"/>
+        <location filename="../formatter.py" line="69"/>
         <source>Performer:</source>
         <translation>Wykonawca:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="63"/>
+        <location filename="../formatter.py" line="69"/>
         <source>%performer%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="42"/>
+        <location filename="../formatter.py" line="48"/>
         <source>MPD version:</source>
         <translation>Wersja MPD:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="42"/>
+        <location filename="../formatter.py" line="48"/>
         <source>%mpdversion%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="52"/>
+        <location filename="../formatter.py" line="58"/>
         <source>Name:</source>
         <translation>Nazwa:</translation>
     </message>
     <message>
-        <location filename="../formatter.py" line="52"/>
+        <location filename="../formatter.py" line="58"/>
         <source>%name%</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatter.py" line="46"/>
+        <source>$if(%disconnected%,,%totalcount% items$if($gt(%totallength%,0),\, $time(%totallength%) total,))</source>
+        <translation>$if(%disconnected%,,%totalcount% elementów$if($gt(%totallength%,0),\, $time(%totallength%) razem,))</translation>
     </message>
 </context>
 <context>
@@ -378,132 +383,132 @@
 <context>
     <name>browser</name>
     <message>
-        <location filename="../ui/browser.py" line="249"/>
+        <location filename="../ui/browser.py" line="261"/>
         <source>Music database</source>
         <translation>Baza muzyki</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="250"/>
+        <location filename="../ui/browser.py" line="262"/>
         <source>&amp;Database</source>
         <translation>&amp;Baza</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="251"/>
+        <location filename="../ui/browser.py" line="263"/>
         <source>&amp;Playlists</source>
         <translation>&amp;Listy</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="252"/>
+        <location filename="../ui/browser.py" line="264"/>
         <source>Tag to search</source>
         <translation>Szukany tag</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="253"/>
+        <location filename="../ui/browser.py" line="265"/>
         <source>&amp;Search</source>
         <translation>&amp;Szukaj</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="254"/>
+        <location filename="../ui/browser.py" line="266"/>
         <source>&amp;Add selected</source>
         <translation>&amp;Dodaj zaznaczone</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="255"/>
+        <location filename="../ui/browser.py" line="267"/>
         <source>Add selected songs to the current playlist</source>
         <translation>Dodaj zaznaczone utwory do głównej listy</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="256"/>
+        <location filename="../ui/browser.py" line="268"/>
         <source>&amp;Close</source>
         <translation>&amp;Zamknij</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="257"/>
+        <location filename="../ui/browser.py" line="269"/>
         <source>Close this window</source>
         <translation>Zamknij to okno</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="258"/>
+        <location filename="../ui/browser.py" line="270"/>
         <source>Ctrl+W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="259"/>
+        <location filename="../ui/browser.py" line="271"/>
         <source>Search</source>
         <translation>Szukaj</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="260"/>
+        <location filename="../ui/browser.py" line="272"/>
         <source>&amp;Remove selected</source>
         <translation>&amp;Usuń zaznaczone</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="261"/>
+        <location filename="../ui/browser.py" line="273"/>
         <source>Del</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="262"/>
+        <location filename="../ui/browser.py" line="274"/>
         <source>Add selected and &amp;play</source>
         <translation>Dodaj zaznaczone i &amp;odtwarzaj</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="263"/>
+        <location filename="../ui/browser.py" line="275"/>
         <source>Shift+Return</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="264"/>
+        <location filename="../ui/browser.py" line="276"/>
         <source>Song &amp;details...</source>
         <translation>&amp;Szczegóły...</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="265"/>
+        <location filename="../ui/browser.py" line="277"/>
         <source>Ctrl+I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="266"/>
+        <location filename="../ui/browser.py" line="278"/>
         <source>Re&amp;name</source>
         <translation>Zmień &amp;nazwę</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="267"/>
+        <location filename="../ui/browser.py" line="279"/>
         <source>F2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="268"/>
+        <location filename="../ui/browser.py" line="280"/>
         <source>R&amp;eplace the current playlist</source>
         <translation>Za&amp;stąp główną listę</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="269"/>
+        <location filename="../ui/browser.py" line="281"/>
         <source>Rep&amp;lace and play</source>
         <translation>Zas&amp;tąp i odtwarzaj</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="270"/>
+        <location filename="../ui/browser.py" line="282"/>
         <source>C&amp;opy selected</source>
         <translation>&amp;Kopiuj zaznaczone</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="271"/>
+        <location filename="../ui/browser.py" line="283"/>
         <source>Add with &amp;high priority</source>
         <translation>Dodaj z &amp;wysokim priorytetem</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="272"/>
+        <location filename="../ui/browser.py" line="284"/>
         <source>Update the data&amp;base</source>
         <translation>Odśwież &amp;bazę</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="273"/>
+        <location filename="../ui/browser.py" line="285"/>
         <source>Add &amp;URL...</source>
         <translation>Dodaj U&amp;RL...</translation>
     </message>
     <message>
-        <location filename="../ui/browser.py" line="274"/>
+        <location filename="../ui/browser.py" line="286"/>
         <source>Ctrl+U</source>
         <translation type="unfinished"></translation>
     </message>

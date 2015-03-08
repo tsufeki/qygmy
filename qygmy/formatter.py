@@ -39,6 +39,12 @@ class Formatter(QObject):
                     '$if($gt(%totallength%,0),'
                         '\\, $time(%totallength%) total,))'
             ),
+            'browser_status': self.tr(
+                '$if(%disconnected%,,'
+                    '%totalcount% items'
+                    '$if($gt(%totallength%,0),'
+                        '\\, $time(%totallength%) total,))'
+            ),
             'statistics': (
                 (self.tr('MPD version:'), self.tr('%mpdversion%')),
                 (self.tr('Songs:'), self.tr('%songs%')),
@@ -62,7 +68,7 @@ class Formatter(QObject):
                 (self.tr('Last modified:'), self.tr('%lastmodified%')),
                 (self.tr('Composer:'), self.tr('%composer%')),
                 (self.tr('Performer:'), self.tr('%performer%')),
-            )
+            ),
         }
 
     standard_tags = {'file', 'directory', 'playlist', 'filename', 'name', 'title',
@@ -220,6 +226,11 @@ class Formatter(QObject):
         context = {'totallength': str(totallength), 'totalcount': str(totalcount)}
         context.update(self._prepare_state(state))
         return self.render('status', context)
+
+    def browser_status(self, state, totallength, totalcount):
+        context = {'totallength': str(totallength), 'totalcount': str(totalcount)}
+        context.update(self._prepare_state(state))
+        return self.render('browser_status', context)
 
     def info_dialog(self, name, info):
         unrecognized = []

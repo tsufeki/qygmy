@@ -17,17 +17,23 @@ class Browser(QMainWindow):
         self.ui = Ui_browser()
         self.ui.setupUi(self)
         self.setup_icons()
+        self.ui.statusbar.addWidget(self.ui.status, 1)
         self.ui.database.setup(self.srv.database)
         self.srv.database.current.changed.connect(self.ui.dbpath.set_path)
+        self.srv.database.current.changed.connect(self.update_status)
         self.ui.dbpath.clicked.connect(self.srv.database.cd)
         self.ui.playlists.setup(self.srv.playlists)
         self.srv.playlists.current.changed.connect(self.ui.plpath.set_path)
+        self.srv.playlists.current.changed.connect(self.update_status)
         self.ui.plpath.clicked.connect(self.srv.playlists.cd)
         self.ui.search_results.setup(self.srv.search)
+        self.srv.search.current.changed.connect(self.update_status)
         self.ui.search_button.setDefaultAction(self.ui.search)
         self.ui.what.setModel(self.srv.search.search_tags)
         self.ui.what.model().modelReset.connect(lambda: self.ui.what.setCurrentIndex(0))
         self.srv.state.changed.connect(self.on_state_changed)
+        self.srv.state.changed.connect(self.update_status)
+        self.ui.tabs.currentChanged.connect(self.update_status)
         self.ui.updatedb.triggered.connect(self.srv.updatedb)
         self.ui.close.triggered.connect(self.close)
 
@@ -62,6 +68,10 @@ class Browser(QMainWindow):
         if i == 0: return self.ui.database
         elif i == 1: return self.ui.playlists
         elif i == 2: return self.ui.search_results
+
+    def update_status(self, *_):
+        self.ui.status.setText(self.main.fmt.browser_status(self.srv.state.value,
+                self.current_view.model().total_length, len(self.current_view.model())))
 
     def closeEvent(self, e):
         self.main.settings['guistate']['browser_geometry'] = str(self.saveGeometry().toBase64())
