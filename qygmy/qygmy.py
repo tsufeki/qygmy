@@ -23,6 +23,9 @@ class Qygmy(QMainWindow):
         self.setup_ui()
         self.srv.start_timer(int(self.settings['gui']['interval']))
 
+    def get_icon(self):
+        return QIcon.fromTheme('applications-multimedia')
+
     def connect_mpd(self):
         self.srv.connect_mpd(
             self.settings['connection']['host'],
@@ -56,7 +59,7 @@ class Qygmy(QMainWindow):
             pass
 
     def setup_icons(self):
-        self.setWindowIcon(QIcon.fromTheme('applications-multimedia'))
+        self.setWindowIcon(self.get_icon())
         self.ui.settings_icon = QIcon.fromTheme('configure')
         self.ui.settings_icon_updating = QIcon.fromTheme('view-refresh')
         for e, icon in (

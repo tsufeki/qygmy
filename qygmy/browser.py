@@ -47,7 +47,7 @@ class Browser(QMainWindow):
             pass
 
     def setup_icons(self):
-        self.setWindowIcon(QIcon.fromTheme('list-add'))
+        self.setWindowIcon(self.main.get_icon())
         for action, icon in (
             ('add', 'list-add'),
             ('remove', 'edit-delete'),
