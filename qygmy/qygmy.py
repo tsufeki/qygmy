@@ -211,13 +211,15 @@ class Qygmy(QMainWindow):
         self.ui.disconnect.setVisible(c)
         self.ui.play.setVisible(state != 'play')
         self.ui.pause.setVisible(state == 'play')
-        for e in ('previous', 'play', 'pause', 'stop', 'next', 'volume',
-                'add', 'addurl', 'clear', 'repeat', 'shuffle', 'single',
-                'consume', 'updatedb', 'save', 'randomize', 'details',
-                'statistics', 'louder', 'quieter', 'reverse',
-                'playback_menu', 'volume_menu', 'playlist_menu', 'outputs_menu'):
+        for e in ('play', 'pause', 'stop', 'volume', 'add', 'addurl', 'clear',
+                'repeat', 'shuffle', 'single', 'consume', 'updatedb', 'save',
+                'randomize', 'details', 'statistics', 'louder', 'quieter',
+                'reverse', 'playback_menu', 'volume_menu', 'playlist_menu',
+                'outputs_menu'):
             getattr(self.ui, e).setEnabled(c)
         self.on_queue_selection_changed()
+        self.ui.previous.setEnabled(state == 'play' or state == 'pause') # it only works then
+        self.ui.next.setEnabled(state == 'play' or state == 'pause')
 
     @Slot(bool)
     def on_updating_db_changed(self, updating):
