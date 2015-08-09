@@ -20,7 +20,7 @@ class RichTextDelegate(QStyledItemDelegate):
         ctx = QAbstractTextDocumentLayout.PaintContext()
         if option.state & QStyle.State_Selected:
             ctx.palette.setColor(QPalette.Text, option.palette.color(QPalette.Active, QPalette.HighlightedText))
-        textRect = style.subElementRect(QStyle.SE_ItemViewItemText, option)
+        textRect = style.subElementRect(QStyle.SE_ItemViewItemText, option, None)
         painter.save()
         painter.translate(textRect.topLeft())
         painter.setClipRect(textRect.translated(-textRect.topLeft()))
