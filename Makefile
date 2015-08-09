@@ -9,6 +9,8 @@ TS := $(foreach lang,$(LANGUAGES),qygmy/translations/qygmy_$(lang).ts)
 QM := $(TS:.ts=.qm)
 PY := $(PY) $(UIPY)
 
+export QT_SELECT := 4
+
 UIC := pyside-uic -x
 LUPDATE := pyside-lupdate
 LRELEASE := lrelease -compress -silent -nounfinished
