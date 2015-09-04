@@ -7,7 +7,7 @@ Build-Depends: python3,
  qt4-linguist-tools,
  debhelper (>= 7.4.3)
 X-Python3-Version: >= 3.3
-Standards-Version: 3.9.4
+Standards-Version: 3.9.6
 Homepage: https://github.com/tsufeki/qygmy
 Vcs-Browser: https://github.com/tsufeki/qygmy
 Vcs-Git: git://github.com/tsufeki/qygmy.git
