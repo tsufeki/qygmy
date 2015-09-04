@@ -42,10 +42,10 @@ class sdist(sdist):
         super().finalize_options()
         del archive_util.ARCHIVE_FORMATS['xztar']
 
-    def make_archive(self, base_name, format, root_dir=None, base_dir=None):
+    def make_archive(self, base_name, format, *args, **kwargs):
         if format != 'xztar':
-            return super().make_archive(base_name, format, root_dir, base_dir)
-        tar = super().make_archive(base_name, 'tar', root_dir, base_dir)
+            return super().make_archive(base_name, format, *args, **kwargs)
+        tar = super().make_archive(base_name, 'tar', *args, **kwargs)
         xz_opts = '-zf'
         self.spawn(['xz', xz_opts, tar])
         return tar + '.xz'
