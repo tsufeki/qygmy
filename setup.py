@@ -131,6 +131,7 @@ feature is its powerful template engine, allowing highly customizable display.""
     scripts = ['bin/qygmyrun'],
     data_files = [
         ('share/applications', ['qygmy.desktop']),
+        ('share/icons/hicolor/scalable/apps', ['qygmy.svg']),
         ('share/man/man1', ['qygmy.1']),
     ],
     classifiers = [

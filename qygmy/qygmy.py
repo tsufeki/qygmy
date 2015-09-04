@@ -24,7 +24,7 @@ class Qygmy(QMainWindow):
         self.srv.start_timer(int(self.settings['gui']['interval']))
 
     def get_icon(self):
-        return QIcon.fromTheme('applications-multimedia')
+        return QIcon.fromTheme('qygmy', QIcon.fromTheme('applications-multimedia'))
 
     def connect_mpd(self):
         self.srv.connect_mpd(

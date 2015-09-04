@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   height="807.13733"
+   width="807.13733"
+   version="1.1"
+   viewBox="0 0 807.1373 807.13731"
+   id="svg2986">
+  <title
+     id="title3044">qygmy icon</title>
+  <defs
+     id="defs2988">
+    <linearGradient
+       x1="382.34"
+       y1="489.14001"
+       gradientTransform="matrix(2.0779,0,0,2.0779,-518.08,-281.8)"
+       x2="490.53"
+       gradientUnits="userSpaceOnUse"
+       y2="333.89001"
+       id="linearGradient3019">
+      <stop
+         offset="0"
+         style="stop-color:#000000;stop-opacity:.82639"
+         id="stop3015" />
+      <stop
+         offset="1"
+         style="stop-color:#000000"
+         id="stop3017" />
+    </linearGradient>
+  </defs>
+  <circle
+     r="403.56866"
+     cy="403.56866"
+     cx="403.56866"
+     id="path4140"
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:16.02400017;stroke-miterlimit:4;stroke-dasharray:none" />
+  <g
+     transform="translate(51.732208,-151.75085)"
+     id="layer1">
+    <path
+       d="m 418.39,231.34 c 14.32,21.136 21.682,46.728 40.135,64.982 21.135,27.835 48.146,50.891 69.089,79.058 15.157,19.681 31.771,40.599 36.074,65.357 11.587,31.757 6.556,67.409 -5.8056,98.498 -13.947,16.765 -23.482,-4.9319 -19.589,-18.365 0.59324,-18.535 0.32293,-37.021 -6.7859,-54.528 -6.3047,-26.255 -17.834,-51.101 -37.136,-70.366 -16.772,-14.701 -35.813,-47.095 -61.382,-35.941 -16.885,10.637 -9.5289,32.139 -11.346,48.712 -1.0035,101.95 -1.0707,203.94 -2.7005,305.87 -1.2461,42.809 -38.247,71.529 -72.88,89.908 -30.854,18.567 -67.795,28.966 -103.61,20.691 -33.304,-3.4173 -67.756,-27.73 -68.454,-63.704 -2.2204,-41.711 27.904,-80.552 64.988,-97.024 36.404,-20.749 82.429,-25.246 121.63,-10.331 19.156,6.0549 24.483,-11.721 26.874,-28.819 2.2123,-129.77 3.9829,-259.54 4.4354,-389.33 0.36593,-12.973 21.496,-16.139 26.461,-4.6603 z"
+       style="fill:url(#linearGradient3019);fill-rule:evenodd;stroke:#000000;stroke-width:5.92409992;stroke-linecap:round;stroke-linejoin:round"
+       id="path3" />
+  </g>
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>qygmy icon</dc:title>
+        <dc:date>2015-08-09T21:41:00</dc:date>
+        <dc:source>https://openclipart.org/detail/92869/eighth-note-(stem-facing-up)-by-jaschon</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>jaschon</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title>tsufeki</dc:title>
+          </cc:Agent>
+        </dc:contributor>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
