@@ -92,18 +92,19 @@ class Qygmy(QMainWindow):
             getattr(self.ui, e).setIcon(QIcon.fromTheme(icon))
 
     def setup_widgets(self):
-        self.ui.playback_toolbar.insertWidget(self.ui.volume, self.ui.progressbar)
+        self.ui.playback_toolbar.insertWidget(self.ui.volume, self.ui.progress_widget)
         self.ui.queue_toolbar.insertWidget(self.ui.settings, self.ui.status)
         self.ui.queue_toolbar.insertSeparator(self.ui.settings)
         self.ui.queue.setup(self.srv.queue)
 
-        self.ui.wa1 = QWidgetAction(self)
-        self.ui.wa1.setDefaultWidget(self.ui.volume_label)
-        self.ui.wa2 = QWidgetAction(self)
-        self.ui.wa2.setDefaultWidget(self.ui.volume_slider)
+        self.ui.wa = QWidgetAction(self)
+        self.ui.wa.setDefaultWidget(self.ui.volume_widget)
         vm = QMenu(self)
-        vm.addAction(self.ui.wa1)
-        vm.addAction(self.ui.wa2)
+        vm.addAction(self.ui.wa)
+        # layout resets when adding to menu, redoing it by hand
+        self.ui.volume_vlayout.setAlignment(Qt.AlignCenter)
+        self.ui.volume_vlayout.setContentsMargins(4, 4, 4, 4)
+        self.ui.volume_vlayout.setSpacing(4)
         self.ui.volume_popup = vm
         vb = self.ui.playback_toolbar.widgetForAction(self.ui.volume)
         vb.setMenu(vm)
@@ -123,8 +124,7 @@ class Qygmy(QMainWindow):
         self.srv.current_song.changed.connect(self.update_current_song)
         self.srv.current_song.changed2.connect(self.scroll_to_current)
         self.srv.queue.current.changed.connect(self.update_status)
-        self.srv.volume.changed.connect(self.ui.volume_slider.setValue)
-        self.srv.volume.changed.connect(lambda v: self.ui.volume_label.setText(str(v)))
+        self.srv.volume.changed.connect(self.update_volume)
         self.ui.volume_slider.sliderMoved.connect(self.srv.volume.send)
         self.ui.louder.triggered.connect(lambda v=self.srv.volume: v.send(min(v.value+1, 100)))
         self.ui.quieter.triggered.connect(lambda v=self.srv.volume: v.send(max(v.value-1, 0)))
@@ -164,13 +164,29 @@ class Qygmy(QMainWindow):
             total = 1
         self.ui.progressbar.setRange(0, total)
         self.ui.progressbar.setValue(elapsed)
-        self.ui.progressbar.setFormat(text)
+        self.ui.progress_label.setText(text)
 
     def update_current_song(self, *_):
         s, c = self.srv.state.value, self.srv.current_song.value
         self.ui.current_song.setText(self.fmt.current_song(s, c))
         self.ui.current_song.setToolTip(self.fmt.current_song_tooltip(s, c))
         self.setWindowTitle(self.fmt.window_title(s, c))
+
+    def update_volume(self, volume):
+        if volume < 0:
+            # this happens e.g. while stopped on PulseAudio
+            enabled = False
+            volume = 0
+            volume_str = '-'
+        else:
+            enabled = True
+            volume = min(volume, 100)
+            volume_str = str(volume)
+        self.ui.volume_slider.setEnabled(enabled)
+        self.ui.louder.setEnabled(enabled)
+        self.ui.quieter.setEnabled(enabled)
+        self.ui.volume_slider.setValue(volume)
+        self.ui.volume_label.setText(volume_str)
 
     def update_status(self, *_):
         self.ui.status.setText(self.fmt.status(self.srv.state.value,
