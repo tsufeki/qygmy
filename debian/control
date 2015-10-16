@@ -18,8 +18,8 @@ Depends: ${misc:Depends},
  ${python3:Depends},
  python3-pyside.qtcore (>= 1.1.2-4),
  python3-pyside.qtgui (>= 1.1.2-4),
- python3-mpd2,
- oxygen-icon-theme | hicolor-icon-theme
+ python3-mpd2
+Recommends: breeze-icon-theme | oxygen-icon-theme | hicolor-icon-theme
 Provides: mpd-client
 Suggests: mpd
 Description: Simple graphical MPD client.
