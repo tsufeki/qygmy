@@ -165,6 +165,7 @@ class Qygmy(QMainWindow):
         self.ui.progressbar.setRange(0, total)
         self.ui.progressbar.setValue(elapsed)
         self.ui.progress_label.setText(text)
+        self.ui.progressbar.update() # fix funny skipping
 
     def update_current_song(self, *_):
         s, c = self.srv.state.value, self.srv.current_song.value
