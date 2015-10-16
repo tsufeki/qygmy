@@ -16,7 +16,7 @@ class Qygmy(QMainWindow):
         super().__init__()
         QTextCodec.setCodecForTr(QTextCodec.codecForName('UTF-8'))
         self.settings = Settings(self)
-        self.fmt = Formatter(self.settings)
+        self.fmt = Formatter(self.settings, self.error)
         self.srv = Server(self)
         self.info = Info(self)
         self.browser = Browser(self)
@@ -152,7 +152,7 @@ class Qygmy(QMainWindow):
         self.ui.normprio.triggered.connect(lambda: self.ui.queue.set_priority(0))
 
     def error(self, message):
-        QMessageBox.critical(self, self.tr('Error'), self.tr(message))
+        QMessageBox.critical(self, self.tr('Error'), self.tr(str(message)))
 
     def update_progressbar(self, *_):
         s = self.srv.state.value

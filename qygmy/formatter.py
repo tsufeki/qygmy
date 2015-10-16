@@ -2,13 +2,14 @@
 from PySide.QtCore import QObject
 from PySide.QtGui import QApplication, QIcon, QBrush, QColor
 
-from .templates import Template
+from .templates import Template, TemplateError
 
 
 class Formatter(QObject):
 
-    def __init__(self, settings):
+    def __init__(self, settings, error_callback):
         super().__init__()
+        self._error = error_callback
         self.settings = settings
         self._tmplcache = {}
         self.retranslate()
@@ -20,6 +21,13 @@ class Formatter(QObject):
     playlist_column_count = 2
 
     def retranslate(self):
+        self.display_names = {
+            'current_song': self.tr('Current song'),
+            'playlist_item': self.tr('Playlist item'),
+            'progressbar': self.tr('Progress bar'),
+            'window_title': self.tr('Window title'),
+            'sort_order': self.tr('Sort order'),
+        }
         self.templates = {
             'current_song_tooltip': self.tr(
                 '$if3(%paused%,[Paused] ,'
@@ -125,18 +133,23 @@ class Formatter(QObject):
             'total': str(total),
         }
 
-    def _compile(self, template, boldable, tmplmodules):
+    def _compile(self, template, boldable, tmplmodules, name):
         if isinstance(template, str):
             if boldable:
                 pref = '$if(%bold%,<span style="font-weight: bold">,)'
                 suff = '$if(%bold%,</span>,)'
                 template = pref + template + suff
-            return Template(template, tmplmodules + self.settings.tmplplugins)
+            try:
+                return Template(template, tmplmodules + self.settings.tmplplugins)
+            except TemplateError as e:
+                self._error(self.tr('{} template error: {}')
+                        .format(self.display_names.get(name, name), e))
+                return Template('')
         r = []
         for a, b in template:
-            a = self._compile(a, boldable, tmplmodules)
+            a = self._compile(a, boldable, tmplmodules, name)
             if b is not None:
-                b = self._compile(b, boldable, tmplmodules)
+                b = self._compile(b, boldable, tmplmodules, name)
             r.append((a, b))
         return tuple(r)
 
@@ -159,7 +172,7 @@ class Formatter(QObject):
             else:
                 t = self.templates[name]
             tmpl = self._tmplcache[name] = self._compile(t, bold is not None,
-                    tmplmodules)
+                    tmplmodules, name)
         if bold is not None:
             context['bold'] = '1' if bold else ''
         return self._render(tmpl, context)
